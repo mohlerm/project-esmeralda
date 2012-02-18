@@ -16,31 +16,20 @@ public class TaskUnit {
 	public TaskUnit(Date starttime,long duration){
 		this.starttime = starttime;
 		this.duration = duration;
+		this.streamURL = "";
 	}
 
-	//---- Getter and Setters
+	//---- Getters
 	public Date getStarttime() {
 		return starttime;
-	}
-
-	public void setStarttime(Date starttime) {
-		this.starttime = starttime;
 	}
 
 	public long getDuration() {
 		return duration;
 	}
 
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
-
 	public String getStreamURL() {
 		return streamURL;
-	}
-
-	public void setStreamURL(String streamURL) {
-		this.streamURL = streamURL;
 	}
 
 }
