@@ -1,18 +1,35 @@
 package ch.esmeralda.notredame.unitHandling;
 
 import java.util.Date;
-
+/**
+ * TaskUnit represents either a Break- or a Workshift. Depending
+ * on the streamURL. 
+ * @author Thomas Richner
+ * @since 0.1
+ *
+ */
 public class TaskUnit {
 	private Date starttime;
 	private long duration;
 	private String streamURL;
-	
+	/**
+	 * Creates a new Object and initializes everything.
+	 * After the creation, nothing can be changed.
+	 * @param starttime When does it start?
+	 * @param duration How long does it take?
+	 * @param streamURL URL of a Radiostream like DI
+	 */
 	public TaskUnit(Date starttime,long duration,String streamURL){
 		this.starttime = starttime;
 		this.duration = duration;
 		this.streamURL = streamURL;
 	}
-	
+	/**
+	 * Creates a new TaskUnit Object as a 'Workshift', since
+	 * there is no stream given.
+	 * @param starttime	When does it start?
+	 * @param duration How long does it take?
+	 */
 	public TaskUnit(Date starttime,long duration){
 		this.starttime = starttime;
 		this.duration = duration;
