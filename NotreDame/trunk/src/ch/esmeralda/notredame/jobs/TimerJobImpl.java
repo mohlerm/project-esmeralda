@@ -1,7 +1,5 @@
 package ch.esmeralda.notredame.jobs;
 
-import com.sun.xml.internal.ws.wsdl.parser.InaccessibleWSDLException;
-
 public class TimerJobImpl extends TimerJob{
 	
 	public TimerJobImpl(SoundJob soundJob) {
