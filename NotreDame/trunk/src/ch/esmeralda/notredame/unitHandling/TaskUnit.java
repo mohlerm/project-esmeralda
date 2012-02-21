@@ -17,7 +17,7 @@ public class TaskUnit {
 	/**
 	 * Creates a new Object and initializes everything.
 	 * After the creation, nothing can be changed.
-	 * @param starttime When does it start?
+	 * @param starttime When does it start? be aware, this ist probably UTC!
 	 * @param duration How long does it take?
 	 * @param streamURL URL of a Radiostream like DI
 	 */
@@ -29,7 +29,7 @@ public class TaskUnit {
 	/**
 	 * Creates a new TaskUnit Object as a 'Workshift', since
 	 * there is no stream given.
-	 * @param starttime	When does it start?
+	 * @param starttime	When does it start? be aware, this ist probably UTC!
 	 * @param duration How long does it take?
 	 */
 	public TaskUnit(Date starttime,long duration){
