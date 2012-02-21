@@ -1,4 +1,4 @@
-package ch.esmeralda.notredame.main;
+package ch.esmeralda.notredame.jobs;
 
 
 public abstract class StreamJob extends Thread {

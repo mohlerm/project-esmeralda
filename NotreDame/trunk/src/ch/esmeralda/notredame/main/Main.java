@@ -4,6 +4,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import ch.esmeralda.notredame.jobs.*;
+import ch.esmeralda.notredame.unitHandling.Workday;
+import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 
 /**
  * The actual Frontend.
@@ -18,15 +20,18 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-		SoundJob soundJob = new SoundJob();
-		TimerJob timerJob = new TimerJobImpl(soundJob);
+		
+		StreamJob streamJob = new StreamJobImpl();
+		Workday workday = new WorkdayImpl();
+		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
+		
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {}
 		
 		executor.shutdownNow();
-		soundJob.stop();
+		streamJob.stop(); // better way??
 		
 	}
 
