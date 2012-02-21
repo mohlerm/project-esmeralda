@@ -23,9 +23,11 @@ public class Main {
 		
 		StreamJob streamJob = new StreamJobImpl();
 		Workday workday = new WorkdayImpl();
+		//fill the workday with stuff
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
+		
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {}
