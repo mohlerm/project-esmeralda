@@ -2,6 +2,7 @@ package ch.esmeralda.notredame.unitHandling;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -9,12 +10,12 @@ import java.sql.Timestamp;
 /**
  * class WorkDay
  * 
- * implements a sorted List of TimeUnits
+ * implements a sorted List of TaskUnits
  * 
  * @author ThomasR
  * @version 0.7
  * @since 0.1
- * @see TimeUnit
+ * @see TaskUnit
  */
 public interface Workday {
 	
@@ -25,21 +26,21 @@ public interface Workday {
 	/**
 	 * Doesn't care if it's older than the duration!!! (coming soon...)
 	 * @param TimeStamp timestamp actual time
-	 * @return TimeUnit
+	 * @return TaskUnit
 	 */
-	public TimeUnit getActiveUnit(Timestamp time);
+	public TaskUnit getActiveUnit(Timestamp time);
 	/**
-	 * adds a new TimeUnit, sorts it, checks for overlapping
+	 * adds a new TaskUnit, sorts it, checks for overlapping
 	 * 
-	 * @param timeunit
-	 * @throws OverlappingTimeUnitException
+	 * @param TaskUnit
+	 * @throws OverlappingTaskUnitException
 	 */
-	public void addUnit (TimeUnit unit);
+	public void addUnit (TaskUnit unit);
 
 	/**
-	 * Removes a TimeUnit at an given index.
+	 * Removes a TaskUnit at an given index.
 	 * @param index index of the Unit which should be removed
-	 * @throws OverlappingTimeUnitException
+	 * @throws OverlappingTaskUnitException
 	 */
 	public void removeUnit (int index);
 
@@ -49,19 +50,24 @@ public interface Workday {
 	 */
 	public String toString();
 	/**
-	 * Get the TimeUnit at 'index', starting with 0.
+	 * Get the TaskUnit at 'index', starting with 0.
 	 * 
-	 * @param index index of the TimeUnit
-	 * @return TimeUnit at the given index
+	 * @param index index of the TaskUnit
+	 * @return TaskUnit at the given index
 	 * @throws IndexOutOfBoundsException
 	 */
-	public TimeUnit getUnit(int index) throws IndexOutOfBoundsException;
+	public TaskUnit getUnit(int index) throws IndexOutOfBoundsException;
 	
 	/**
-	 * Gives back the number of TimeUnit elements
-	 * @return number of TimeUnit elements
+	 * Gives back the number of TaskUnit elements
+	 * @return number of TaskUnit elements
 	 */
 	public int size();
+	/**
+	 * Provides the internal list of TaskUnits
+	 * @return a sorted list of all TaskUnits
+	 */
+	public List<TaskUnit> getList();
 }
 
 
