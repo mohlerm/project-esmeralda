@@ -5,13 +5,15 @@ import java.util.Date;
  * TaskUnit represents either a Break- or a Workshift. Depending
  * on the streamURL. 
  * @author Thomas Richner
- * @since 0.1
+ * @version 0.8
+ * @since 0.1 (former TimeUnit)
  *
  */
 public class TaskUnit {
 	private Date starttime;
 	private long duration;
 	private String streamURL;
+	String description;
 	/**
 	 * Creates a new Object and initializes everything.
 	 * After the creation, nothing can be changed.
@@ -48,5 +50,9 @@ public class TaskUnit {
 	public String getStreamURL() {
 		return streamURL;
 	}
+	public String getDescription() {
+		return description;
+	}
+	
 
 }
