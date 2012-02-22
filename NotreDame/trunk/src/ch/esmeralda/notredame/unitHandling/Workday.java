@@ -54,7 +54,6 @@ public interface Workday {
 	 * 
 	 * @param index index of the TaskUnit
 	 * @return TaskUnit at the given index
-	 * @throws IndexOutOfBoundsException
 	 */
 	public TaskUnit getUnit(int index) throws IndexOutOfBoundsException;
 	
