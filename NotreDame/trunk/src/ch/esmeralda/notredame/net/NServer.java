@@ -2,7 +2,7 @@ package ch.esmeralda.notredame.net;
 
 import java.util.List;
 
-public interface NSever {
+public interface NServer {
 	/*
 	interrupt {
 		response = wdh.verarbeite(request);
