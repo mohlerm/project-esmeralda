@@ -36,19 +36,20 @@ public class Main {
 			System.out.println(workday.toString());
 		}
 		
+		String asdf;
+		
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
 		System.out.println("schedule jobs");
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
-		streamJob.start();
 		
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(60000);
 		} catch (InterruptedException e) {}
 		
 		System.out.println("stopping jobs");
 		executor.shutdownNow();
-		streamJob.stop(); // better way??
+
 		
 		
 		System.out.println("...bye, bye");

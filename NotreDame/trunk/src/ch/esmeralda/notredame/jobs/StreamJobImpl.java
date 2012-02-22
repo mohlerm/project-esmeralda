@@ -23,7 +23,7 @@ public class StreamJobImpl implements StreamJob{
 	public void startStream(String urlString) {
 		this.urlString = urlString;
         performing = true;
-        playSound.start();
+        playSound.start(); //du chasch en thread nur 1 starte!!!!
 	}
 
 	public void stopStream() {
@@ -33,6 +33,6 @@ public class StreamJobImpl implements StreamJob{
 
 	public boolean isPerforming()
 	{
-		return performing;
+		return performing; //warum nid eifach playSound.isRunning() ???
 	}
 }

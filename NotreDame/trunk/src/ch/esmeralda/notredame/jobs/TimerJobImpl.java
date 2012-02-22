@@ -15,10 +15,11 @@ public class TimerJobImpl extends TimerJob{
 	public void run(){
 		
 		if(workday==null||streamJob==null) return;
+		/*
 		//Valid soundJob?
 		if(streamJob.getState()==Thread.State.TERMINATED) return;
 		//not yet started?
-		if(streamJob.getState()==Thread.State.NEW) streamJob.start();
+		if(streamJob.getState()==Thread.State.NEW) streamJob.start();*/
 		
 		TaskUnit nextTask = workday.getActiveUnit(new Timestamp(System.currentTimeMillis()));
 		if(nextTask.equals(activeTask)) return;
