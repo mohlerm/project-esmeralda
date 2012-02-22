@@ -41,7 +41,13 @@ public class NServerImpl implements NServer {
 	private class Listener extends Thread {
 		public void run() {
 			while(active) {
-				
+				try {
+					/*
+					 * todo:
+					 * accept a connection and add socket to list
+					 * call client handler
+					 */
+				} catch (Exception e) {}
 			}
 		}
 	}
