@@ -27,16 +27,14 @@ public class Main {
 		// TODO Auto-generated method stub
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
-		StreamJob streamJob = new StreamJobImpl();
-		
+		StreamJob streamJob = new AthmosStream();//StreamJobImpl();// 
+
 		Workday workday = new WorkdayImpl();
 		
-		if(args.length>0){
+		if(true){//args.length>0){
 			prefill(workday);
 			System.out.println(workday.toString());
 		}
-		
-		String asdf;
 		
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
@@ -60,7 +58,8 @@ public class Main {
 		long now = System.currentTimeMillis()+1000;
 		TaskUnit task;
 		for(int i=0;i<10;i++){
-			task = new TaskUnit(new Date(now+i*4000), 4000, "hallo");
+			if(i%2==0)	task = new TaskUnit(new Date(now+i*4000), 4000, "http://u11aw.di.fm:80/di_trance");
+			else		task = new TaskUnit(new Date(now+i*4000), 4000, "");
 			workday.addUnit(task);
 		}
 	}
