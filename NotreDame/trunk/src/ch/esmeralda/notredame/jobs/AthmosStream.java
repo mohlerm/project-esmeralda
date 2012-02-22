@@ -11,6 +11,7 @@ import javazoom.jl.player.Player;
  *
  */
 public class AthmosStream implements StreamJob{
+	public static boolean D = false;
 	//internal thread that handles the player, because player is blocking
     private class PlaySound extends Thread{
     	private String urlString;
@@ -30,17 +31,17 @@ public class AthmosStream implements StreamJob{
 	private PlaySound playSound;				//the Player Thread
 	
 	public AthmosStream(){
-		System.out.println("Created new AthmosStream");
+		if(D) System.out.println("Created new AthmosStream");
 	}
 	
 	public void startStream(String urlString) {
-		System.out.println("starting Stream");
+		if(D) System.out.println("starting Stream");
 		playSound = new PlaySound(urlString);	//create a new Player thread
         playSound.start();						//start the thread
 	}
 
 	public void stopStream() {
-		System.out.println("stopping Stream");
+		if(D) System.out.println("stopping Stream");
 		if(player==null||playSound==null)		//stopping before starting?
 			return;
 		player.close();							//close the player

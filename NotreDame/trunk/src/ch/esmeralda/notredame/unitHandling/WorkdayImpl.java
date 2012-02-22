@@ -27,12 +27,12 @@ public class WorkdayImpl implements Workday{
 	 * @param TimeStamp timestamp actual time
 	 * @return TaskUnit
 	 */
-	public TaskUnit getActiveUnit(Timestamp time){
+	public TaskUnit getActiveUnit(Date date){
 	   if(daylist.size()==0||daylist==null) return null;
 	   
 	   TaskUnit active = null;
 		for(int j=0;j<daylist.size();j++){
-			if(daylist.get(j).getStarttime().before(time))
+			if(daylist.get(j).getStarttime().before(date))
 				active = daylist.get(j);
 		}
 		return active;
@@ -146,6 +146,11 @@ public class WorkdayImpl implements Workday{
 	@Override
 	public List<TaskUnit> getList() {
 		return daylist;
+	}
+
+	@Override
+	public void reset() {
+		daylist = new ArrayList<TaskUnit>();
 	}
 	
 }

@@ -37,6 +37,15 @@ public class TaskUnit {
 		this.duration = duration;
 		this.streamURL = "";
 	}
+	/**
+	 * @return a String representation
+	 */
+	public String toString(){
+		StringBuffer str = new StringBuffer();
+		long mins = duration/(60000);
+		str.append(starttime.toString() + "  " +mins+ "  "+ streamURL + "  " + description);
+		return str.toString();
+	}
 
 	//---- Getters
 	public Date getStarttime() {
