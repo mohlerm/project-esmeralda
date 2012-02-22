@@ -33,14 +33,12 @@ public interface Workday {
 	 * adds a new TaskUnit, sorts it, checks for overlapping
 	 * 
 	 * @param TaskUnit
-	 * @throws OverlappingTaskUnitException
 	 */
 	public void addUnit (TaskUnit unit);
 
 	/**
 	 * Removes a TaskUnit at an given index.
 	 * @param index index of the Unit which should be removed
-	 * @throws OverlappingTaskUnitException
 	 */
 	public void removeUnit (int index);
 
@@ -54,6 +52,7 @@ public interface Workday {
 	 * 
 	 * @param index index of the TaskUnit
 	 * @return TaskUnit at the given index
+	 * @throws IndexOutOfBoundsException
 	 */
 	public TaskUnit getUnit(int index) throws IndexOutOfBoundsException;
 	
