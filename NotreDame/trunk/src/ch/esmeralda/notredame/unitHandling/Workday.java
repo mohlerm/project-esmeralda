@@ -1,11 +1,7 @@
 package ch.esmeralda.notredame.unitHandling;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
-import java.util.Vector;
-import java.sql.Time;
-import java.sql.Timestamp;
 
 /**
  * class WorkDay
@@ -28,7 +24,7 @@ public interface Workday {
 	 * @param TimeStamp timestamp actual time
 	 * @return TaskUnit
 	 */
-	public TaskUnit getActiveUnit(Timestamp time);
+	public TaskUnit getActiveUnit(Date date);
 	/**
 	 * adds a new TaskUnit, sorts it, checks for overlapping
 	 * 
@@ -66,6 +62,10 @@ public interface Workday {
 	 * @return a sorted list of all TaskUnits
 	 */
 	public List<TaskUnit> getList();
+	/**
+	 * Resets a workday and removes everything
+	 */
+	public void reset();
 }
 
 

@@ -6,7 +6,7 @@ import ch.esmeralda.notredame.unitHandling.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class TimerJobImpl extends TimerJob{
-	private static boolean D = true;
+	private static boolean D = false;
 	public TimerJobImpl(StreamJob streamJob,Workday workday) {
 		super(streamJob,workday);
 	}
