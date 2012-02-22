@@ -9,7 +9,7 @@ public interface NServer {
 		send(response)
 	}
 	*/
-	public void start();
+	public void start(int port);
 	public void stop();
 	public boolean isRunning();
 	public List getConnections();
