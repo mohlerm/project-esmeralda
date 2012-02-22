@@ -4,21 +4,15 @@ import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import ch.esmeralda.notredame.jobs.*;
+import ch.esmeralda.notredame.jobs.AthmosStream;
+import ch.esmeralda.notredame.jobs.StreamJob;
+import ch.esmeralda.notredame.jobs.TimerJob;
+import ch.esmeralda.notredame.jobs.TimerJobImpl;
 import ch.esmeralda.notredame.unitHandling.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 
-/**
- * The actual Frontend.
- * Notes:
- * -http://www.javazoom.net/javalayer/sources.html
- * 
- * @author Thomas Richner
- *
- */
-public class Main {
-
+public class MainThread extends Thread{
 	/**
 	 * @param args
 	 */
@@ -61,6 +55,7 @@ public class Main {
 		for(int i=0;i<10;i++){
 			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, "http://u11aw.di.fm:80/di_trance");
 			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
+			task.setDescription("debug "+i);
 			workday.addUnit(task);
 		}
 	}
