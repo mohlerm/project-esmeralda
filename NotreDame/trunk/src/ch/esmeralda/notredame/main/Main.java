@@ -11,6 +11,9 @@ import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 
 /**
  * The actual Frontend.
+ * Notes:
+ * -http://www.javazoom.net/javalayer/sources.html
+ * 
  * @author Thomas Richner
  *
  */
@@ -22,7 +25,7 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("starting...");
 		// TODO Auto-generated method stub
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
 		StreamJob streamJob = new StreamJobImpl();
 		
@@ -52,10 +55,11 @@ public class Main {
 	}
 	
 	private static void prefill(Workday workday){
-		long now = System.currentTimeMillis()+10000;
+		System.out.println("prefill a debug workday");
+		long now = System.currentTimeMillis()+1000;
 		TaskUnit task;
 		for(int i=0;i<10;i++){
-			task = new TaskUnit(new Date(now+i*10000), 10000, "hallo");
+			task = new TaskUnit(new Date(now+i*4000), 4000, "hallo");
 			workday.addUnit(task);
 		}
 	}
