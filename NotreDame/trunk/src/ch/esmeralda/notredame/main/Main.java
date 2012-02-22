@@ -24,10 +24,10 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		System.out.println("starting...");
-		// TODO Auto-generated method stub
+		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
-		StreamJob streamJob = new AthmosStream();//StreamJobImpl();// 
+		StreamJob streamJob = new AthmosStream();
 
 		Workday workday = new WorkdayImpl();
 		
@@ -42,7 +42,7 @@ public class Main {
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
 		
 		try {
-			Thread.sleep(60000);
+			Thread.sleep(600000000);
 		} catch (InterruptedException e) {}
 		
 		System.out.println("stopping jobs");
@@ -58,8 +58,8 @@ public class Main {
 		long now = System.currentTimeMillis()+1000;
 		TaskUnit task;
 		for(int i=0;i<10;i++){
-			if(i%2==0)	task = new TaskUnit(new Date(now+i*4000), 4000, "http://u11aw.di.fm:80/di_trance");
-			else		task = new TaskUnit(new Date(now+i*4000), 4000, "");
+			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, "http://u11aw.di.fm:80/di_trance");
+			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
 			workday.addUnit(task);
 		}
 	}

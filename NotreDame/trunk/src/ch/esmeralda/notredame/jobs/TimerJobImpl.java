@@ -13,8 +13,9 @@ public class TimerJobImpl extends TimerJob{
 
 	@Override
 	public void run(){
-		if(D) System.out.println("running Timer...");
+		if(D) System.out.print("running Timer...");
 		if(workday==null||streamJob==null) return;
+		if(D) System.out.println("nothing is null");
 		/*
 		//Valid soundJob?
 		if(streamJob.getState()==Thread.State.TERMINATED) return;
@@ -22,14 +23,15 @@ public class TimerJobImpl extends TimerJob{
 		if(streamJob.getState()==Thread.State.NEW) streamJob.start();*/
 		
 		TaskUnit nextTask = workday.getActiveUnit(new Timestamp(System.currentTimeMillis()));
-		if(nextTask.equals(activeTask)) return;
-		
+		if(nextTask!=null&&!nextTask.equals(activeTask)){
+
 		streamJob.stopStream();
 		
 		if(nextTask!=null)	streamJob.startStream(nextTask.getStreamURL());
 		
 		activeTask = nextTask;
-
+		}
+		System.out.println("  end of run");
 	}
 
 }
