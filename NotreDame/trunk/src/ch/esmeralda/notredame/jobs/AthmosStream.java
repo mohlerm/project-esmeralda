@@ -2,10 +2,16 @@
 package ch.esmeralda.notredame.jobs;
 
 import java.net.URL;
-
 import javazoom.jl.player.Player;
-
+/**
+ * Another Implementation of StreamJob
+ * 
+ * @author Thomas Richner
+ * @version 0.1
+ *
+ */
 public class AthmosStream implements StreamJob{
+	//internal thread that handles the player, because player is blocking
     private class PlaySound extends Thread{
     	private String urlString;
     	public PlaySound(String urlString){
@@ -20,24 +26,31 @@ public class AthmosStream implements StreamJob{
         }
     }
     
-	private Player player;
-	private PlaySound playSound;
+	private Player player;						//the StreamPlayer
+	private PlaySound playSound;				//the Player Thread
 	
+	public AthmosStream(){
+		System.out.println("Created new AthmosStream");
+	}
 	
 	public void startStream(String urlString) {
-		playSound = new PlaySound(urlString);
-        playSound.start(); //du chasch en thread nur 1 starte!!!!
+		System.out.println("starting Stream");
+		playSound = new PlaySound(urlString);	//create a new Player thread
+        playSound.start();						//start the thread
 	}
 
 	public void stopStream() {
-		player.close();
+		System.out.println("stopping Stream");
+		if(player==null||playSound==null)		//stopping before starting?
+			return;
+		player.close();							//close the player
 		try {
-			playSound.join();
+			playSound.join();					//wait for the Thread to exit clean, be aware: possible block
 		} catch (InterruptedException e) {}
 	}
 
 	public boolean isPerforming()
 	{
-		return playSound.isAlive();
+		return playSound!=null && playSound.isAlive();				//any stream playing right now?
 	}
 }

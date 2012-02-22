@@ -6,14 +6,14 @@ import ch.esmeralda.notredame.unitHandling.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class TimerJobImpl extends TimerJob{
-	
+	private static boolean D = true;
 	public TimerJobImpl(StreamJob streamJob,Workday workday) {
 		super(streamJob,workday);
 	}
 
 	@Override
 	public void run(){
-		
+		if(D) System.out.println("running Timer...");
 		if(workday==null||streamJob==null) return;
 		/*
 		//Valid soundJob?
