@@ -1,33 +1,38 @@
 package ch.esmeralda.notredame.jobs;
 
+import java.net.URL;
+
 import javazoom.jl.player.Player;
 
-public class StreamJobImpl extends StreamJob{
+public class StreamJobImpl implements StreamJob{
 	private Player player;
-	private boolean isRunning = false;
+	private String urlString;
+	private boolean performing = false;
 
     Thread playSound = new Thread() {
         public void run() {
-            try { player.play(); }
-            catch (Exception e) { System.out.println(e); }
+            try {
+            	URL url = new URL(urlString);
+                player = new Player(url.openStream());
+                player.play(); }
+            catch (Exception e) {}
+            performing = false;
         }
     };
 	
-	@Override
-	public void startStream(String url) {
-		// TODO Auto-generated method stub
-		
+	public void startStream(String urlString) {
+		this.urlString = urlString;
+        performing = true;
+        playSound.start();
 	}
 
-	@Override
 	public void stopStream() {
-		// TODO Auto-generated method stub
-		
+		player.close();
+		performing = false;
 	}
 
-	@Override
-	public void run(){
-		
+	public boolean isPerforming()
+	{
+		return performing;
 	}
-	
 }
