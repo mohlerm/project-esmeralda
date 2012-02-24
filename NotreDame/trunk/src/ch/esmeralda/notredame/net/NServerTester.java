@@ -9,7 +9,7 @@ public class NServerTester {
 	 */
 	public static void main(String[] args) {
 		NServerImpl server = new NServerImpl();
-		server.start(1241);
+		server.start(10002);
 		while(true) {try {Thread.sleep(100);} catch (Exception e) {}}
 	}
 
