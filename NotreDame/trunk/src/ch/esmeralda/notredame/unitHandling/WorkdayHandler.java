@@ -1,9 +1,9 @@
 package ch.esmeralda.notredame.unitHandling;
 
-public interface WorkdayHandler {
+public interface WorkdayHandler {	
 	/**
 	 * Handles incoming requests
-	 * @param request a commandh from a Client
+	 * @param request a command from a Client
 	 * @return a response to the given request
 	 */
 	public String getResponse(String request);
