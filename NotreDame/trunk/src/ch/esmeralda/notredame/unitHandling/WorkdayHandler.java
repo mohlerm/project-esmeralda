@@ -7,5 +7,4 @@ public interface WorkdayHandler {
 	 * @return a response to the given request
 	 */
 	public String getResponse(String request);
-	
 }

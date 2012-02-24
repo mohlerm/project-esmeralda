@@ -36,7 +36,13 @@ public interface Workday {
 	 * Removes a TaskUnit at an given index.
 	 * @param index index of the Unit which should be removed
 	 */
-	public void removeUnit (int index);
+	public void removeUnitByIndex(int index);
+	
+	/**
+	 * Removes a TaskUnit at an given key.
+	 * @param key key of the Unit which should be removed
+	 */
+	public void removeUnitByKey(int key);
 
 	/**
 	 * Represents a Workday in a String

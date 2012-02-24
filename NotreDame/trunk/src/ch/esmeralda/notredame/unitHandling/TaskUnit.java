@@ -13,7 +13,8 @@ public class TaskUnit {
 	private Date starttime;
 	private long duration;
 	private String streamURL;
-	String description;
+	private String description;
+	private int key = 0;
 	/**
 	 * Creates a new Object and initializes everything.
 	 * After the creation, nothing can be changed.
@@ -66,5 +67,11 @@ public class TaskUnit {
 		this.description = description;
 	}
 	
+	void setKey(int key){
+		this.key = key;
+	}
+	public int getKey(){
+		return key;
+	}
 
 }
