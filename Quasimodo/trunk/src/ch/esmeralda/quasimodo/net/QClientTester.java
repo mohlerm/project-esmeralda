@@ -10,10 +10,8 @@ public class QClientTester {
 	public static void main(String[] args) {
 		try {
 			QClientImpl client = new QClientImpl();
-			client.connect("127.0.0.1", 1241);
+			client.connect("127.0.0.1", 10002);
 			System.out.print("Connected!");
 		} catch (Exception e) {System.out.print("Q: Something failed");}
-
 	}
-
 }
