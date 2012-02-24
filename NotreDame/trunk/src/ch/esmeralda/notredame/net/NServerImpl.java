@@ -1,29 +1,26 @@
 package ch.esmeralda.notredame.net;
 
 import java.util.*;
+import java.io.*;
 
 import java.util.List;
 import java.net.*;
 public class NServerImpl implements NServer {
+	private static final boolean D=true;
 	private int port;
 	private boolean active = false;
 	private ServerSocket serverSocket;
 	private Listener listener;
-	private ArrayList<Socket> socketList;
+	private ArrayList<Socket> socketList = new ArrayList<Socket>();
 
-	@Override
 	public List getConnections() {
-		// TODO Auto-generated method stub
 		return socketList;
 	}
 
-	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
-		return false;
+		return active;
 	}
 
-	@Override
 	public void start(int port) {
 		this.port = port;
 		try {
@@ -35,7 +32,6 @@ public class NServerImpl implements NServer {
 		} catch (Exception e) {System.out.print("Something failed");}
 	}
 
-	@Override
 	public void stop() {
 		try {
 			if (active) serverSocket.close();
@@ -54,8 +50,11 @@ public class NServerImpl implements NServer {
 					 * call client handler
 					 */
 					socket = serverSocket.accept();
+					System.out.print("N: client connected, blub...");
 					socketList.add(socket);
+					if(D) System.out.println("added socket");
 					ClientHandler clientHandler = new ClientHandler(socket);
+					clientHandler.start();
 				} catch (Exception e) {}
 			}
 		}
@@ -63,11 +62,22 @@ public class NServerImpl implements NServer {
 	
 	private class ClientHandler extends Thread {
 		private Socket socket;
+		private PrintWriter out;
+		private BufferedReader in;
+		
 		public ClientHandler(Socket socket) {
+			if(D) System.out.println("new ClientHandler...");
 			this.socket = socket;
 		}
 		public void run() {
-
+			if(D) System.out.println("ClientHandler started!");
+			try {
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				out = new PrintWriter(socket.getOutputStream(), true);
+				//test stuff
+				System.out.print(in.readLine());
+				//until here
+			} catch (IOException e) {}
 		}
 	}
 }
