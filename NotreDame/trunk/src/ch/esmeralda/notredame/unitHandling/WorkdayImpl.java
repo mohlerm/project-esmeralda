@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 public class WorkdayImpl implements Workday{
 	//contains the list of all the TaskUnit sorted by starttime
 	List<TaskUnit> daylist;
+	int keycount = 0;
 	
 	public WorkdayImpl(){
 		//TODO
@@ -43,9 +44,12 @@ public class WorkdayImpl implements Workday{
 	 * @param TaskUnit
 	 * @throws OverlappingTaskUnitException
 	 */
+	@Override
 	public void addUnit (TaskUnit unit){
 		daylist.add(unit);
 		this.sortVec();
+		keycount++;
+		unit.setKey(keycount);
 	}
 	
 	private void sortVec(){
@@ -75,7 +79,8 @@ public class WorkdayImpl implements Workday{
 	 * @param index index of the Unit which should be removed
 	 * @throws OverlappingTaskUnitException
 	 */
-	public void removeUnit (int index){
+	@Override
+	public void removeUnitByIndex(int index){
 		try{
 			daylist.remove(index);
 		}catch (ArrayIndexOutOfBoundsException e){
@@ -88,8 +93,11 @@ public class WorkdayImpl implements Workday{
 	 * @param unit TaskUnit wich should be removed
 	 * @throws OverlappingTaskUnitException
 	 */
-	public void removeUnit (TaskUnit unit){
-		daylist.remove(unit);
+	@Override
+	public void removeUnitByKey(int key){
+		for(TaskUnit unit : daylist){
+			if(unit.getKey()==key) daylist.remove(unit);
+		}
 	}
 	/*
 	/**
@@ -115,11 +123,12 @@ public class WorkdayImpl implements Workday{
 		}
 		str.append("Workday Starts at: " + starttime + '\n');
 		str.append("-----------------------------------------------\n");
-		str.append("start \t\t\tduration \tcomment\n");
-		for(int i=0;i<daylist.size();i++){
-			str.append(daylist.get(i).getStarttime().toString()+" \t");
-			str.append(daylist.get(i).getDuration()+" \t");
-			str.append(daylist.get(i).getDescription() + '\n');
+		str.append("start \t\t\t\t\tduration \tkey \tcomment\n");
+		for(TaskUnit unit:daylist){
+			str.append(unit.getStarttime().toString()+" \t");
+			str.append(unit.getDuration()+" \t");
+			str.append(unit.getKey()+" \t");
+			str.append(unit.getDescription() + '\n');
 		}
 		str.append('\n');
 		return str.toString();
@@ -151,6 +160,7 @@ public class WorkdayImpl implements Workday{
 	@Override
 	public void reset() {
 		daylist = new ArrayList<TaskUnit>();
+		keycount = 0;
 	}
 	
 }
