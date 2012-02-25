@@ -70,12 +70,16 @@ public class NServerImpl implements NServer {
 			this.socket = socket;
 		}
 		public void run() {
-			if(D) System.out.println("ClientHandler started!");
+			System.out.println("ClientHandler started!");
 			try {
-				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				out = new PrintWriter(socket.getOutputStream(), true);
+				//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				//out = new PrintWriter(socket.getOutputStream(), true);
+				ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
+				ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
+				System.out.print("N: Writing obj...");
+				os.writeObject("bla");
 				//test stuff
-				System.out.print(in.readLine());
+				//System.out.print(in.readLine());
 				//until here
 			} catch (IOException e) {}
 		}
