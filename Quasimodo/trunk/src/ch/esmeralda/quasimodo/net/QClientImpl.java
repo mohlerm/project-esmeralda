@@ -6,20 +6,16 @@ import java.net.*;
 public class QClientImpl implements QClient {
 	private Socket socket;
 	private boolean connected = false;
-	private BufferedReader in;
-	private PrintWriter out;
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
+	
 	@Override
 	public void connect(String ip, int port) throws UnableToConnectException {
 		try {
-			System.out.print("Q: connecting...");
 			socket = new Socket(ip, port);
-			//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			//out = new PrintWriter(socket.getOutputStream(), true);
-			ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());
 			connected = true;
-			System.out.print("Q: reading obj...");
-			out.println((String)is.readObject());
 		} catch (Exception e) {throw new UnableToConnectException();}
 	}
 
@@ -36,8 +32,12 @@ public class QClientImpl implements QClient {
 	}
 
 	@Override
-	public String sendRequest(String request) {
-		// TODO Auto-generated method stub
+	public Object sendRequest(Object request) {
+		try {
+			out.writeObject(request);
+			out.flush();
+			return in.readObject();
+		} catch (Exception e) {}
 		return null;
 	}
 
