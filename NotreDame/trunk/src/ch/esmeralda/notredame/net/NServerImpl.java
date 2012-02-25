@@ -1,18 +1,23 @@
 package ch.esmeralda.notredame.net;
 
 import java.util.*;
+import ch.esmeralda.notredame.unitHandling.*;
 import java.io.*;
-
 import java.util.List;
 import java.net.*;
+
 public class NServerImpl implements NServer {
-	private static final boolean D=true;
 	private int port;
 	private boolean active = false;
 	private ServerSocket serverSocket;
 	private Listener listener;
 	private ArrayList<Socket> socketList = new ArrayList<Socket>();
+	private WorkdayHandler workdayHandler = null;
 
+	public NServerImpl(WorkdayHandler workdayHandler) {
+		this.workdayHandler = workdayHandler;
+	}
+	
 	public List getConnections() {
 		return socketList;
 	}
@@ -67,9 +72,8 @@ public class NServerImpl implements NServer {
 		}
 		public void run() {
 			try {
-				//to complete (call workdayhandler);
 				in.readObject();
-				out.writeObject("hurrdurr");
+				out.writeObject(workdayHandler.getResponse(in.readObject()));
 				out.flush();
 			} catch (Exception e) {}
 		}
