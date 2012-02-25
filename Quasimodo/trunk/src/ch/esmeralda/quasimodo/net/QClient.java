@@ -6,7 +6,7 @@ public interface QClient {
 		public UnableToConnectException(){}	
 	};
 	
-	public String sendRequest(String request); //blocking
+	public Object sendRequest(Object request); //blocking
 
 	public void connect(String ip, int port) throws UnableToConnectException;
 	public void disconnect();
