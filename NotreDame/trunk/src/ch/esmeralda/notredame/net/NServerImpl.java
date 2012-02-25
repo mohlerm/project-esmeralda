@@ -29,7 +29,7 @@ public class NServerImpl implements NServer {
 			active = true;
 			listener = new Listener();
 			listener.start();
-		} catch (Exception e) {System.out.print("Something failed");}
+		} catch (Exception e) {}
 	}
 
 	public void stop() {
@@ -44,15 +44,8 @@ public class NServerImpl implements NServer {
 		public void run() {
 			while(active) {
 				try {
-					/*
-					 * todo:
-					 * accept a connection and add socket to list
-					 * call client handler
-					 */
 					socket = serverSocket.accept();
-					System.out.print("N: client connected, blub...");
 					socketList.add(socket);
-					if(D) System.out.println("added socket");
 					ClientHandler clientHandler = new ClientHandler(socket);
 					clientHandler.start();
 				} catch (Exception e) {}
@@ -62,26 +55,23 @@ public class NServerImpl implements NServer {
 	
 	private class ClientHandler extends Thread {
 		private Socket socket;
-		private PrintWriter out;
-		private BufferedReader in;
+		private ObjectOutputStream out;
+		private ObjectInputStream in;
 		
 		public ClientHandler(Socket socket) {
-			if(D) System.out.println("new ClientHandler...");
 			this.socket = socket;
+			try {
+				out = new ObjectOutputStream(socket.getOutputStream());
+				in = new ObjectInputStream(socket.getInputStream());
+			} catch (Exception e) {}
 		}
 		public void run() {
-			System.out.println("ClientHandler started!");
 			try {
-				//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				//out = new PrintWriter(socket.getOutputStream(), true);
-				ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-				ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
-				System.out.print("N: Writing obj...");
-				os.writeObject("bla");
-				//test stuff
-				//System.out.print(in.readLine());
-				//until here
-			} catch (IOException e) {}
+				//to complete (call workdayhandler);
+				in.readObject();
+				out.writeObject("hurrdurr");
+				out.flush();
+			} catch (Exception e) {}
 		}
 	}
 }
