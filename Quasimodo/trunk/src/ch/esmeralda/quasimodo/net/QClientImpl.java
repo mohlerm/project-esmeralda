@@ -40,5 +40,4 @@ public class QClientImpl implements QClient {
 		} catch (Exception e) {}
 		return null;
 	}
-
 }
