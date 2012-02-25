@@ -6,5 +6,5 @@ public interface WorkdayHandler {
 	 * @param request a command from a Client
 	 * @return a response to the given request
 	 */
-	public String getResponse(String request);
+	public Object getResponse(Object request);
 }
