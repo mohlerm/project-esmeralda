@@ -9,7 +9,6 @@ public class QClientImpl implements QClient {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	
-	@Override
 	public void connect(String ip, int port) throws UnableToConnectException {
 		try {
 			socket = new Socket(ip, port);
@@ -19,19 +18,16 @@ public class QClientImpl implements QClient {
 		} catch (Exception e) {throw new UnableToConnectException();}
 	}
 
-	@Override
 	public void disconnect() {
 		try {
 			socket.close();
 		} catch (Exception e) {}
 	}
 
-	@Override
 	public boolean isConnected() {
 		return connected;
 	}
 
-	@Override
 	public Object sendRequest(Object request) {
 		try {
 			out.writeObject(request);
