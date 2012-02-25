@@ -11,12 +11,15 @@ public class QClientImpl implements QClient {
 	@Override
 	public void connect(String ip, int port) throws UnableToConnectException {
 		try {
+			System.out.print("Q: connecting...");
 			socket = new Socket(ip, port);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream(), true);
+			//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			//out = new PrintWriter(socket.getOutputStream(), true);
+			ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
 			connected = true;
-			
-			out.println("asdlkfsalkdks");
+			System.out.print("Q: reading obj...");
+			out.println((String)is.readObject());
 		} catch (Exception e) {throw new UnableToConnectException();}
 	}
 
