@@ -27,17 +27,18 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 	 * 	p	poll	- polls the server for actual Workday
 	 * 	r	remove	- removes the unit specified later in the string
 	 */
-	public String getResponse(String request) {
+	public String getResponse(Object request) {
 
 		if (request == null)
 			System.err.println("Request is null");
 		
 		// Split request string into substrings
-		String[] arguments = request.split(",");
+		String string = (String) request;
+		String[] arguments = string.split(",");
 		
 		
 		// Create request denominator
-		char denom = request.charAt(0);
+		char denom = string.charAt(0);
 		
 		if ((denom == 'a' && arguments.length == 3)||(denom == 'e' && arguments.length == 4))
 			arguments[arguments.length] = "";	// takes care of the workshift, so no special cases occur later
