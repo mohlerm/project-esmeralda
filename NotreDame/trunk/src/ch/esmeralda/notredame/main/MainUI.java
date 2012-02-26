@@ -1,8 +1,10 @@
 package ch.esmeralda.notredame.main;
 
+import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -11,16 +13,22 @@ import ch.esmeralda.notredame.jobs.AthmosStream;
 import ch.esmeralda.notredame.jobs.StreamJob;
 import ch.esmeralda.notredame.jobs.TimerJob;
 import ch.esmeralda.notredame.jobs.TimerJobImpl;
+import ch.esmeralda.notredame.net.NServer;
+import ch.esmeralda.notredame.net.NServerImpl;
 import ch.esmeralda.notredame.unitHandling.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 
 public class MainUI{
+	private static final int SERVERPORT = 10002;
+	private static final boolean L = true;
+	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("starting...");
+		if(L) System.out.println("starting...");
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
@@ -35,8 +43,10 @@ public class MainUI{
 		
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
-		System.out.println("schedule jobs");
+		if(L) System.out.println("schedule jobs");
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
+		NServer server = new NServerImpl();
+		server.start(SERVERPORT);
 		
 		Scanner in = new Scanner(System.in);
 		String msg;
@@ -46,7 +56,8 @@ public class MainUI{
 	         //d(msg.charAt(msg.length()-1));
 	         
 	         if(msg.equals("help")){
-	            //help();            
+	            //help();
+	        	 d("your lost...");
 	         }else if(msg.equals("set default")){
 	        	p("starting hour: ");
 	        	int hour = in.nextInt();
@@ -69,8 +80,16 @@ public class MainUI{
 	         }else if(msg.equals("show sounds")){
 	            //show_sounds();
 	         }
-	         else if(msg.equals("skip sound")){
-	            //skip_sound();
+	         else if(msg.equals("status")){
+	        	 d("Timerstatus:  \t" + (executor.isTerminated() ? "terminated" : "running"));
+	        	 d("Serverstatus: \t" + (server.isRunning() ? "running" : "down"));
+	        	 List<Socket> connections= server.getConnections();
+	        	 d(" Connections: " + connections.size());
+	        	for(Socket socket : connections){
+	        		d(" " + socket.getRemoteSocketAddress()+ ":"+socket.getPort());
+	        	}
+	        	
+	            
 	         }else{
 	            //d("Unknown command!");
 	            //help();
@@ -78,11 +97,12 @@ public class MainUI{
 	      }
 		
 		
-		System.out.println("stopping jobs");
+		 if(L) System.out.println("stopping jobs");
 		executor.shutdownNow();
-		System.out.println("...bye, bye");
+		server.stop();
+		if(L) System.out.println("...bye, bye");
 	}
-	
+
 	//helper
 	private static void d(Object msg){
 		System.out.println(msg);
@@ -97,11 +117,11 @@ public class MainUI{
 	
 	private static Workday set_debug(){
 		Workday workday = new WorkdayImpl();
-		System.out.println("prefill a debug workday");
+		if(L) System.out.println("prefill a debug workday");
 		long now = System.currentTimeMillis()+1000;
 		TaskUnit task;
 		for(int i=0;i<10;i++){
-			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, "http://u11aw.di.fm:80/di_trance");
+			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, DI_TRANCE);
 			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
 			task.setDescription("debug "+i);
 			workday.addUnit(task);
@@ -128,7 +148,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 75*60*1000;
 		
-		task = new TaskUnit(new Date(start), 15*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
 		task.setDescription("break1");
 		workday.addUnit(task);
 		start += 15*60*1000;
@@ -138,7 +158,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 60*60*1000;
 		
-		task = new TaskUnit(new Date(start), 15*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
 		task.setDescription("break2");
 		workday.addUnit(task);
 		start += 15*60*1000;
@@ -148,7 +168,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 45*60*1000;
 		
-		task = new TaskUnit(new Date(start), 60*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 60*60*1000, DI_TRANCE);		
 		task.setDescription("supper");
 		workday.addUnit(task);
 		start += 60*60*1000;
@@ -158,7 +178,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 75*60*1000;
 		
-		task = new TaskUnit(new Date(start), 15*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
 		task.setDescription("break1");
 		workday.addUnit(task);
 		start += 15*60*1000;
@@ -168,7 +188,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 60*60*1000;
 		
-		task = new TaskUnit(new Date(start), 15*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
 		task.setDescription("break2");
 		workday.addUnit(task);
 		start += 15*60*1000;
@@ -178,7 +198,7 @@ public class MainUI{
 		workday.addUnit(task);
 		start += 45*60*1000;
 		
-		task = new TaskUnit(new Date(start), 10*60*1000, "http://u11aw.di.fm:80/di_trance");		
+		task = new TaskUnit(new Date(start), 10*60*1000, DI_TRANCE);		
 		task.setDescription("end of day");
 		workday.addUnit(task);
 		//start += 15*60*1000;
