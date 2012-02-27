@@ -27,7 +27,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 	 * 	p	poll	- polls the server for actual Workday
 	 * 	r	remove	- removes the unit specified later in the string
 	 */
-	public String getResponse(Object request) {
+	public Object getResponse(Object request) {
 
 		if (request == null)
 			System.err.println("Request is null");
