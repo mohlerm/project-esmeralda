@@ -1,88 +1,218 @@
 package ch.esmeralda.quasimodo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
+
+import ch.esmeralda.quasimodo.unitHandlingWrapper.QTaskUnit;
 
 public class QuasimodoActivity extends Activity {
+	
+	// Various GUI Objects
+    private ProgressDialog m_ProgressDialog = null; // -
+    private ArrayList<QTaskUnit> m_qtus = null;
+    private QTUAdapter m_adapter;
+    private Runnable viewOrders;  // -
+    private Button addbutton;
+    private ListView lv_qtu;
+    private SharedPreferences settings;
+    
+    // Connection specific values
+    private String ip;
+    private int port;
+    
+    // Public constants
+    public static final String PREFS_NAME = "EsmeraldaPrefsFile";
+    public static final String QTU_NEW_KEY = "QTUIFNEWTAGACTIVITY";
+    public static final String QTU_OBJECT_KEY = "QTUSTATUSTOEDITACTIVITY";
+    public static final String QTU_DELETE_KEY = "QTUTOBEDELETED"; 
+	
+    
+    
+    // ---------- initial Handling
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
         setContentView(R.layout.main);
         
-        // Put other important stuff here liek networking and stuff.
+        // get ID's from various gui objects
+        addbutton = (Button) findViewById(R.id.addbtn);			// define GUI objects
+        AddListenerClass addlistener = new AddListenerClass();
+        addbutton.setOnClickListener(addlistener);
+        lv_qtu = (ListView) findViewById(R.id.taskunitlist);
         
-        OnItemClickListener itemclick = new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				Toast toast = Toast.makeText(getBaseContext(), (CharSequence) ((ListView)arg0).getItemAtPosition(position), Toast.LENGTH_SHORT);
-				toast.show();
-			}
-        };
+        settings = getSharedPreferences(PREFS_NAME, 0);			// read settings
+        readSettings();
         
-        OnClickListener addclick = new OnClickListener() {
-        	public void onClick(View v) {
-				addelement();
-				}
-        };
+        m_qtus = new ArrayList<QTaskUnit>();						// initialize orders and set adapter
+        this.m_adapter = new QTUAdapter(this, R.layout.row, m_qtus);
+        lv_qtu.setAdapter(this.m_adapter);
         
-        OnClickListener removeclick = new OnClickListener() {
-        	public void onClick(View v) {
-				removeelement();
-        	}
-        };
-        
-        ListView lv = (ListView) findViewById(R.id.listView1);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,(List<String>)COUNTRIES);
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(itemclick);
-      
-        Button add = (Button) findViewById(R.id.button1);
-        add.setOnClickListener(addclick);
-        
-        Button remove = (Button) findViewById(R.id.button2);
-        remove.setOnClickListener(removeclick);
+        getDataFromNet();
         
     }
-    
-    private ArrayAdapter<String> adapter;
-    
-    private int n = 0;
-    
-    private final String[] rawcountries = new String[] {
-            "Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra",
-            "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina",
-            "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan",
-            "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
-            "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia",
-            "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory",
-            "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-            "Cote d'Ivoire", "Cambodia", "Cameroon", "Canada", "Cape Verde"
-          };
-    
-    private ArrayList<String> COUNTRIES = new ArrayList<String>(Arrays.asList(rawcountries)); 
-    
-    
-   	private void addelement() {
-    	COUNTRIES.add(Integer.toString(n));
-    	n++;
-    	adapter.notifyDataSetChanged();
+
+	private class AddListenerClass implements OnClickListener{
+		public void onClick(View v) {
+			startedit(m_qtus.size()-1,1);
+		}
     }
-   	
-   	private void removeelement() {
-		COUNTRIES.remove(COUNTRIES.size()-1);
-		adapter.notifyDataSetChanged();
-	}
+	
+	
+	// ------------------------- custom ArrayList Adapter class
+	
+    private class QTUAdapter extends ArrayAdapter<QTaskUnit> implements OnClickListener{
+
+        private ArrayList<QTaskUnit> items;
+
+        public QTUAdapter(Context context, int textViewResourceId, ArrayList<QTaskUnit> items) {
+                super(context, textViewResourceId, items);
+                this.items = items;
+        }
+        
+        /**
+         * This gets called whenever a new ListItem is created from the m_orders set.
+         * @param position the position of the listitem at which it is created
+         * @param convertView the View object of the ListItem.
+         */
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+                View v = convertView;
+                if (v == null) {
+                    LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    v = vi.inflate(R.layout.row, null);
+                }
+                QTaskUnit o = items.get(position);
+                if (o != null) {
+                	Button btnRemove = (Button) v.findViewById(R.id.removebutton);
+                    btnRemove.setFocusableInTouchMode(false);
+                    btnRemove.setFocusable(false);
+                    btnRemove.setTag(position);
+                    btnRemove.setOnClickListener(this);     
+                	TextView tt = (TextView) v.findViewById(R.id.toptext);
+                    TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+                    if (tt != null) {
+                          // Set Value of upper text to something
+                    }
+                    if(bt != null){
+                          // set Value of lower text to something
+                    }
+                }
+                return v;
+        }
+        /**
+         * What happens on the edit buttons?
+         */
+		public void onClick(View v) {
+			 startedit((Integer) v.getTag(),0);
+		}
+    }
+	
+    private void updateListView() {
+    	// update the listview and notify adapter etc.
+    }
+    
+    
+    // ------------------------ get results from subactivity
+    
+   
+    /**
+     * RequestCode 0: Back from Edit Activity.
+     *             1: Back from Settings Activity
+     */
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    switch (requestCode) {
+	    case 0:
+	    	// edit values come back by intent extras!
+	    	// store data to server
+		    break;
+	    case 1:
+	    	switch (resultCode) {
+	    	case Activity.RESULT_OK:
+				readSettings();
+	    	}
+		    break;
+		default:
+	    }
+   		
+   }
+ 
+    
+    
+    // ------------------------ Edit Screen related
+    
+    private int beingmodified;
+    private void startedit(int o, int code) {			// code = 1 if we just added a new one.
+    	beingmodified = o;
+    	final Intent i = new Intent(this, editActivity.class);
+    	// put extra object stuff
+    	i.putExtra(QTU_NEW_KEY, code);
+    	startActivityForResult(i,0);
+    }
+    
+    
+	// ------------------------- All Networking
+	
+	private void getDataFromNet() {
+		m_ProgressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving data ...", true);
+		// fill data from network. Use Task or something
+	}	
+	
+	
+	// ------------------------- Menu Funktionalität
+	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.menu, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.menu_exit:
+    		finish();
+    		break;
+    	case R.id.menu_settings:
+    		final Intent intent = new Intent(this,SettingsActivity.class);
+    		startActivityForResult(intent,1);
+    		break;
+    	default:
+    	}
+		return true;
+    }
+	
+    
+    // ------------------------- Shared Preferences
+    
+
+	private void readSettings() {
+    	ip = settings.getString(SettingsActivity.SET_IP_KEY, "not set");
+		port = settings.getInt(SettingsActivity.SET_PORT_KEY, 99999);
+		Log.d("Settings","ip: "+ip);
+		Log.d("Settings","Port: "+Integer.toString(port));
+    }
+    
 }
 

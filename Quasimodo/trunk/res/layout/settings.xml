@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center"
+        android:layout_margin="6dip" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="IP"
+            android:layout_margin="4dip" />
+
+        <EditText
+            android:id="@+id/setText_IP"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <requestFocus />
+        </EditText>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Port"
+            android:layout_margin="4dip" />
+
+
+        <EditText
+            android:id="@+id/setText_PORT"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number" >
+
+            <requestFocus />
+        </EditText>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dip">
+        <Button
+            android:id="@+id/set_defaultbtn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Default Values"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/set_savebtn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Save" 
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</LinearLayout>
