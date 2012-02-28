@@ -1,6 +1,8 @@
 package ch.esmeralda.quasimodo.unitHandlingWrapper;
 
+import java.io.Serializable;
 import java.util.Date;
+
 /**
  * TaskUnit represents either a Break- or a Workshift. Depending
  * on the streamURL. 
@@ -8,7 +10,9 @@ import java.util.Date;
  * @version 0.1
  *
  */
-public class QTaskUnit {
+public class QTaskUnit implements Serializable {
+	
+	private static final long serialVersionUID = 5275585922124992816L;
 	private Date starttime;
 	private long duration;
 	private String streamURL;

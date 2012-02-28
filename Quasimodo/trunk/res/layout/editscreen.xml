@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/titlebar"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:text="Edit QTaskUnit"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        
+			<TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OrderName"
+                android:layout_margin="4dip"
+                android:layout_gravity="center" />
+            <EditText
+                android:id="@+id/editName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dip" />
+            
+      </LinearLayout>
+      
+      <LinearLayout
+		android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+            
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OrderStatus"
+                android:layout_margin="4dip"
+                android:layout_gravity="center"/>
+            <EditText
+                android:id="@+id/editStatus"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dip" />
+            
+    	</LinearLayout>
+
+    
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+        <Button
+        	android:id="@+id/edit_deletebtn"
+        	android:layout_height="wrap_content"
+        	android:layout_width="fill_parent"
+        	android:text="Delete"
+        	android:layout_weight="1" />
+	    <Button
+         	android:id="@+id/edit_donebtn"
+         	android:layout_height="wrap_content"
+         	android:layout_width="fill_parent"
+         	android:text="Done"
+         	android:layout_weight="1" />
+	</LinearLayout>
+
+</LinearLayout>

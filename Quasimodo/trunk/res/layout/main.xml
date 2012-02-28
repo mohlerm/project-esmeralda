@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_gravity="left">
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    android:gravity="center" android:textSize="12sp"/>
+    android:orientation="vertical" >
 
-<LinearLayout
-    android:id="@+id/linearLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:baselineAligned="false" >
-
-    <Button
-        android:id="@+id/button1"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:text="add" />
+        android:text="Quasimodo"
+        android:layout_gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_margin="5dip" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="remove" />
+        android:orientation="horizontal" >
 
-</LinearLayout>
+        <Button
+            android:id="@+id/connectbtn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Connect"
+            android:layout_weight="1" />
+        <Button
+            android:id="@+id/addbtn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Element"
+            android:layout_weight="1" />
 
-<ListView
-    android:id="@+id/listView1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-</ListView>
+    </LinearLayout>
+
+   <ListView
+	    android:id="@+id/taskunitlist"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" />
+   
+    <TextView
+        android:id="@+id/emptylist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="There are no items to display." />
 
 </LinearLayout>
