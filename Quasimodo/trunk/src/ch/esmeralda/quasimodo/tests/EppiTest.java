@@ -1,16 +1,16 @@
 package ch.esmeralda.quasimodo.tests;
 
-import java.util.Date;
-
-import ch.esmeralda.quasimodo.unitHandlingWrapper.QTaskUnit;
+import java.util.ArrayList;
 
 public class EppiTest {
 
 	public static void main(String[] args) {
-		Date date = new Date(56546540);
-		QTaskUnit qt = new QTaskUnit(date , 3600000);
-		System.out.println(qt.getDurationAsString());
-		System.out.println(qt.getStarttimeAsString(0));
+		ArrayList<String> liste = new ArrayList<String>();
+		liste.add("Hallo, Liste wurde erstellt.");
+		TestClass1 test1 = new TestClass1(liste);
+		test1.changelist();
+		test1 = null;
+		System.out.println(liste.toString());  // WORKS!!
 	}
 
 }

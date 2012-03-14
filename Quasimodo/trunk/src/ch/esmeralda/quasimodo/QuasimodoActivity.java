@@ -21,13 +21,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import ch.esmeralda.quasimodo.unitHandlingWrapper.QTaskUnit;
+import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
 
 public class QuasimodoActivity extends Activity {
 	
 	// Various GUI Objects
     private ProgressDialog m_ProgressDialog = null; // -
-    private ArrayList<QTaskUnit> m_qtus = null;
+    private ArrayList<TaskUnit> m_qtus = null;
     private QTUAdapter m_adapter;
     private Runnable viewOrders;  // -
     private Button addbutton;
@@ -40,9 +40,9 @@ public class QuasimodoActivity extends Activity {
     
     // Public constants
     public static final String PREFS_NAME = "EsmeraldaPrefsFile";
-    public static final String QTU_NEW_KEY = "QTUIFNEWTAGACTIVITY";
-    public static final String QTU_OBJECT_KEY = "QTUSTATUSTOEDITACTIVITY";
-    public static final String QTU_DELETE_KEY = "QTUTOBEDELETED"; 
+    public static final String TU_NEW_KEY = "TUIFNEWTAGACTIVITY";
+    public static final String TU_OBJECT_KEY = "TUSTATUSTOEDITACTIVITY";
+    public static final String TU_DELETE_KEY = "TUTOBEDELETED"; 
 	
     
     
@@ -63,7 +63,7 @@ public class QuasimodoActivity extends Activity {
         settings = getSharedPreferences(PREFS_NAME, 0);			// read settings
         readSettings();
         
-        m_qtus = new ArrayList<QTaskUnit>();						// initialize orders and set adapter
+        m_qtus = new ArrayList<TaskUnit>();						// initialize orders and set adapter
         this.m_adapter = new QTUAdapter(this, R.layout.row, m_qtus);
         lv_qtu.setAdapter(this.m_adapter);
         
@@ -80,11 +80,11 @@ public class QuasimodoActivity extends Activity {
 	
 	// ------------------------- custom ArrayList Adapter class
 	
-    private class QTUAdapter extends ArrayAdapter<QTaskUnit> implements OnClickListener{
+    private class QTUAdapter extends ArrayAdapter<TaskUnit> implements OnClickListener{
 
-        private ArrayList<QTaskUnit> items;
+        private ArrayList<TaskUnit> items;
 
-        public QTUAdapter(Context context, int textViewResourceId, ArrayList<QTaskUnit> items) {
+        public QTUAdapter(Context context, int textViewResourceId, ArrayList<TaskUnit> items) {
                 super(context, textViewResourceId, items);
                 this.items = items;
         }
@@ -101,7 +101,7 @@ public class QuasimodoActivity extends Activity {
                     LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     v = vi.inflate(R.layout.row, null);
                 }
-                QTaskUnit o = items.get(position);
+                TaskUnit o = items.get(position);
                 if (o != null) {
                 	Button btnRemove = (Button) v.findViewById(R.id.removebutton);
                     btnRemove.setFocusableInTouchMode(false);
@@ -166,7 +166,7 @@ public class QuasimodoActivity extends Activity {
     	beingmodified = o;
     	final Intent i = new Intent(this, editActivity.class);
     	// put extra object stuff
-    	i.putExtra(QTU_NEW_KEY, code);
+    	i.putExtra(TU_NEW_KEY, code);
     	startActivityForResult(i,0);
     }
     
