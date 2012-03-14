@@ -3,6 +3,14 @@ package ch.esmeralda.notredame.unitHandling;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * implementation of WorkdayHandler
+ * 
+ * receives an Object over network from the Android handheld device app, modifies the workday
+ * and sends an answer Object back.
+ * @author Stefan Mach, Marco Eppenberger
+ *
+ */
 public class WorkdayHandlerImpl implements WorkdayHandler {
 
 	private Workday workday;
@@ -18,15 +26,33 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 	 * Handles incoming requests
 	 * @param request a command from a client
 	 * @return a response to the given request
-	 * 
-	 * REQUEST DENOMINATORS (first letter of request string followed by a comma):
-	 * 	a	add		- adds the unit specified later in the string
-	 * 	c	clear	- clears the whole Workday
-	 * 	d	default	- resets the Workday to predefined default value
-	 * 	e	edit	- edits the unit specified later in the string
-	 * 	p	poll	- polls the server for actual Workday
-	 * 	r	remove	- removes the unit specified later in the string
 	 */
+	public Object getResponse(Object request) {
+			
+	}
+	
+	
+	
+
+}
+
+
+
+
+/**
+old stuff:
+
+public class WorkdayHandlerImpl implements WorkdayHandler {
+
+	private Workday workday;
+
+	public WorkdayHandlerImpl(Workday workday) {
+		if (workday==null)
+			System.err.println("Workday is null");
+		this.workday = workday;
+	}
+	
+	@Override
 	public Object getResponse(Object request) {
 
 		if (request == null)
@@ -111,3 +137,5 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 	
 
 }
+
+*/

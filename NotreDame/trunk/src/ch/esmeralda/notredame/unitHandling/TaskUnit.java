@@ -1,15 +1,18 @@
 package ch.esmeralda.notredame.unitHandling;
 
+import java.io.Serializable;
 import java.util.Date;
+
 /**
  * TaskUnit represents either a Break- or a Workshift. Depending
  * on the streamURL. 
  * @author Thomas Richner
- * @version 0.8
- * @since 0.1 (former TimeUnit)
+ * @version 0.1
  *
  */
-public class TaskUnit {
+public class TaskUnit implements Serializable {
+	
+	private static final long serialVersionUID = 5275585922124992816L;
 	private Date starttime;
 	private long duration;
 	private String streamURL;
@@ -19,7 +22,7 @@ public class TaskUnit {
 	 * Creates a new Object and initializes everything.
 	 * After the creation, nothing can be changed.
 	 * @param starttime When does it start? be aware, this ist probably UTC!
-	 * @param duration How long does it take?
+	 * @param duration How long does it take? [ms]
 	 * @param streamURL URL of a Radiostream like DI
 	 */
 	public TaskUnit(Date starttime,long duration,String streamURL){
@@ -31,7 +34,7 @@ public class TaskUnit {
 	 * Creates a new TaskUnit Object as a 'Workshift', since
 	 * there is no stream given.
 	 * @param starttime	When does it start? be aware, this ist probably UTC!
-	 * @param duration How long does it take?
+	 * @param duration How long does it take? [ms]
 	 */
 	public TaskUnit(Date starttime,long duration){
 		this.starttime = starttime;
@@ -49,10 +52,31 @@ public class TaskUnit {
 	}
 
 	//---- Getters
+	/**
+	 * Returns the Starttime as a string like '9:00'
+	 * @param timeshift
+	 * @return
+	 */
+	public String getStarttimeAsString(int timeshift) {
+		int hour=starttime.getHours()+timeshift;
+		int minutes = starttime.getMinutes(); 
+		return String.format("%02d:%02d", hour,minutes);
+	}
+	
 	public Date getStarttime() {
 		return starttime;
 	}
-
+	/**
+	 * Returns the time in mins.
+	 * Be aware, this functions is very unrelyable because
+	 * the unit of the time isn't always clear.
+	 * @return duration of the unit in minutes
+	 */
+	public String getDurationAsString() {
+		long mins = duration/(60000);
+		return mins+"min";
+	}
+	
 	public long getDuration() {
 		return duration;
 	}
@@ -60,14 +84,16 @@ public class TaskUnit {
 	public String getStreamURL() {
 		return streamURL;
 	}
+	
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	
-	void setKey(int key){
+	public void setKey(int key){
 		this.key = key;
 	}
 	public int getKey(){
