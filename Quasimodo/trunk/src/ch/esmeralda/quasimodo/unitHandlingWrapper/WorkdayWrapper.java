@@ -19,7 +19,7 @@ public interface WorkdayWrapper {
 	 * @param TimeStamp timestamp actual time
 	 * @return TaskUnit
 	 */
-	public QTaskUnit getActiveUnit();
+	public TaskUnit getActiveUnit();
 	/**
 	 * adds a new TaskUnit, sorts it, checks for overlapping
 	 * 
@@ -53,7 +53,7 @@ public interface WorkdayWrapper {
 	 * Provides the internal list of TaskUnits
 	 * @return a sorted list of all TaskUnits
 	 */
-	public List<QTaskUnit> getList();
+	public List<TaskUnit> getList();
 	/**
 	 * Resets a workday and removes everything
 	 */

@@ -10,7 +10,7 @@ import java.util.Date;
  * @version 0.1
  *
  */
-public class QTaskUnit implements Serializable {
+public class TaskUnit implements Serializable {
 	
 	private static final long serialVersionUID = 5275585922124992816L;
 	private Date starttime;
@@ -25,7 +25,7 @@ public class QTaskUnit implements Serializable {
 	 * @param duration How long does it take? [ms]
 	 * @param streamURL URL of a Radiostream like DI
 	 */
-	public QTaskUnit(Date starttime,long duration,String streamURL){
+	public TaskUnit(Date starttime,long duration,String streamURL){
 		this.starttime = starttime;
 		this.duration = duration;
 		this.streamURL = streamURL;
@@ -36,7 +36,7 @@ public class QTaskUnit implements Serializable {
 	 * @param starttime	When does it start? be aware, this ist probably UTC!
 	 * @param duration How long does it take? [ms]
 	 */
-	public QTaskUnit(Date starttime,long duration){
+	public TaskUnit(Date starttime,long duration){
 		this.starttime = starttime;
 		this.duration = duration;
 		this.streamURL = "";
@@ -75,6 +75,10 @@ public class QTaskUnit implements Serializable {
 	public String getDurationAsString() {
 		long mins = duration/(60000);
 		return mins+"min";
+	}
+	
+	public long getDuration() {
+		return duration;
 	}
 
 	public String getStreamURL() {
