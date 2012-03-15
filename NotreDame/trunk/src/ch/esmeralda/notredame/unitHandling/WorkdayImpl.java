@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 public class WorkdayImpl implements Workday{
 	//contains the list of all the TaskUnit sorted by starttime
 	List<TaskUnit> daylist;
-	int keycount = 0;
+	long keycount = 0;
 	
 	public WorkdayImpl(){
 		//TODO
