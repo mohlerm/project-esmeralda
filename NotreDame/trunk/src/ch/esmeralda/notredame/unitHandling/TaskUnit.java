@@ -17,7 +17,7 @@ public class TaskUnit implements Serializable {
 	private long duration;
 	private String streamURL;
 	private String description;
-	private int key = 0;
+	private long key = 0;
 	/**
 	 * Creates a new Object and initializes everything.
 	 * After the creation, nothing can be changed.
@@ -93,10 +93,10 @@ public class TaskUnit implements Serializable {
 		this.description = description;
 	}
 	
-	public void setKey(int key){
-		this.key = key;
+	void setKey(long keycount){
+		this.key = keycount;
 	}
-	public int getKey(){
+	public long getKey(){
 		return key;
 	}
 
