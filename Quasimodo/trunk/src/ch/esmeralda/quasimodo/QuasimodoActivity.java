@@ -1,6 +1,7 @@
 package ch.esmeralda.quasimodo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -20,23 +21,32 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import ch.esmeralda.quasimodo.net.QClient;
+import ch.esmeralda.quasimodo.net.QClient.UnableToConnectException;
+import ch.esmeralda.quasimodo.net.QClientImpl;
+import ch.esmeralda.quasimodo.unitHandlingWrapper.AnsDataPkg;
+import ch.esmeralda.quasimodo.unitHandlingWrapper.QueryDataPkg;
 import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
 
 public class QuasimodoActivity extends Activity {
 	
 	// Various GUI Objects
-    private ProgressDialog m_ProgressDialog = null; // -
-    private ArrayList<TaskUnit> m_qtus = null;
-    private QTUAdapter m_adapter;
-    private Runnable viewOrders;  // -
+    private ProgressDialog m_ProgressDialog = null;
     private Button addbutton;
+    private Button connectbutton;
     private ListView lv_qtu;
+
+    // Data objects
+    private List<TaskUnit> m_qtus = null;
+    private TUAdapter m_adapter;
     private SharedPreferences settings;
     
     // Connection specific values
     private String ip;
     private int port;
+    private QClient connection;
     
     // Public constants
     public static final String PREFS_NAME = "EsmeraldaPrefsFile";
@@ -51,40 +61,84 @@ public class QuasimodoActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	// android default
         super.onCreate(savedInstanceState);   
         setContentView(R.layout.main);
         
-        // get ID's from various gui objects
+        // get ID's from various gui objects and initialize clickability
         addbutton = (Button) findViewById(R.id.addbtn);			// define GUI objects
         AddListenerClass addlistener = new AddListenerClass();
         addbutton.setOnClickListener(addlistener);
-        lv_qtu = (ListView) findViewById(R.id.taskunitlist);
         
+        connectbutton = (Button) findViewById(R.id.connectbtn);			// define GUI objects
+        ConnectListenerClass connectlistener = new ConnectListenerClass();
+        connectbutton.setOnClickListener(connectlistener);
+        
+        // load previous Settings.
         settings = getSharedPreferences(PREFS_NAME, 0);			// read settings
         readSettings();
         
+        // load List and its adapter
+        lv_qtu = (ListView) findViewById(R.id.taskunitlist);
         m_qtus = new ArrayList<TaskUnit>();						// initialize orders and set adapter
-        this.m_adapter = new QTUAdapter(this, R.layout.row, m_qtus);
+        this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
         lv_qtu.setAdapter(this.m_adapter);
         
-        getDataFromNet();
+        // Make Connection
+        connection = (QClient) new QClientImpl();
+        connectbutton.performClick();
         
     }
 
+    /**
+     * What happens when the "Add" button gets clicked?
+     * @author Marco
+     */
 	private class AddListenerClass implements OnClickListener{
 		public void onClick(View v) {
-			startedit(m_qtus.size()-1,1);
+			startedit(-1,1);
 		}
     }
 	
+	/**
+	 * What happens when the "Connect" button gets clicked?
+	 * @author Marco
+	 */
+	private class ConnectListenerClass implements OnClickListener{
+		public void onClick(View v) {
+			if (ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") && port > 0 && port < 65537) {
+				try {
+					connection.connect(ip, port);
+				} catch (UnableToConnectException e) {
+					Log.e("connection", "UnableToConnect Exception thrown, could not connect to server.");
+					Toast.makeText(getApplicationContext(), "Error communicating with server.", Toast.LENGTH_LONG).show();
+				}
+				getWorkdayFromNet();
+			} else {
+				Toast.makeText(v.getContext(), "Please set the right IP and PORT in the settings.", Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+	
+	/**
+	 * This gets called when the activity shuts down.
+	 */
+	protected void onDestroy() {
+		try {
+			connection.disconnect();
+		} catch (Exception e) { }
+		
+		Toast.makeText(this.getApplicationContext(), "disconnected", Toast.LENGTH_SHORT).show();
+		super.onDestroy();
+	}
 	
 	// ------------------------- custom ArrayList Adapter class
 	
-    private class QTUAdapter extends ArrayAdapter<TaskUnit> implements OnClickListener{
+    private class TUAdapter extends ArrayAdapter<TaskUnit> implements OnClickListener{
 
-        private ArrayList<TaskUnit> items;
+        private List<TaskUnit> items;
 
-        public QTUAdapter(Context context, int textViewResourceId, ArrayList<TaskUnit> items) {
+        public TUAdapter(Context context, int textViewResourceId, List<TaskUnit> items) {
                 super(context, textViewResourceId, items);
                 this.items = items;
         }
@@ -102,11 +156,12 @@ public class QuasimodoActivity extends Activity {
                     v = vi.inflate(R.layout.row, null);
                 }
                 TaskUnit o = items.get(position);
+                int curkey = o.getKey();
                 if (o != null) {
                 	Button btnRemove = (Button) v.findViewById(R.id.removebutton);
                     btnRemove.setFocusableInTouchMode(false);
                     btnRemove.setFocusable(false);
-                    btnRemove.setTag(position);
+                    btnRemove.setTag(curkey);
                     btnRemove.setOnClickListener(this);     
                 	TextView tt = (TextView) v.findViewById(R.id.toptext);
                     TextView bt = (TextView) v.findViewById(R.id.bottomtext);
@@ -125,10 +180,6 @@ public class QuasimodoActivity extends Activity {
 		public void onClick(View v) {
 			 startedit((Integer) v.getTag(),0);
 		}
-    }
-	
-    private void updateListView() {
-    	// update the listview and notify adapter etc.
     }
     
     
@@ -161,9 +212,12 @@ public class QuasimodoActivity extends Activity {
     
     // ------------------------ Edit Screen related
     
-    private int beingmodified;
-    private void startedit(int o, int code) {			// code = 1 if we just added a new one.
-    	beingmodified = o;
+   /**
+    * Function called when we want to edit or add a TaskUnit
+    * @param key	key of the TaskUnit to be edited.
+    * @param code	0 for editing. 1 for adding.
+    */
+    private void startedit(int key, int code) {
     	final Intent i = new Intent(this, editActivity.class);
     	// put extra object stuff
     	i.putExtra(TU_NEW_KEY, code);
@@ -173,10 +227,52 @@ public class QuasimodoActivity extends Activity {
     
 	// ------------------------- All Networking
 	
-	private void getDataFromNet() {
+    /**
+     * Gets a whole workday update.
+     * call code = 0
+     */
+	private void getWorkdayFromNet() {
+		if (!connection.isConnected()) return;
 		m_ProgressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving data ...", true);
-		// fill data from network. Use Task or something
+		Thread conn_thrd =  new Thread(null, GetWorkday, "GetDatafromServer");
+        conn_thrd.start();
 	}	
+	
+	private Runnable GetWorkday = new Runnable(){
+		public void run() {
+			
+			QueryDataPkg req = new QueryDataPkg(0, null);
+			AnsDataPkg ans;
+			
+			try {
+				Log.d("connection","starting the sendrequest.");
+				ans = (AnsDataPkg) connection.sendRequest((Object)req);
+				Log.d("connection","got the ans package!");
+			} catch (Exception e) {
+				Log.e("connection", "Server sent not an AnsDataPkg as object.");
+				Toast.makeText(m_ProgressDialog.getContext(), "Error communicating with server.", Toast.LENGTH_LONG).show();
+				ans = null;
+			}
+			
+			if (ans == null) {
+				Log.e("connection","ans is null");
+			} else {
+				if (ans.getworkday() == null) Log.e("connection","workday is null");
+			}
+			
+			if (ans != null && ans.getworkday() != null){
+				Log.d("connection",Integer.toString(ans.getworkday().get(0).getKey()));
+				m_qtus.clear();
+				m_qtus.addAll(ans.getworkday());
+				m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
+				lv_qtu.setAdapter(m_adapter);
+				
+			}
+				
+			m_ProgressDialog.dismiss();
+		}
+	};
+	
 	
 	
 	// ------------------------- Menu Funktionalität
@@ -195,8 +291,14 @@ public class QuasimodoActivity extends Activity {
     		finish();
     		break;
     	case R.id.menu_settings:
+    		connection.disconnect();
+    		Toast.makeText(this.getApplicationContext(), "disconnected", Toast.LENGTH_SHORT).show();
     		final Intent intent = new Intent(this,SettingsActivity.class);
     		startActivityForResult(intent,1);
+    		break;
+    	case R.id.menu_disconnect:
+    		connection.disconnect();
+    		Toast.makeText(this.getApplicationContext(), "disconnected", Toast.LENGTH_SHORT).show();
     		break;
     	default:
     	}

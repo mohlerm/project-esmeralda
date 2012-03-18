@@ -1,7 +1,8 @@
 package ch.esmeralda.quasimodo.unitHandlingWrapper;
 
+import java.io.Serializable;
+
 /**
- * @author Marco Eppenberger
  * Used for sending data between quasimodo and notredame
  * action codes:
  * 0  =  get whole workday
@@ -11,8 +12,11 @@ package ch.esmeralda.quasimodo.unitHandlingWrapper;
  * 4  =  reset workday
  * 
  * Just put all nescessary data in the DataTU and it will be sent properly.
+ * @author Marco Eppenberger
  */
-public class QueryDataPkg {
+public class QueryDataPkg implements Serializable{
+	private static final long serialVersionUID = -3934629610220252062L;
+
 	// control vars:
 	public int action;
 	
