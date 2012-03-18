@@ -161,7 +161,7 @@ public class WorkdayImpl implements Workday{
 
 	@Override
 	public void reset() {
-		daylist = new ArrayList<TaskUnit>();
+		daylist.clear();
 		keycount = 0;
 	}
 	
