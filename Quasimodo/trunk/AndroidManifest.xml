@@ -4,6 +4,8 @@
       android:versionCode="1"
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="8" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /><uses-permission android:name="android.permission.INTERNET"/>
+    
 
     <application android:icon="@drawable/icon" android:label="@string/app_name"
                 android:theme="@android:style/Theme.Light" >>
@@ -14,6 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="SettingsActivity" android:label="@string/app_name"></activity>
+        <activity android:label="@string/app_name" android:name="editActivity"></activity>
 
     </application>
 </manifest>
