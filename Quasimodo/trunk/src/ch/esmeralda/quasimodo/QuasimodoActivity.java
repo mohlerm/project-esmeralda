@@ -26,9 +26,8 @@ import android.widget.Toast;
 import ch.esmeralda.quasimodo.net.QClient;
 import ch.esmeralda.quasimodo.net.QClient.UnableToConnectException;
 import ch.esmeralda.quasimodo.net.QClientImpl;
-import ch.esmeralda.quasimodo.unitHandlingWrapper.AnsDataPkg;
-import ch.esmeralda.quasimodo.unitHandlingWrapper.QueryDataPkg;
-import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
+import ch.esmeralda.DataExchange.*;
+
 
 public class QuasimodoActivity extends Activity {
 	
@@ -156,7 +155,7 @@ public class QuasimodoActivity extends Activity {
                     v = vi.inflate(R.layout.row, null);
                 }
                 TaskUnit o = items.get(position);
-                int curkey = o.getKey();
+                int curkey = (int) o.getKey();
                 if (o != null) {
                 	Button btnRemove = (Button) v.findViewById(R.id.removebutton);
                     btnRemove.setFocusableInTouchMode(false);
@@ -233,7 +232,7 @@ public class QuasimodoActivity extends Activity {
      */
 	private void getWorkdayFromNet() {
 		if (!connection.isConnected()) return;
-		m_ProgressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving data ...", true);
+		m_ProgressDialog = ProgressDialog.show(QuasimodoActivity.this, "Please wait...", "Retrieving data ...", true);
 		Thread conn_thrd =  new Thread(null, GetWorkday, "GetDatafromServer");
         conn_thrd.start();
 	}	
@@ -261,14 +260,20 @@ public class QuasimodoActivity extends Activity {
 			}
 			
 			if (ans != null && ans.getworkday() != null){
-				Log.d("connection",Integer.toString(ans.getworkday().get(0).getKey()));
+				Log.d("connection", "workdaysize: "+Integer.toString(ans.getworkday().size()));
 				m_qtus.clear();
 				m_qtus.addAll(ans.getworkday());
-				m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
-				lv_qtu.setAdapter(m_adapter);
-				
+				runOnUiThread(UpdateData);
 			}
 				
+
+		}
+	};
+	
+	private Runnable UpdateData = new Runnable() {
+		public void run() {
+			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
+			lv_qtu.setAdapter(m_adapter);
 			m_ProgressDialog.dismiss();
 		}
 	};

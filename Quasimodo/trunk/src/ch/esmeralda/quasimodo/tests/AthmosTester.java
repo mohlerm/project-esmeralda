@@ -2,7 +2,8 @@ package ch.esmeralda.quasimodo.tests;
 
 import java.util.Date;
 
-import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
+
+import ch.esmeralda.DataExchange.*;
 
 public class AthmosTester {
 

@@ -1,6 +1,7 @@
 package ch.esmeralda.quasimodo;
 
-import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
+import ch.esmeralda.DataExchange.*;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;

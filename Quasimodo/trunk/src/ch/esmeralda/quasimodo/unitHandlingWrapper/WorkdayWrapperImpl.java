@@ -1,6 +1,8 @@
 package ch.esmeralda.quasimodo.unitHandlingWrapper;
 
 import java.io.NotActiveException;
+
+import ch.esmeralda.DataExchange.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
