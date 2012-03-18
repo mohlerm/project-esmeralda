@@ -24,6 +24,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 		if (workday==null)
 			System.err.println("Workday is null");
 		this.workday = workday;
+		System.out.println(workday.getList().size());
 	}
 	
 	@Override
