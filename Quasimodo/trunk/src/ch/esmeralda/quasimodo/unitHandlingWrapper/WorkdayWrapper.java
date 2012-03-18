@@ -3,6 +3,8 @@ package ch.esmeralda.quasimodo.unitHandlingWrapper;
 import java.util.Date;
 import java.util.List;
 
+import ch.esmeralda.DataExchange.*;
+
 /**
  * class WorkDay
  * 
