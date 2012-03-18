@@ -3,6 +3,8 @@ package ch.esmeralda.notredame.unitHandling;
 import java.util.*;
 import java.sql.Timestamp;
 
+import ch.esmeralda.DataExchange.TaskUnit;
+
 /**
  * class WorkdayImpl
  * 

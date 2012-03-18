@@ -5,7 +5,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import ch.esmeralda.notredame.jobs.*;
-import ch.esmeralda.notredame.unitHandling.TaskUnit;
+import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 

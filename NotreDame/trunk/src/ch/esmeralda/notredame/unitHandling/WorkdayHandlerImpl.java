@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.esmeralda.DataExchange.AnsDataPkg;
+import ch.esmeralda.DataExchange.QueryDataPkg;
+import ch.esmeralda.DataExchange.TaskUnit;
+
 /**
  * implementation of WorkdayHandler
  * 
@@ -20,8 +24,6 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 		if (workday==null)
 			System.err.println("Workday is null");
 		this.workday = workday;
-		System.out.println("System out stream!");
-		System.err.println("System error stream!");
 	}
 	
 	@Override
@@ -31,8 +33,11 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 	 * @return a response to the given request	(AnsDataPkg object)
 	 */
 	public Object getResponse(Object request) {
+		
 			QueryDataPkg req = null;
 			AnsDataPkg ans = null;
+			System.out.println("WorkdayHandler got a request!");
+			
 			try {
 				req = (QueryDataPkg) request;
 			} catch (Exception e) {
@@ -42,6 +47,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 			TaskUnit data = req.getTU();
 			switch (action) {
 			case 0:		// get the actual workday
+				System.out.println("Action: get actual workday: "+Integer.toString(workday.getList().size()));
 				ans = new AnsDataPkg(action,true,workday.getList());
 				break;
 			case 1:		// add new tu

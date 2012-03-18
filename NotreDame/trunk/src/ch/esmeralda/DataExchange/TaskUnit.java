@@ -1,4 +1,4 @@
-package ch.esmeralda.notredame.unitHandling;
+package ch.esmeralda.DataExchange;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -93,7 +93,7 @@ public class TaskUnit implements Serializable {
 		this.description = description;
 	}
 	
-	void setKey(long keycount){
+	public void setKey(long keycount){
 		this.key = keycount;
 	}
 	public long getKey(){
