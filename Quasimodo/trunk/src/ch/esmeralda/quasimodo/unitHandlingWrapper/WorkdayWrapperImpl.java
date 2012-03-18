@@ -28,10 +28,9 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 	
 	/**
 	 *  Gets a full Workday Update from the Server
-	 * @param listofTU insert the List of TaskUnits here to update.  (Exchange with the to be modified workday later)
 	 * @return the boolean state: false if the operation failed or true if it was successful
 	 */
-	public boolean getWorkday(ArrayList<TaskUnit> listofTU){
+	public boolean getNewList(){
 		QueryDataPkg req = new QueryDataPkg(0, null);
 		return sendAndHandleAns(req);
 	}
@@ -40,39 +39,46 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		QueryDataPkg req = new QueryDataPkg(3, null);
 		boolean state = sendAndHandleAns(req);
 		if (!state) return null;
-		return lastanswer.getworkday().getList().get(0);
+		if (lastanswer.getworkday().size() != 1) {
+			ErrIncorrectPackage();
+		}
+		return lastanswer.getworkday().get(0);
 	}
 
-	public void addUnit(Date starttime, long duration, String streamURL) {
-		// TODO Auto-generated method stub
-
+	public boolean addUnit(Date starttime, long duration, String streamURL) {
+		TaskUnit senditem = new TaskUnit(starttime, duration, streamURL);
+		QueryDataPkg req = new QueryDataPkg(1, senditem);
+		return sendAndHandleAns(req);
 	}
 
-	public void removeUnitByIndex(int index) {
-		// TODO Auto-generated method stub
-
+	public boolean removeUnitByIndex(int index) {
+		// does nothing!
+		Log.d("Local","removeUnitByIndex is not implemented!");
+		return false;
 	}
 
-	public void removeUnitByKey(int key) {
-		// TODO Auto-generated method stub
-
+	public boolean removeUnitByKey(int key) {
+		TaskUnit senditem = new TaskUnit(null, 0L);
+		senditem.setKey(key);
+		QueryDataPkg req = new QueryDataPkg(2, senditem);
+		return sendAndHandleAns(req);
 	}
 
 	public int size() {
 		if (lastanswer != null)
-			return lastanswer.getworkday().getList().size();
+			return lastanswer.getworkday().size();
 		return -1;
 	}
 
 	public List<TaskUnit> getList() {
 		if (lastanswer != null)
-			return lastanswer.getworkday().getList();
+			return lastanswer.getworkday();
 		return null;
 	}
 
-	public void reset() {
-		// TODO Auto-generated method stub
-
+	public boolean reset() {
+		QueryDataPkg req = new QueryDataPkg(4, null);
+		return sendAndHandleAns(req);
 	}
 	
 	/**
@@ -86,15 +92,20 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 			ans = (AnsDataPkg)connection.sendRequest(datapkg);
 			this.lastanswer = ans;
 		} catch (Exception e) {
-			System.out.println("Warning: I did not receive a proper Answer Data Package.");
-			Log.w("WorkdayWrapper", "I did not receive a proper Answer Data Package.");
+			ErrIncorrectPackage();
 			return false;
 		}
 		if (ans != null && ans.getaction() == datapkg.getaction()){
 			if (ans.getstate()) {
-				listofTU.clear();							// change accordingly to workday!
-				listofTU.addAll(ans.getworkday().getList());
-				Log.d("WorkdayWrapper","The server completed the request and sent a new workday.");
+				if (ans.getaction() == 0 || ans.getaction() == 1 || ans.getaction() == 2 || ans.getaction() == 4) {
+					listofTU.clear();
+					listofTU.addAll(ans.getworkday());
+				} else if (ans.getaction() == 3){
+				} else {
+					ErrIncorrectPackage();
+					return false;
+				}
+				Log.d("WorkdayWrapper","The server completed the request " + Integer.toString(ans.getaction()) + " and sent a correct processed package.");
 				return true;
 			} else {
 				System.out.println("Warning: The Server could not complete the request.");
@@ -102,9 +113,16 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 				return false;
 			}
 		}
+		ErrIncorrectPackage();
+		return false;
+	}
+	
+	/**
+	 * Simples loggen und ausgeben eines Fehlers des Antwortpackets.
+	 */
+	private void ErrIncorrectPackage() {
 		System.out.println("Warning: I did not receive a proper Answer Data Package.");
 		Log.w("WorkdayWrapper", "I did not receive a proper Answer Data Package.");
-		return false;
 	}
 	
 }

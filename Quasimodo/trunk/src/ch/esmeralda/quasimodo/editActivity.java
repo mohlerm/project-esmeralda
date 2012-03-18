@@ -1,5 +1,6 @@
 package ch.esmeralda.quasimodo;
 
+import ch.esmeralda.quasimodo.unitHandlingWrapper.TaskUnit;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,11 +16,13 @@ public class editActivity extends Activity implements OnClickListener{
 	Button donebtn;
 	Button deletebtn;
 	
-	String name = new String();
-    String status = new String();
+	TaskUnit tu = null;
     
     EditText nametxt;
     EditText statustxt;
+    
+    String name = new String("bla");
+    String status = new String("bla2");
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,13 +36,12 @@ public class editActivity extends Activity implements OnClickListener{
         int justnew = 0;
         if (extras != null)
         {
-        	name = extras.getString(AndroidlistviewtestActivity.ORDER_NAME_KEY);
-        	status = extras.getString(AndroidlistviewtestActivity.ORDER_STATUS_KEY);
-        	justnew = extras.getInt(AndroidlistviewtestActivity.ORDER_NEW_KEY);
+        	tu = (TaskUnit) extras.getSerializable(QuasimodoActivity.TU_OBJECT_KEY);
+        	justnew = extras.getInt(QuasimodoActivity.TU_NEW_KEY);
         }
         nametxt = (EditText) findViewById(R.id.editName);
         statustxt = (EditText) findViewById(R.id.editStatus);
-        nametxt.setText(name);
+        nametxt.setText(name);   // fill with info about task unit!
         statustxt.setText(status);
         
         donebtn.setOnClickListener(this);
@@ -58,12 +60,12 @@ public class editActivity extends Activity implements OnClickListener{
 		if (v.getId() == R.id.edit_donebtn){
 			name = nametxt.getText().toString();
 			status = statustxt.getText().toString();
-			backintent.putExtra(AndroidlistviewtestActivity.ORDER_DELETE_KEY, false);
+			backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, false);
 		} else if (v.getId() == R.id.edit_deletebtn){
-			backintent.putExtra(AndroidlistviewtestActivity.ORDER_DELETE_KEY, true);
+			backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, true);
 		}
-		backintent.putExtra(AndroidlistviewtestActivity.ORDER_NAME_KEY,name);
-		backintent.putExtra(AndroidlistviewtestActivity.ORDER_STATUS_KEY,status);
+		backintent.putExtra("herpderp2",name);
+		backintent.putExtra("herpderp",status);
 		setResult(Activity.RESULT_OK, backintent);
 		finish();
 	}

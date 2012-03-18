@@ -25,19 +25,19 @@ public interface WorkdayWrapper {
 	 * 
 	 * @param QTaskUnit
 	 */
-	public void addUnit (Date starttime,long duration,String streamURL);
+	public boolean addUnit (Date starttime,long duration,String streamURL);
 
 	/**
 	 * Removes a TaskUnit at an given index.
 	 * @param index index of the Unit which should be removed
 	 */
-	public void removeUnitByIndex (int index);
+	public boolean removeUnitByIndex (int index);
 
 	/**
 	 * Removes a TaskUnit with a given key.
 	 * @param key key of the Unit which should be removed
 	 */
-	public void removeUnitByKey (int key);
+	public boolean removeUnitByKey (int key);
 	/**
 	 * Represents a Workday in a String
 	 * @return string representation of the Workday
@@ -57,7 +57,7 @@ public interface WorkdayWrapper {
 	/**
 	 * Resets a workday and removes everything
 	 */
-	public void reset();
+	public boolean reset();
 }
 
 

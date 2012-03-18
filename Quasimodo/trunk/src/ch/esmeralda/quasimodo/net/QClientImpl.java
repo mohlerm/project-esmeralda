@@ -3,6 +3,8 @@ package ch.esmeralda.quasimodo.net;
 import java.io.*;
 import java.net.*;
 
+import android.util.Log;
+
 public class QClientImpl implements QClient {
 	private Socket socket;
 	private boolean connected = false;
@@ -30,10 +32,17 @@ public class QClientImpl implements QClient {
 
 	public Object sendRequest(Object request) {
 		try {
+			Log.d("connection", "writing object:");
 			out.writeObject(request);
+			Log.d("connection", "writing object done, now flushing");
 			out.flush();
-			return in.readObject();
-		} catch (Exception e) {}
+			Log.d("connection", "flushing done, now reading");
+			Object o = in.readObject();
+			Log.d("connection", "reading done!");
+			return o;
+		} catch (Exception e) {
+			Log.e("connection","Could not complete sendRequest: " + e.getMessage());
+		}
 		return null;
 	}
 }
