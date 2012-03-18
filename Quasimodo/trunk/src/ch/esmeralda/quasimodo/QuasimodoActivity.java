@@ -28,7 +28,6 @@ import ch.esmeralda.quasimodo.net.QClient.UnableToConnectException;
 import ch.esmeralda.quasimodo.net.QClientImpl;
 import ch.esmeralda.DataExchange.*;
 
-
 public class QuasimodoActivity extends Activity {
 	
 	// Various GUI Objects
