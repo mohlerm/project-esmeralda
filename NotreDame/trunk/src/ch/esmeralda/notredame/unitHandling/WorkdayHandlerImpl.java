@@ -1,5 +1,6 @@
 package ch.esmeralda.notredame.unitHandling;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,22 +20,148 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 		if (workday==null)
 			System.err.println("Workday is null");
 		this.workday = workday;
+		System.out.println("System out stream!");
+		System.err.println("System error stream!");
 	}
 	
 	@Override
 	/**
 	 * Handles incoming requests
-	 * @param request a command from a client
-	 * @return a response to the given request
+	 * @param request a command from a client	(QueryDataPkg object)
+	 * @return a response to the given request	(AnsDataPkg object)
 	 */
 	public Object getResponse(Object request) {
+			QueryDataPkg req = null;
+			AnsDataPkg ans = null;
+			try {
+				req = (QueryDataPkg) request;
+			} catch (Exception e) {
+				System.err.println("The client sent a not valid QueryDataPkg!");
+			}
+			int action = req.getaction();
+			TaskUnit data = req.getTU();
+			switch (action) {
+			case 0:		// get the actual workday
+				ans = new AnsDataPkg(action,true,workday.getList());
+				break;
+			case 1:		// add new tu
+				TaskUnit TU = new TaskUnit(data.getStarttime(),data.getDuration(),data.getStreamURL());
+				TU.setDescription(data.getDescription());
+				TU.setKey(data.getKey());
+				workday.addUnit(TU);
+				ans = new AnsDataPkg(action,true,workday.getList());
+				break;
+			case 2:		// remove tu by key
+				long key = data.getKey();
+				if (key != 0){
+					workday.removeUnitByKey((int) key);								// workaround!! Key just should be long type!
+					ans = new AnsDataPkg(action,false,workday.getList());
+				} else {
+					System.err.println("WorkdayHandlerImpl: Key to remove was default 0.");
+					ans = new AnsDataPkg(action,true,workday.getList());
+				}
+				break;
+			case 3:		// get active tu
+				TaskUnit tu = workday.getActiveUnit(new Date());	// copy old TaskUnit from Workday
+				TaskUnit anstu = new TaskUnit(tu.getStarttime(),tu.getDuration(),data.getStreamURL());
+				anstu.setDescription(tu.getDescription());
+				anstu.setKey(tu.getKey());
+				ArrayList<TaskUnit> anslist = new ArrayList<TaskUnit>();	// create list with only one TU item.
+				anslist.add(anstu);
+				ans = new AnsDataPkg(action,true,(List<TaskUnit>)anslist);
+				break;
+			case 4:		// reset the workday
+				resetworkday();
+				ans = new AnsDataPkg(action,true,workday.getList());
+				break;
+			default:
+				ans = new AnsDataPkg(-1,false,null);
+				System.err.println("An invalid QueryDAtaPkg was sent.");
+				break;
+			}
 			
+			return ans;
 	}
 	
+	/**
+	 * Resets the whole workday to the default values.
+	 */
+	private void resetworkday() {
+		
+		String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
+		
+		workday.reset();
+		
+		long a = System.currentTimeMillis();
+		a = a-a%(1000*3600*24);
+		long start = a + 9*3600*1000;
+		
+		TaskUnit task;
+		task = new TaskUnit(new Date(start), 75*60*1000, "");
+		task.setDescription("Work1");
+		workday.addUnit(task);
+		start += 75*60*1000;
+		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
+		task.setDescription("break1");
+		workday.addUnit(task);
+		start += 15*60*1000;
+		
+		task = new TaskUnit(new Date(start), 60*60*1000, "");
+		task.setDescription("Work2");
+		workday.addUnit(task);
+		start += 60*60*1000;
+		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
+		task.setDescription("break2");
+		workday.addUnit(task);
+		start += 15*60*1000;
+		
+		task = new TaskUnit(new Date(start), 45*60*1000, "");
+		task.setDescription("Work3");
+		workday.addUnit(task);
+		start += 45*60*1000;
+		
+		task = new TaskUnit(new Date(start), 60*60*1000, DI_TRANCE);		
+		task.setDescription("supper");
+		workday.addUnit(task);
+		start += 60*60*1000;
+		
+		task = new TaskUnit(new Date(start), 75*60*1000, "");
+		task.setDescription("Work1");
+		workday.addUnit(task);
+		start += 75*60*1000;
+		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
+		task.setDescription("break1");
+		workday.addUnit(task);
+		start += 15*60*1000;
+		
+		task = new TaskUnit(new Date(start), 60*60*1000, "");
+		task.setDescription("Work2");
+		workday.addUnit(task);
+		start += 60*60*1000;
+		
+		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
+		task.setDescription("break2");
+		workday.addUnit(task);
+		start += 15*60*1000;
+		
+		task = new TaskUnit(new Date(start), 45*60*1000, "");
+		task.setDescription("Work3");
+		workday.addUnit(task);
+		start += 45*60*1000;
+		
+		task = new TaskUnit(new Date(start), 10*60*1000, DI_TRANCE);		
+		task.setDescription("end of day");
+		workday.addUnit(task);
+	}
 	
 	
 
 }
+
+
 
 
 
