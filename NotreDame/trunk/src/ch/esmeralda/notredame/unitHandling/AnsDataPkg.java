@@ -1,15 +1,20 @@
 package ch.esmeralda.notredame.unitHandling;
 
+import java.io.Serializable;
+import java.util.List;
 
-public class AnsDataPkg {
+
+public class AnsDataPkg implements Serializable{
+
+	private static final long serialVersionUID = -5951515345498462431L;
 	// Control fields:
-	public int action;
-	public boolean state;
+	private int action;
+	private boolean state;
 	
 	// Data fields for answer:
-	public Workday workday;
+	private List<TaskUnit> workday;
 	
-	public AnsDataPkg(int action, boolean state, Workday workday){
+	public AnsDataPkg(int action, boolean state, List<TaskUnit> workday){
 		this.action = action;
 		this.state = state;
 		this.workday = workday;
@@ -21,7 +26,7 @@ public class AnsDataPkg {
 	public boolean getstate() {
 		return this.state;
 	}
-	public Workday getworkday() {
+	public List<TaskUnit> getworkday() {
 		return this.workday;
 	}
 }
