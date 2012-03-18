@@ -1,18 +1,13 @@
 package ch.esmeralda.notredame.main;
 
 import java.net.Socket;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import ch.esmeralda.notredame.jobs.AthmosStream;
-import ch.esmeralda.notredame.jobs.StreamJob;
-import ch.esmeralda.notredame.jobs.TimerJob;
-import ch.esmeralda.notredame.jobs.TimerJobImpl;
+import ch.esmeralda.notredame.jobs.*;
 import ch.esmeralda.notredame.net.NServer;
 //import ch.esmeralda.notredame.net.NServerImpl;
 import ch.esmeralda.notredame.net.NServerImplEppi;
