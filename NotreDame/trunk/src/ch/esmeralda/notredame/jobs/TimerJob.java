@@ -1,6 +1,6 @@
 package ch.esmeralda.notredame.jobs;
 
-import ch.esmeralda.notredame.unitHandling.TaskUnit;
+import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 /**
  * TimerJob starts and stops the SoundStream depending on the active

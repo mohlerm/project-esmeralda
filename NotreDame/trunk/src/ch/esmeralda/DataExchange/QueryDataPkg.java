@@ -1,4 +1,4 @@
-package ch.esmeralda.notredame.unitHandling;
+package ch.esmeralda.DataExchange;
 
 import java.io.Serializable;
 

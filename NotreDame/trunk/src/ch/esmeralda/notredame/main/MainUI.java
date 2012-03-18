@@ -14,8 +14,9 @@ import ch.esmeralda.notredame.jobs.StreamJob;
 import ch.esmeralda.notredame.jobs.TimerJob;
 import ch.esmeralda.notredame.jobs.TimerJobImpl;
 import ch.esmeralda.notredame.net.NServer;
-import ch.esmeralda.notredame.net.NServerImpl;
-import ch.esmeralda.notredame.unitHandling.TaskUnit;
+//import ch.esmeralda.notredame.net.NServerImpl;
+import ch.esmeralda.notredame.net.NServerImplEppi;
+import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 import ch.esmeralda.notredame.unitHandling.WorkdayHandler;
 import ch.esmeralda.notredame.unitHandling.WorkdayHandlerImpl;
@@ -43,13 +44,14 @@ public class MainUI{
 		if(true){//args.length>0){
 			workday = set_debug();
 			System.out.println(workday.toString());
+			System.out.println(workday.getList().size());
 		}
 		
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
 		if(L) System.out.println("schedule jobs");
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
-		NServer server = new NServerImpl(workdayHandler);
+		NServer server = new NServerImplEppi(workdayHandler);
 		server.start(SERVERPORT);
 		
 		Scanner in = new Scanner(System.in);

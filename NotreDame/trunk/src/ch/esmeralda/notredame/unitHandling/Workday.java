@@ -3,6 +3,8 @@ package ch.esmeralda.notredame.unitHandling;
 import java.util.Date;
 import java.util.List;
 
+import ch.esmeralda.DataExchange.TaskUnit;
+
 /**
  * class WorkDay
  * 

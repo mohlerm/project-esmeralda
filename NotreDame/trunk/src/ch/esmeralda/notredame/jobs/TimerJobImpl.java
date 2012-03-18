@@ -2,7 +2,7 @@ package ch.esmeralda.notredame.jobs;
 
 import java.sql.Timestamp;
 
-import ch.esmeralda.notredame.unitHandling.TaskUnit;
+import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class TimerJobImpl extends TimerJob{
