@@ -34,13 +34,14 @@ public class MainUI{
 
 		Workday workday = new WorkdayImpl();
 		
-		WorkdayHandler workdayHandler = new WorkdayHandlerImpl(workday);
-		
 		if(true){//args.length>0){
 			workday = set_debug();
 			System.out.println(workday.toString());
 			System.out.println(workday.getList().size());
 		}
+		
+		WorkdayHandler workdayHandler = new WorkdayHandlerImpl(workday);
+		
 		
 		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
 		
