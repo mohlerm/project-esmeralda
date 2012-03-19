@@ -71,10 +71,15 @@ public class NServerImpl implements NServer {
 			} catch (Exception e) {}
 		}
 		public void run() {
-			try {
-				out.writeObject(workdayHandler.getResponse(in.readObject()));
-				out.flush();
-			} catch (Exception e) {}
+			while(true){
+				try {
+					out.writeObject(workdayHandler.getResponse(in.readObject()));
+					out.flush();
+				} catch (Exception e) {
+					System.out.println("Connection lost");
+					break;
+				}
+			}
 		}
 	}
 }
