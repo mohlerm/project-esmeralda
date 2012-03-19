@@ -72,7 +72,6 @@ public class NServerImpl implements NServer {
 		}
 		public void run() {
 			try {
-				in.readObject();
 				out.writeObject(workdayHandler.getResponse(in.readObject()));
 				out.flush();
 			} catch (Exception e) {}
