@@ -13,11 +13,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -92,37 +94,47 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.set_defaultbtn:
-			ip = DefaultIP;
-			port = DefaultPORT;
-			editip.setText(ip);
-	        editport.setText(Integer.toString(port));
+			// default ip and port
+				ip = DefaultIP;
+				port = DefaultPORT;
+				editip.setText(ip);
+		        editport.setText(Integer.toString(port));
+	        // clear Radio List
+		        RADIO_LIST.clear();
+		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
+		        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
+		        // add the last button
+			        RadioStation adder = new RadioStation("","New Radio...");
+		     		adder.newtag = true;
+		     		RADIO_LIST.add(adder);
+	     		reinit_RadioList();
 	        return;
 		case R.id.set_savebtn:
 			// Prüfe ob IP richtig eingegeben.
-			if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
-				Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
-				return;
-			}
-			ip = editip.getText().toString();
-			
+				if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
+					Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
+					return;
+				}
+				ip = editip.getText().toString();
+				
 			// Prüfe ob Port richtig eingegeben.
-			int tempport = Integer.parseInt(editport.getText().toString());
-			if (tempport < 0 || tempport > 65536) {
-				Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
-				return;
-			}
-			port = tempport;
+				int tempport = Integer.parseInt(editport.getText().toString());
+				if (tempport < 0 || tempport > 65536) {
+					Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
+					return;
+				}
+				port = tempport;
 			
 			// Alles ok, schreibe die Einstellungen und die RadioListe
-			RADIO_LIST.remove(RADIO_LIST.size()-1);
-			writeRadioList(RADIO_LIST,RadioListFilename);
-			
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(SET_IP_KEY,ip);
-			editor.putInt(SET_PORT_KEY,port);
-			editor.commit();
-			setResult(Activity.RESULT_OK, null);
-			finish();
+				RADIO_LIST.remove(RADIO_LIST.size()-1);
+				writeRadioList(RADIO_LIST,RadioListFilename);
+				
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putString(SET_IP_KEY,ip);
+				editor.putInt(SET_PORT_KEY,port);
+				editor.commit();
+				setResult(Activity.RESULT_OK, null);
+				finish();
 		default:
 		}
 	}
@@ -142,6 +154,10 @@ public class SettingsActivity extends Activity implements OnClickListener{
                 	EditText url_edit = (EditText) textEntryView.findViewById(R.id.radiourl_edit);
                 	RADIO_LIST.add(RADIO_LIST.size()-1, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
                 	reinit_RadioList();
+                	// lässt Tastatur verschwinden.
+	                	InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
+	        	        if (name_edit != null) 
+	        	        	inputManager.hideSoftInputFromWindow(name_edit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -167,6 +183,11 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				}
 			}
         });
+        // lässt Tastatur verschwinden.
+	        InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
+	        View v = this.getCurrentFocus();
+	        if (v != null) 
+	        	inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 	
 	private class RadioAdapter extends ArrayAdapter<RadioStation> implements OnClickListener {
