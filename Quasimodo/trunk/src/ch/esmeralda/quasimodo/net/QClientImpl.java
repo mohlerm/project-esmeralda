@@ -13,7 +13,9 @@ public class QClientImpl implements QClient {
 	
 	public void connect(String ip, int port) throws UnableToConnectException {
 		try {
-			socket = new Socket(ip, port);
+			socket = new Socket();
+			SocketAddress sockaddr = new InetSocketAddress(ip, port);
+			socket.connect(sockaddr, 3000);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 			connected = true;
