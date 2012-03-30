@@ -1,6 +1,5 @@
 package ch.esmeralda.quasimodo.net;
 
-import java.net.*;
 
 public class QClientTester {
 
