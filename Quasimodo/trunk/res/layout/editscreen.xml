@@ -13,24 +13,40 @@
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+        <Button
+        	android:id="@+id/edit_workTU"
+        	android:layout_height="wrap_content"
+        	android:layout_width="fill_parent"
+        	android:text="Work"
+        	android:layout_weight="1" />
+	    <Button
+         	android:id="@+id/edit_breakTU"
+         	android:layout_height="wrap_content"
+         	android:layout_width="fill_parent"
+         	android:text="Break"
+         	android:layout_weight="1" />
+	</LinearLayout>
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         
 			<TextView
-                android:id="@+id/textView1"
-                android:layout_width="fill_parent"
+                android:layout_width="80dip"
                 android:layout_height="wrap_content"
-                android:text="OrderName"
+                android:text="Start"
                 android:layout_margin="4dip"
-                android:layout_gravity="center"
-                android:layout_weight="3" />
-            <EditText
-                android:id="@+id/editName"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dip"
-                android:layout_weight="1" />
+                android:layout_gravity="center"/>
+
+			<TimePicker
+			    android:id="@+id/TimePicker_Start"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="left" />
             
       </LinearLayout>
       
@@ -38,21 +54,19 @@
 		android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-            
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="OrderStatus"
-                android:layout_margin="4dip"
-                android:layout_gravity="center"
-                android:layout_weight="3"/>
-            <EditText
-                android:id="@+id/editStatus"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dip"
-                android:layout_weight="1"/>
+
+          <TextView
+              android:layout_width="80dip"
+              android:layout_height="wrap_content"
+              android:layout_margin="4dip"
+              android:text="End"
+              android:layout_gravity="center" />
+
+          <TimePicker
+              android:id="@+id/TimePicker_End"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="left" />
             
     	</LinearLayout>
 
@@ -63,24 +77,28 @@
 
           <TextView
               android:id="@+id/TextView3"
-              android:layout_width="fill_parent"
+              android:layout_width="80dip"
               android:layout_height="wrap_content"
               android:layout_gravity="center"
               android:layout_margin="4dip"
-              android:text="Radio Stream"
-              android:layout_weight="3" />
+              android:text="Radio Stream" />
 
           <Spinner
               android:id="@+id/RadioStationSpinner"
               android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:layout_weight="1" />
+              android:layout_height="wrap_content"/>
       </LinearLayout>
     
+      <!-- filler -->
+	<TextView android:layout_height="0dip" 
+	          android:layout_width="fill_parent"
+	          android:layout_weight="1" />
+      
 	<LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:orientation="horizontal">
+	    android:orientation="horizontal"
+	    android:layout_gravity="bottom">
         <Button
         	android:id="@+id/edit_deletebtn"
         	android:layout_height="wrap_content"
