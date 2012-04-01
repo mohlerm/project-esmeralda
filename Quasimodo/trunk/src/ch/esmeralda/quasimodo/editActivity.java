@@ -12,10 +12,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 public class editActivity extends Activity implements OnClickListener{
 	
@@ -24,12 +25,11 @@ public class editActivity extends Activity implements OnClickListener{
 	
 	TaskUnit tu = null;
     
-    EditText nametxt;
-    EditText statustxt;
+	TimePicker StartTimePicker;
+	TimePicker EndTimePicker;
     Spinner radiospinner;
     
-    String name = new String("bla");
-    String status = new String("bla2");
+    // add data classes for the start time and end time
     
     public  ArrayList<RadioStation> Radio_List;
 	
@@ -45,7 +45,15 @@ public class editActivity extends Activity implements OnClickListener{
         // find Views and make objects.
         donebtn = (Button) findViewById(R.id.edit_donebtn);
         deletebtn = (Button) findViewById(R.id.edit_deletebtn);
+        
+        // fill the Radio Station spinner
         radiospinner = (Spinner) findViewById(R.id.RadioStationSpinner);
+        ArrayList<String> RadioStationNames = new ArrayList<String>();
+        for (RadioStation o : Radio_List) {
+        	RadioStationNames.add(o.name);
+        }
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, RadioStationNames);
+        radiospinner.setAdapter(spinnerArrayAdapter);
         
         // set further View settings.
         donebtn.setOnClickListener(this);
@@ -59,10 +67,11 @@ public class editActivity extends Activity implements OnClickListener{
         	tu = (TaskUnit) extras.getSerializable(QuasimodoActivity.TU_OBJECT_KEY);
         	justnew = extras.getInt(QuasimodoActivity.TU_NEW_KEY);
         }
-        nametxt = (EditText) findViewById(R.id.editName);
-        statustxt = (EditText) findViewById(R.id.editStatus);
-        nametxt.setText(name);   // fill with info about task unit!
-        statustxt.setText(status);
+        StartTimePicker = (TimePicker) findViewById(R.id.TimePicker_Start);
+        EndTimePicker = (TimePicker) findViewById(R.id.TimePicker_End);
+        
+        // fill with info about task unit!
+        
         
         
         // We just added a new TU, grey out delete button.
@@ -87,16 +96,15 @@ public class editActivity extends Activity implements OnClickListener{
 		Intent backintent = new Intent();
 		if (v.getId() == R.id.edit_donebtn){
 			// done button
-			name = nametxt.getText().toString();
-			status = statustxt.getText().toString();
+			// get time from timepicker
 			backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, false);
 		} else if (v.getId() == R.id.edit_deletebtn){
 			// delete button
 			backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, true);
 		}
-		backintent.putExtra("herpderp2",name);
-		backintent.putExtra("herpderp",status);
 		setResult(Activity.RESULT_OK, backintent);
 		finish();
 	}
+	
+
 }

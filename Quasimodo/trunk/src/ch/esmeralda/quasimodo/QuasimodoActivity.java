@@ -1,6 +1,7 @@
 package ch.esmeralda.quasimodo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -197,24 +198,28 @@ public class QuasimodoActivity extends Activity {
                 TaskUnit o = items.get(position);
                 int curkey = (int) o.getKey();
                 if (o != null) {
+                	// fill View with info
                 	Log.d("QAct","adding TU to list: "+o.toString());
-                	ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
-                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
-                		icon.setImageResource(R.drawable.pause);
-                	} else {
-                		icon.setImageResource(R.drawable.work);
-                	}
                 	Button btnRemove = (Button) v.findViewById(R.id.editbutton);
                     btnRemove.setTag(curkey);
                     btnRemove.setOnClickListener(this);     
                 	TextView tt = (TextView) v.findViewById(R.id.toptext);
                     TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-                    if (tt != null) {
-                          // Set Value of upper text to something
-                    }
-                    if(bt != null){
-                          // set Value of lower text to something
-                    }
+                    ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
+                    // convert Time Data etc.
+                    Date starttime = o.getStarttime();
+                    Date endtime = new Date();
+                    endtime.setTime(starttime.getTime() + o.getDuration());
+                    String timestring = new String(starttime.getHours()+":"+starttime.getMinutes()+" - "+endtime.getHours()+":"+endtime.getMinutes());
+                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
+                		icon.setImageResource(R.drawable.pause);
+                		if (tt != null) { tt.setText(timestring); }
+                        if(bt != null) { bt.setText(o.getStreamURL()); }
+                	} else {
+                		icon.setImageResource(R.drawable.work);
+                		if (tt != null) { tt.setText(timestring); }
+                		if(bt != null) { bt.setVisibility(View.GONE); }
+                	}
                 }
                 return v;
         }
