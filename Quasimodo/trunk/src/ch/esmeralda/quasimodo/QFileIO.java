@@ -14,8 +14,8 @@ import android.util.Log;
 
 public class QFileIO {
 	/**
-	 * Füllt die RadioListe mit statischen werten.
-	 * Eventuell später noch dynamisch machen.
+	 * Fï¿½llt die RadioListe mit statischen werten.
+	 * Eventuell spï¿½ter noch dynamisch machen.
 	 */
 	public static boolean loadRadioList(Activity act,List<RadioStation> liste,String filename) {
 		
@@ -51,7 +51,7 @@ public class QFileIO {
 					Log.d("Settings File IO","Received EOF.");
 					break;
 				}
-				// liste auffüllen.
+				// liste auffï¿½llen.
 				if (name) {
 					adder = new RadioStation(inline,"");
 					name = false;
