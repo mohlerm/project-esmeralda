@@ -3,6 +3,7 @@ package ch.esmeralda.quasimodo.unitHandlingWrapper;
 import java.io.NotActiveException;
 
 import ch.esmeralda.DataExchange.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,11 +15,11 @@ import ch.esmeralda.quasimodo.net.QClient;
 public class WorkdayWrapperImpl implements WorkdayWrapper {
 
 	private QClient connection;
-	private ArrayList<TaskUnit> listofTU;   	// Pointer to our TaskUnitList or Workday to be displayed (change accordingly)
+	private List<TaskUnit> listofTU;   	// Pointer to our TaskUnitList or Workday to be displayed (change accordingly)
 	private AnsDataPkg lastanswer;				// always the last answer package (unchecked for errors!)
 	
-	public WorkdayWrapperImpl(QClient client, ArrayList<TaskUnit> inputlist) throws NotActiveException {
-		this.listofTU = inputlist;
+	public WorkdayWrapperImpl(QClient client, List<TaskUnit> m_qtus) throws NotActiveException {
+		this.listofTU = m_qtus;
 		this.connection = client;
 		if (!connection.isConnected()) {
 			System.err.println("Error, the connection is not set!");
@@ -59,7 +60,7 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		return false;
 	}
 
-	public boolean removeUnitByKey(int key) {
+	public boolean removeUnitByKey(long key) {
 		TaskUnit senditem = new TaskUnit(null, 0L);
 		senditem.setKey(key);
 		QueryDataPkg req = new QueryDataPkg(2, senditem);
@@ -100,6 +101,7 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		if (ans != null && ans.getaction() == datapkg.getaction()){
 			if (ans.getstate()) {
 				if (ans.getaction() == 0 || ans.getaction() == 1 || ans.getaction() == 2 || ans.getaction() == 4) {
+					Log.d("WorkdayWrapper","clearing and readding the list of TU!");
 					listofTU.clear();
 					listofTU.addAll(ans.getworkday());
 				} else if (ans.getaction() == 3){
