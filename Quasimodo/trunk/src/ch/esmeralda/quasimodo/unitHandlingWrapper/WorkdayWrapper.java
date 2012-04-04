@@ -37,9 +37,9 @@ public interface WorkdayWrapper {
 
 	/**
 	 * Removes a TaskUnit with a given key.
-	 * @param key key of the Unit which should be removed
+	 * @param modified_key key of the Unit which should be removed
 	 */
-	public boolean removeUnitByKey (int key);
+	public boolean removeUnitByKey (long modified_key);
 	/**
 	 * Represents a Workday in a String
 	 * @return string representation of the Workday

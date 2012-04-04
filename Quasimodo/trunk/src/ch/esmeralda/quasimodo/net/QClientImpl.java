@@ -25,6 +25,7 @@ public class QClientImpl implements QClient {
 	public void disconnect() {
 		try {
 			socket.close();
+			connected = false;
 		} catch (Exception e) {}
 	}
 

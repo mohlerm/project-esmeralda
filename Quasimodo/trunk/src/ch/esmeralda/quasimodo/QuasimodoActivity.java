@@ -1,5 +1,6 @@
 package ch.esmeralda.quasimodo;
 
+import java.io.NotActiveException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,8 @@ import android.widget.Toast;
 import ch.esmeralda.quasimodo.net.QClient;
 import ch.esmeralda.quasimodo.net.QClient.UnableToConnectException;
 import ch.esmeralda.quasimodo.net.QClientImpl;
+import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapper;
+import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapperImpl;
 import ch.esmeralda.DataExchange.*;
 
 public class QuasimodoActivity extends Activity {
@@ -48,6 +51,7 @@ public class QuasimodoActivity extends Activity {
     private String ip;
     private int port;
     private QClient connection;
+    private WorkdayWrapper wrapper;
     
     // Public constants
     public static final String PREFS_NAME = "EsmeraldaPrefsFile";
@@ -89,6 +93,7 @@ public class QuasimodoActivity extends Activity {
 		connection = (QClient) new QClientImpl();
         connectbutton.performClick();
         
+        
     }
 
     /**
@@ -97,7 +102,9 @@ public class QuasimodoActivity extends Activity {
      */
 	private class AddListenerClass implements OnClickListener{
 		public void onClick(View v) {
-			startedit(-1,1);
+			if (connection.isConnected()) {
+				startedit(0,0,true);
+			}
 		}
     }
 	
@@ -126,6 +133,13 @@ public class QuasimodoActivity extends Activity {
 						Log.e("connection", "UnableToConnect Exception thrown, could not connect to server.");
 					}
 					if (connection.isConnected()) {
+						// were connected, initialize the workday wrapper!
+						try	{
+							wrapper = (WorkdayWrapper) new WorkdayWrapperImpl(connection,m_qtus);
+						} catch (NotActiveException e) {
+							Log.e("Qact connection","connection not set while making the workdaywrapper!");
+							e.printStackTrace();
+						}
 						// were connected, start the reading thread:
 						Thread net_thrd =  new Thread(null, GetWorkday, "GetDatafromServer");
 				        net_thrd.start();
@@ -196,30 +210,39 @@ public class QuasimodoActivity extends Activity {
                     v = vi.inflate(R.layout.row, null);
                 }
                 TaskUnit o = items.get(position);
-                int curkey = (int) o.getKey();
                 if (o != null) {
                 	// fill View with info
-                	Log.d("QAct","adding TU to list: "+o.toString());
-                	Button btnRemove = (Button) v.findViewById(R.id.editbutton);
-                    btnRemove.setTag(curkey);
-                    btnRemove.setOnClickListener(this);     
-                	TextView tt = (TextView) v.findViewById(R.id.toptext);
-                    TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-                    ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
+	                	Log.d("QAct","adding TU to list: "+o.toString());
+	                // Button
+	                	Button btnRemove = (Button) v.findViewById(R.id.editbutton);
+	                	TUTag tag = new TUTag(position, o.getKey());
+	                    btnRemove.setTag(tag);
+	                    btnRemove.setOnClickListener(this);
+	                // TextView und ImageView
+	                	TextView tt = (TextView) v.findViewById(R.id.toptext);
+	                    TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+	                    ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
                     // convert Time Data etc.
-                    Date starttime = o.getStarttime();
-                    Date endtime = new Date();
-                    endtime.setTime(starttime.getTime() + o.getDuration());
-                    String timestring = new String(starttime.getHours()+":"+starttime.getMinutes()+" - "+endtime.getHours()+":"+endtime.getMinutes());
-                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
-                		icon.setImageResource(R.drawable.pause);
-                		if (tt != null) { tt.setText(timestring); }
-                        if(bt != null) { bt.setText(o.getStreamURL()); }
-                	} else {
-                		icon.setImageResource(R.drawable.work);
-                		if (tt != null) { tt.setText(timestring); }
-                		if(bt != null) { bt.setVisibility(View.GONE); }
-                	}
+	                    Date starttime = o.getStarttime();
+	                    Date endtime = new Date();
+	                    endtime.setTime(starttime.getTime() + o.getDuration());
+	                    String timestring = new String(starttime.getHours()+":"+starttime.getMinutes()+" - "+endtime.getHours()+":"+endtime.getMinutes());
+		            // je nach pause/work einfüllen
+	                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
+	                		icon.setImageResource(R.drawable.pause);
+	                		if (tt != null) { tt.setText(timestring); }
+	                        if(bt != null) { 
+	                        	bt.setText(o.getStreamURL());
+	                        	bt.setVisibility(View.VISIBLE);
+	                        }
+	                	} else {
+	                		icon.setImageResource(R.drawable.work);
+	                		if (tt != null) { tt.setText(timestring); }
+	                		if(bt != null) {
+	                			bt.setText("");
+	                			bt.setVisibility(View.GONE);
+	                		}
+	                	}
                 }
                 return v;
         }
@@ -227,25 +250,98 @@ public class QuasimodoActivity extends Activity {
          * What happens on the edit buttons?
          */
 		public void onClick(View v) {
-			 startedit((Integer) v.getTag(),0);
+			TUTag tag = (TUTag) v.getTag();
+			startedit(tag.position,tag.key,false);
 		}
     }
     
+    private class TUTag {
+    	public int position;
+    	public long key;
+    	public TUTag(int p, long k) {
+    		this.position = p; this.key = k;
+    	}
+    }
     
-    // ------------------------ get results from subactivity
     
-   
+    // ------------------------ Edit Screen related
+    
+   /**
+    * Function called when we want to edit or add a TaskUnit
+    * @param key	key of the TaskUnit to be edited.
+    * @param add	false if we edit, true if we add a new one TU
+    * @param index	position of the TU in the m_qtus
+    */
+    private long modified_key;
+    private void startedit(int index, long key ,boolean add) {
+    	TaskUnit orig;
+    	TaskUnit tu;
+    	final Intent i = new Intent(this, editActivity.class);
+    	if (!add) {
+    		orig = m_qtus.get(index);
+    		tu = new TaskUnit(orig.getStarttime(),orig.getDuration(),orig.getStreamURL());
+    		modified_key = key;
+        	i.putExtra(TU_OBJECT_KEY,tu);
+    	}
+	    i.putExtra(TU_NEW_KEY, add);
+    	startActivityForResult(i,0);
+    }
+    
+    private void notifyadapter() {
+    	m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
+		lv_qtu.setAdapter(m_adapter);
+    }
+    
+    
+    // 	------------------------ get results from subactivity
+    
     /**
-     * RequestCode 0: Back from Edit Activity.
-     *             1: Back from Settings Activity
+     * RequestCode 	0: Back from Edit Activity.
+     *             	1: Back from Settings Activity
      */
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    switch (requestCode) {
+	    // back from edit activity.
 	    case 0:
-	    	// edit values come back by intent extras!
-	    	// store data to server
-		    break;
+	    	if (resultCode == Activity.RESULT_OK) {
+	    		// get exras von intent
+			    	final Bundle extras = data.getExtras();
+			    	TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
+			    	boolean delete = (Boolean) extras.get(TU_DELETE_KEY);
+			    	boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
+		    	// lösche die aktuel modifizierende TU
+			    	if (delete) {
+			    		if (wrapper.removeUnitByKey(modified_key)) {
+			    			Log.d("Qact connect","removed a TU by key!");	    
+			    		} else {
+			    			Log.e("Qact connect","could not remove TU by key!");
+			    		}
+			    		notifyadapter();
+			    	}
+		    	// wenn nicht gelöscht, dann erstelle ein neues TU! (und lösche eventuell das alte)
+			    	else {
+			    		boolean res;
+			    		if (!justnew) {
+			    			// Da wir kein neues hinzugefügt haben, müssen wir da alte löschen!
+			    			res = wrapper.removeUnitByKey(modified_key);
+			    			Log.d("Qact connect","altes TU löschen vor neuem TU machen:"+res);
+			    		}
+			    		if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dürfte!"); break; }
+			    		res = wrapper.addUnit(TUret.getStarttime(), TUret.getDuration(), TUret.getStreamURL());
+			    		Log.d("Qact connect","resultat von wrapper.addunit(3): "+res);
+			    		if (!res) {
+			    			connection.disconnect();
+			    			runOnUiThread(connectionreturn);
+			    			m_qtus.clear();
+			    			notifyadapter();
+			    		} else {
+			    			notifyadapter();
+			    		}
+			    	}
+	    	}
+	    	break;
+		 // Settings Activity
 	    case 1:
 	    	switch (resultCode) {
 	    	case Activity.RESULT_OK:
@@ -256,32 +352,9 @@ public class QuasimodoActivity extends Activity {
 	    }
    		
    }
- 
-    
-    
-    // ------------------------ Edit Screen related
-    
-   /**
-    * Function called when we want to edit or add a TaskUnit
-    * @param key	key of the TaskUnit to be edited.
-    * @param code	0 for editing. 1 for adding.
-    */
-    private void startedit(int key, int code) {
-    	final Intent i = new Intent(this, editActivity.class);
-    	// put extra object stuff
-    	i.putExtra(TU_NEW_KEY, code);
-    	startActivityForResult(i,0);
-    }
     
     
 	// ------------------------- All Networking
-	
-    /**
-     * Gets a whole workday update.
-     */
-	private void getWorkdayFromNet() {
-		 connectbutton.performClick();
-	}	
 	
 	private Runnable GetWorkday = new Runnable(){
 		public void run() {
@@ -301,11 +374,11 @@ public class QuasimodoActivity extends Activity {
 			}
 			
 			// debug
-			if (ans == null) {
-				Log.e("connection","ans is null");
-			} else {
-				if (ans.getworkday() == null) Log.e("connection","workday is null");
-			}
+				if (ans == null) {
+					Log.e("connection","ans is null");
+				} else {
+					if (ans.getworkday() == null) Log.e("connection","workday is null");
+				}
 			
 			if (ans != null && ans.getworkday() != null){
 				Log.d("connection", "workdaysize: "+Integer.toString(ans.getworkday().size()));
@@ -320,8 +393,7 @@ public class QuasimodoActivity extends Activity {
 	};
 	private Runnable updateList = new Runnable(){
 		public void run() {
-			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
-			lv_qtu.setAdapter(m_adapter);
+			notifyadapter();
 		}
 	};
 	
@@ -338,7 +410,11 @@ public class QuasimodoActivity extends Activity {
 		public void run() {
 			m_ProgressDialog.dismiss();
 			removeDialog(0);
-			if (!connection.isConnected()) Toast.makeText(getApplicationContext(), "Error communicating with server.", Toast.LENGTH_LONG).show();
+			if (!connection.isConnected())  {
+				Toast.makeText(getApplicationContext(), "Error communicating with server.", Toast.LENGTH_LONG).show();
+				m_qtus.clear();
+				notifyadapter();
+			}
 		}
     };
 	
