@@ -52,6 +52,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 				ans = new AnsDataPkg(action,true,workday.getList());
 				break;
 			case 1:		// add new tu
+				System.out.println("Action: add new TU, size of Workday before adding: "+Integer.toString(workday.getList().size()));
 				TaskUnit TU = new TaskUnit(data.getStarttime(),data.getDuration(),data.getStreamURL());
 				TU.setDescription(data.getDescription());
 				TU.setKey(data.getKey());
