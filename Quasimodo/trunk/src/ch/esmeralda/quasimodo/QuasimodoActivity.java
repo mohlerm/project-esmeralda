@@ -227,7 +227,7 @@ public class QuasimodoActivity extends Activity {
 	                    Date endtime = new Date();
 	                    endtime.setTime(starttime.getTime() + o.getDuration());
 	                    String timestring = new String(starttime.getHours()+":"+starttime.getMinutes()+" - "+endtime.getHours()+":"+endtime.getMinutes());
-		            // je nach pause/work einfüllen
+		            // je nach pause/work einfï¿½llen
 	                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
 	                		icon.setImageResource(R.drawable.pause);
 	                		if (tt != null) { tt.setText(timestring); }
@@ -310,7 +310,7 @@ public class QuasimodoActivity extends Activity {
 			    	TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
 			    	boolean delete = (Boolean) extras.get(TU_DELETE_KEY);
 			    	boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
-		    	// lösche die aktuel modifizierende TU
+		    	// lï¿½sche die aktuel modifizierende TU
 			    	if (delete) {
 			    		if (wrapper.removeUnitByKey(modified_key)) {
 			    			Log.d("Qact connect","removed a TU by key!");	    
@@ -319,15 +319,15 @@ public class QuasimodoActivity extends Activity {
 			    		}
 			    		notifyadapter();
 			    	}
-		    	// wenn nicht gelöscht, dann erstelle ein neues TU! (und lösche eventuell das alte)
+		    	// wenn nicht gelï¿½scht, dann erstelle ein neues TU! (und lï¿½sche eventuell das alte)
 			    	else {
 			    		boolean res;
 			    		if (!justnew) {
-			    			// Da wir kein neues hinzugefügt haben, müssen wir da alte löschen!
+			    			// Da wir kein neues hinzugefï¿½gt haben, mï¿½ssen wir da alte lï¿½schen!
 			    			res = wrapper.removeUnitByKey(modified_key);
-			    			Log.d("Qact connect","altes TU löschen vor neuem TU machen:"+res);
+			    			Log.d("Qact connect","altes TU lï¿½schen vor neuem TU machen:"+res);
 			    		}
-			    		if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dürfte!"); break; }
+			    		if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dï¿½rfte!"); break; }
 			    		res = wrapper.addUnit(TUret.getStarttime(), TUret.getDuration(), TUret.getStreamURL());
 			    		Log.d("Qact connect","resultat von wrapper.addunit(3): "+res);
 			    		if (!res) {
@@ -351,8 +351,8 @@ public class QuasimodoActivity extends Activity {
 		default:
 	    }
    		
-   }
-    
+   }   
+   
     
 	// ------------------------- All Networking
 	
@@ -398,14 +398,14 @@ public class QuasimodoActivity extends Activity {
 	};
 	
 	
-	// UI Thread für ProgressDialog
+	// UI Thread fï¿½r ProgressDialog
 	private Runnable connectprogress = new Runnable(){
 		public void run() {
 			showDialog(0);
 		}
 	};
 	
-	// Benötigt damit der Thread wieder auf das UI zugreifen darf.
+	// Benï¿½tigt damit der Thread wieder auf das UI zugreifen darf.
 	private Runnable connectionreturn = new Runnable(){
 		public void run() {
 			m_ProgressDialog.dismiss();
@@ -417,9 +417,23 @@ public class QuasimodoActivity extends Activity {
 			}
 		}
     };
+    
+    private Runnable net_add = new Runnable(){
+		public void run() {
+			// do networking stuff: add a new TU.
+		}
+    };
+    
+    private Runnable net_del = new Runnable(){
+    	public void run() {
+    		runOnUiThread(connectprogress);
+    		// do networing stuff: delete old TU by key.
+    		//runOnUiThread();
+    	}
+    };
 	
 	
-	// ------------------------- Menu Funktionalität
+	// ------------------------- Menu Funktionalitï¿½t
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
