@@ -226,7 +226,7 @@ public class QuasimodoActivity extends Activity {
 	                    Date starttime = o.getStarttime();
 	                    Date endtime = new Date();
 	                    endtime.setTime(starttime.getTime() + o.getDuration());
-	                    String timestring = new String(starttime.getHours()+":"+starttime.getMinutes()+" - "+endtime.getHours()+":"+endtime.getMinutes());
+	                    String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String schön machen entsprechend 01:03 Uhr darstellen.
 		            // je nach pause/work einfï¿½llen
 	                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
 	                		icon.setImageResource(R.drawable.pause);
@@ -299,12 +299,17 @@ public class QuasimodoActivity extends Activity {
      * RequestCode 	0: Back from Edit Activity.
      *             	1: Back from Settings Activity
      */
+   private Date glob_starttime;
+   private long glob_duration;
+   private String glob_StreamURL;
+   private boolean blockadd = false;  // dient dazu beim editieren eines TU den "Füge neue TU hinzu" Thread zu blocken bis die alte TU vom Server gelöscht wurde. 
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    switch (requestCode) {
 	    // back from edit activity.
 	    case 0:
 	    	if (resultCode == Activity.RESULT_OK) {
+
 	    		// get exras von intent
 			    	final Bundle extras = data.getExtras();
 			    	TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
@@ -312,32 +317,26 @@ public class QuasimodoActivity extends Activity {
 			    	boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
 		    	// lï¿½sche die aktuel modifizierende TU
 			    	if (delete) {
-			    		if (wrapper.removeUnitByKey(modified_key)) {
-			    			Log.d("Qact connect","removed a TU by key!");	    
-			    		} else {
-			    			Log.e("Qact connect","could not remove TU by key!");
-			    		}
-			    		notifyadapter();
+		    			runOnUiThread(connectprogress);
+			    		Thread trd = new Thread(null, net_del, "Delete TU by key over network.");
+				        trd.start();
 			    	}
 		    	// wenn nicht gelï¿½scht, dann erstelle ein neues TU! (und lï¿½sche eventuell das alte)
 			    	else {
-			    		boolean res;
 			    		if (!justnew) {
-			    			// Da wir kein neues hinzugefï¿½gt haben, mï¿½ssen wir da alte lï¿½schen!
-			    			res = wrapper.removeUnitByKey(modified_key);
-			    			Log.d("Qact connect","altes TU lï¿½schen vor neuem TU machen:"+res);
+			    			runOnUiThread(connectprogress);
+			    			blockadd = true;
+			    			Thread trd = new Thread(null, net_del, "Delete TU by key over network.");
+					        trd.start();
 			    		}
 			    		if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dï¿½rfte!"); break; }
-			    		res = wrapper.addUnit(TUret.getStarttime(), TUret.getDuration(), TUret.getStreamURL());
-			    		Log.d("Qact connect","resultat von wrapper.addunit(3): "+res);
-			    		if (!res) {
-			    			connection.disconnect();
-			    			runOnUiThread(connectionreturn);
-			    			m_qtus.clear();
-			    			notifyadapter();
-			    		} else {
-			    			notifyadapter();
-			    		}
+			    		glob_starttime = TUret.getStarttime();
+			    		glob_duration = TUret.getDuration();
+			    		glob_StreamURL = TUret.getStreamURL();
+		    			runOnUiThread(connectprogress);
+		    			while (blockadd) {}
+			    		Thread trd = new Thread(null, net_add, "Add TU over network.");
+				        trd.start();
 			    	}
 	    	}
 	    	break;
@@ -391,6 +390,7 @@ public class QuasimodoActivity extends Activity {
 			runOnUiThread(connectionreturn);
 		}
 	};
+	// UI THREAD
 	private Runnable updateList = new Runnable(){
 		public void run() {
 			notifyadapter();
@@ -399,6 +399,7 @@ public class QuasimodoActivity extends Activity {
 	
 	
 	// UI Thread fï¿½r ProgressDialog
+	// UI THREAD
 	private Runnable connectprogress = new Runnable(){
 		public void run() {
 			showDialog(0);
@@ -406,6 +407,7 @@ public class QuasimodoActivity extends Activity {
 	};
 	
 	// Benï¿½tigt damit der Thread wieder auf das UI zugreifen darf.
+	// UI THREAD
 	private Runnable connectionreturn = new Runnable(){
 		public void run() {
 			m_ProgressDialog.dismiss();
@@ -418,17 +420,36 @@ public class QuasimodoActivity extends Activity {
 		}
     };
     
+    
+    /**
+     * Network Thread zum hinzufügen einer neuen TU. die Infos für die TU sind in den glob_XXX Variablen gespeichert.
+     */
     private Runnable net_add = new Runnable(){
 		public void run() {
-			// do networking stuff: add a new TU.
+			boolean res = wrapper.addUnit(glob_starttime, glob_duration, glob_StreamURL);
+    		Log.d("Qact connect","resultat von wrapper.addunit(3): "+res);
+    		if (!res) {
+    			connection.disconnect();
+    			m_qtus.clear();
+    		}
+    		runOnUiThread(updateList);
+    		runOnUiThread(connectionreturn);
 		}
     };
     
+    /**
+     * Network Thread zum löschen einer TU by key. Muss die blockadd-semaphore auf false setzen.
+     */
     private Runnable net_del = new Runnable(){
     	public void run() {
-    		runOnUiThread(connectprogress);
-    		// do networing stuff: delete old TU by key.
-    		//runOnUiThread();
+    		if (wrapper.removeUnitByKey(modified_key)) {
+    			Log.d("Qact connect","removed a TU by key!");	    
+    		} else {
+    			Log.e("Qact connect","could not remove TU by key!");
+    		}
+    		blockadd = false; // hebe die MUTEX auf.
+    		runOnUiThread(updateList);
+    		runOnUiThread(connectionreturn);
     	}
     };
 	
