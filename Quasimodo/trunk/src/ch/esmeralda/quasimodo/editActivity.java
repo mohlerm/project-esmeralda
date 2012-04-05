@@ -28,6 +28,7 @@ public class editActivity extends Activity implements OnClickListener{
 	
 	boolean isworkTU;
 	boolean justnew;
+	int semaphore;
 	
 	TaskUnit tu = null;
     
@@ -111,9 +112,9 @@ public class editActivity extends Activity implements OnClickListener{
 	        StartTP.setIs24HourView(true);
 	        EndTP.setIs24HourView(true);
 	        
-	        //TPlistener tpl = new TPlistener();
-	        //StartTP.setOnTimeChangedListener(tpl);
-	        //EndTP.setOnTimeChangedListener(tpl);
+	        TPlistener tpl = new TPlistener();
+	        StartTP.setOnTimeChangedListener(tpl);
+	        EndTP.setOnTimeChangedListener(tpl);
 	        
 	        StartTP.setCurrentHour(starttime.getHours()); 	StartTP.setCurrentMinute(starttime.getMinutes());
 	        EndTP.setCurrentHour(endtime.getHours()); 		EndTP.setCurrentMinute(endtime.getMinutes());
@@ -132,7 +133,7 @@ public class editActivity extends Activity implements OnClickListener{
 	
 	/**
 	 * OnClick listener function for the 4 buttons.
-	 * edit und delete button closen diese activity und geben Resultate an Quasimodo activity zurück.
+	 * edit und delete button closen diese activity und geben Resultate an Quasimodo activity zurï¿½ck.
 	 */
 	public void onClick(View v) {
 		if (v.getId() == R.id.edit_donebtn){
@@ -140,7 +141,7 @@ public class editActivity extends Activity implements OnClickListener{
 				Date start = makeTodayDate(StartTP.getCurrentHour(),StartTP.getCurrentMinute());
 				Date end = makeTodayDate(EndTP.getCurrentHour(),EndTP.getCurrentMinute());
 				long duration = end.getTime()-start.getTime();
-			//  return TU ausfüllen
+			//  return TU ausfï¿½llen
 				String streamURL = "lol";
 				if (isworkTU) {
 					streamURL = "";
@@ -148,7 +149,7 @@ public class editActivity extends Activity implements OnClickListener{
 					streamURL = Radio_List.get(radiospinner.getSelectedItemPosition()).url;
 				}
 				TaskUnit retTU = new TaskUnit(start,duration,streamURL);
-			// Intent erstellen und zurückgeben und activity beenden.
+			// Intent erstellen und zurï¿½ckgeben und activity beenden.
 				Intent backintent = new Intent();
 				backintent.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
 				backintent.putExtra(QuasimodoActivity.TU_OBJECT_KEY, retTU);
@@ -156,7 +157,7 @@ public class editActivity extends Activity implements OnClickListener{
 				setResult(Activity.RESULT_OK, backintent);
 				finish();
 		} else if (v.getId() == R.id.edit_deletebtn){
-			// Delete button, einfach delete key setzen und zurückgeben.
+			// Delete button, einfach delete key setzen und zurï¿½ckgeben.
 				Intent backintent = new Intent();
 				backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, true);
 				backintent.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
@@ -180,15 +181,23 @@ public class editActivity extends Activity implements OnClickListener{
 			Date end = makeTodayDate(EndTP.getCurrentHour(),EndTP.getCurrentMinute());
 			if (view.getId() == R.id.TimePicker_Start) {
 				// End Timepicker so anpassen das er nach dem Start Time picker liegt.
-				if (start.after(end)) {
-					end = new Date(start.getTime()+60000);
+				if (start.after(end) && semaphore == 0) {
+					// Locke die Semaphore
+						semaphore = 1;
+						Thread trd = new Thread(null, TPTimeout, "SemWait");
+				        trd.start();
+					end = new Date(start.getTime()+120000);
 					EndTP.setCurrentHour(end.getHours());
 					EndTP.setCurrentMinute(end.getMinutes());
 				}
 			} else if (view.getId() == R.id.TimePicker_End) {
 				// genau das umgekehrte wie oben.
-				if (end.before(start)) {
-					start = new Date(end.getTime()-60000);
+				if (end.before(start) && semaphore == 0) {
+					// Locke die Semaphore
+						semaphore = 1;
+						Thread trd = new Thread(null, TPTimeout, "SemWait");
+				        trd.start();
+					start = new Date(end.getTime()-120000);
 					StartTP.setCurrentHour(start.getHours());
 					StartTP.setCurrentMinute(start.getMinutes());
 				}
@@ -196,9 +205,16 @@ public class editActivity extends Activity implements OnClickListener{
 		}
 	};
 	
+	Runnable TPTimeout = new  Runnable() {
+		public void run() {
+			// Warte fÃ¼r 1 Sekunde. #################################################################
+			semaphore = 0;
+		}
+	};
+	
 	
 	/**
-	 * Diese Funktionen übernehmen die Darstellungsänderungen beim Wechsel zwischen Work und Pausenmodus
+	 * Diese Funktionen ï¿½bernehmen die Darstellungsï¿½nderungen beim Wechsel zwischen Work und Pausenmodus
 	 */
 	private void setToBreak(){
 		breakbtn.setTextAppearance(this, R.style.BoldBlueText);
