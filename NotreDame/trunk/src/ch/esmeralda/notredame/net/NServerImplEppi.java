@@ -78,8 +78,13 @@ public class NServerImplEppi implements NServer {
 					out.flush();
 				} catch (IOException e) {
 					System.err.println("IOException: "+e.getMessage());
+					break;
 				} catch (ClassNotFoundException e) {
 					System.err.println("ClassNotFound: "+e.getMessage());
+					break;
+				} catch (Exception e) {
+					System.err.println("Error Transmitting: "+e.getMessage());
+					break;
 				}
 			}
 		}
