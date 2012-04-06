@@ -28,7 +28,7 @@ public class TimerJobImpl extends TimerJob{
 				streamJob.stopStream();
 				if(nextTask!=null)	streamJob.startStream(nextTask.getStreamURL());
 			}else{
-				System.out.println("sound changed, but muted");
+				System.out.println("sound changed, but muted (StreamJob is null)");
 			}
 			activeTask = nextTask;
 		}

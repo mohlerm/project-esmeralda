@@ -16,7 +16,7 @@ public class AthmosCLI extends Thread{
 	private static final int SERVERPORT = 10002;
 	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
 	
-	private static final int TimeOffset = -2;
+	private static final int UTC_OFFSET = -2;
 	
 	private boolean L = false;	// verbose flag
 	private boolean D = false;  // debug flag
@@ -73,7 +73,7 @@ public class AthmosCLI extends Thread{
 		
 		if(D){
 			if(L) d("set a debug workday...");
-			workday = set_debug();
+			set_debug(workday);
 			System.out.println(workday.toString());
 			System.out.println(workday.getList().size());
 		}
@@ -96,6 +96,12 @@ public class AthmosCLI extends Thread{
 		Scanner in = new Scanner(System.in);
 		String msg;
 		boolean quit = false;
+		/*
+		try {
+			wait(100);	//give the server some time to get ready
+		} catch (InterruptedException e1) {	}
+		*/
+		
 		 while(!quit){
 	         msg = in.nextLine();
 	         if(msg.equals("help")){
@@ -107,13 +113,16 @@ public class AthmosCLI extends Thread{
 		        	while(hour<0||hour>23){	
 		        		hour = in.nextInt();
 		        	}
+		        	hour += UTC_OFFSET;
 		        	set_default(workday,hour);
 	        	}catch(Exception e){
 	        		d("Parse Exception");
 	        	}
 	         }else if(msg.equals("show")){
 	            p(workday.toString());
-	         }else if(msg.equals("quit")){
+	         }else if(msg.equals("set debug")){
+		        set_debug(workday);
+		     }else if(msg.equals("quit")){
 	            quit = true;
 	         }else if(msg.equals("active")){
 	            active(workday);
@@ -152,8 +161,8 @@ public class AthmosCLI extends Thread{
 	    System.out.println();
 	}
 	
-	private Workday set_debug(){
-		Workday workday = new WorkdayImpl();
+	private void set_debug(Workday workday){
+		workday.reset();
 		if(L) System.out.println("prefill a debug workday");
 		long now = System.currentTimeMillis()+1000;
 		TaskUnit task;
@@ -163,7 +172,6 @@ public class AthmosCLI extends Thread{
 			task.setDescription("debug "+i);
 			workday.addUnit(task);
 		}
-		return workday;
 	}
 	
 	private void set_default(Workday workday,int hour){

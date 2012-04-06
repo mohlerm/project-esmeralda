@@ -10,7 +10,7 @@ import ch.esmeralda.notredame.unitHandling.Workday;
 import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
 
 /**
- * The actual Frontend.
+ * The actual Main class of the whole Server.
  * Notes:
  * -http://www.javazoom.net/javalayer/sources.html
  * 
@@ -28,14 +28,16 @@ public class Main {
 		boolean verbose = false;
 		boolean debug = false;
 		boolean mute = false;
-		if(args.length==0){
+		
+		if(args.length==0){								//if no command line options given, display the possible ones
 			System.out.println("fyi, there are program options:");
-			System.out.println("[-v] verbose [-d] debug [-m] mute");
-		}else{
+			System.out.println("verbose, debug, mute");
+			System.out.println("Usage: [-v] [-d] [-m] ");
+		}else{											//parse the command line options
 			for(String arg : args){
-				System.out.println(arg);
+				if(DEBUG_FLAG) System.out.println(arg);
 				try{
-					char c = arg.toCharArray()[1];
+					char c = arg.toCharArray()[1];		//might be OutOfBounds -> catch
 					
 					switch(c){
 						case 'v': verbose = true; break;
@@ -45,7 +47,7 @@ public class Main {
 							if(DEBUG_FLAG) System.out.println("Unknown option '" + arg +"'");
 					}
 				}catch(Exception e){
-					if(DEBUG_FLAG) System.out.println("unable to parse option '"+arg+"'");
+					if(DEBUG_FLAG) System.out.println("unable to parse option '"+arg+"'");	//probably OutOfBounds
 				}
 			}
 		}
@@ -64,7 +66,7 @@ public class Main {
 		if(verbose) System.out.println("exiting...");
 		
 		if(!cli.getCleanShutdownFlag()){
-			System.out.println("CLI hasn't terminated controlled, something went wrong...");
+			System.out.println("CLI hasn't terminated clean, something went wrong...");
 			System.exit(0);
 		}
 	}
