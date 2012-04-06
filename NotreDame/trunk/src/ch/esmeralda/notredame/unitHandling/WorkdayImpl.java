@@ -86,7 +86,7 @@ public class WorkdayImpl implements Workday{
 		try{
 			daylist.remove(index);
 		}catch (ArrayIndexOutOfBoundsException e){
-			
+			System.out.println("Index out of bounds. Can't remove.");
 		}
 	}
 	
@@ -98,7 +98,10 @@ public class WorkdayImpl implements Workday{
 	@Override
 	public void removeUnitByKey(int key){
 		for(TaskUnit unit : daylist){
-			if(unit.getKey()==key) daylist.remove(unit);
+			if(unit.getKey()==key){
+				daylist.remove(unit);
+				break;
+			}
 		}
 	}
 	/*
