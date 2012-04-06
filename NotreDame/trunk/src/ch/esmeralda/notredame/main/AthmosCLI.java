@@ -15,6 +15,7 @@ import ch.esmeralda.notredame.unitHandling.*;
 public class AthmosCLI extends Thread{
 	private static final int SERVERPORT = 10002;
 	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
+	private static final String VERSION = "0.9";
 	
 	private static final int UTC_OFFSET = -2;
 	
@@ -52,7 +53,7 @@ public class AthmosCLI extends Thread{
 		if(L) System.out.println("running CLI...");
 		
 		// ---- Welcome banner
-			d("    )                                  v0.9      ");
+			d("    )                                  v" + VERSION);
 			d(" ( /(        )         (                     	");
 			d(" )\\())    ( /((     (  )\\ )   )    )     (   	");
 			d("((_)\\  (  )\\())(   ))\\(()/(( /(   (     ))\\  	");
@@ -120,7 +121,9 @@ public class AthmosCLI extends Thread{
 	        	}
 	         }else if(msg.equals("show")){
 	            p(workday.toString());
-	         }else if(msg.equals("set debug")){
+	         }else if(msg.equals("about")){
+		        about();
+		     }else if(msg.equals("set debug")){
 		        set_debug(workday);
 		     }else if(msg.equals("quit")){
 	            quit = true;
@@ -265,6 +268,26 @@ public class AthmosCLI extends Thread{
         d("add  - - - - Adds a unit to the workday");
         d("show stream  Displays the name of the active stream");
         d("status - - - Displays the current status of the server");
+        d("about  - - - Displays infos about this program");
+	}
+	
+	private void about(){
+		nl();
+        d("NotreDame, Version: " + VERSION);
+        d("                 Authors:                ");
+        d("                ~~~~~~~~~~               ");
+        d("              Thomas Richner             ");
+        d("       Main,CLI,Jobs & UnitHandling      ");
+        nl();
+        d("               Sandro Sgier              "); 
+        d("      Connection Management & Stream     ");
+        nl();
+        d("             Marco Eppenberger           ");
+        d("       Communication & UnitHandling      ");
+        nl();
+        d("               Stefan Mach               ");
+        d("              Communication              ");
+        d("                ~~~~~~~~~~               ");
 	}
 	
 	private void status(){
