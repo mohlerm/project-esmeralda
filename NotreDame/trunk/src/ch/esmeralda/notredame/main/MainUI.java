@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import ch.esmeralda.notredame.jobs.*;
 import ch.esmeralda.notredame.net.NServer;
+import ch.esmeralda.notredame.net.NServerFactory;
 //import ch.esmeralda.notredame.net.NServerImpl;
 import ch.esmeralda.notredame.net.NServerImplEppi;
 import ch.esmeralda.DataExchange.TaskUnit;
@@ -47,7 +48,8 @@ public class MainUI{
 		
 		if(L) System.out.println("schedule jobs");
 		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
-		NServer server = new NServerImplEppi(workdayHandler);
+		
+		NServer server = NServerFactory.createNewInstance(workdayHandler);
 		server.start(SERVERPORT);
 		
 		Scanner in = new Scanner(System.in);
