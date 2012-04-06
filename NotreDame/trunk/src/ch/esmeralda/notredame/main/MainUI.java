@@ -149,7 +149,8 @@ public class MainUI{
 		task.setDescription("Work1");
 		workday.addUnit(task);
 		start += 75*60*1000;
-		
+		//a = a-a%(1000*3600*24);
+		//long start = a + hour*3600*1000;
 		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
 		task.setDescription("break1");
 		workday.addUnit(task);
