@@ -29,11 +29,10 @@ public final class R {
         public static final int edit_donebtn=0x7f070008;
         public static final int edit_workTU=0x7f070001;
         public static final int editbutton=0x7f070019;
-        public static final int emptylist=0x7f07000e;
         public static final int fifth=0x7f070021;
         public static final int fourth=0x7f070020;
         public static final int linearLayout1=0x7f07000a;
-        public static final int menu_disconnect=0x7f070028;
+        public static final int list_is_empty=0x7f07000e;
         public static final int menu_exit=0x7f070026;
         public static final int menu_settings=0x7f070027;
         public static final int radioname_edit=0x7f070010;
