@@ -20,24 +20,38 @@ import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
  *
  */
 public class Main {
-
+	public static final boolean DEBUG_FLAG = false;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		boolean verbose = false;
 		boolean debug = false;
-		if(args.length>0){
-			verbose = args[0].equals("-v");
-			debug   = args[0].equals("-d");
-		}
-		if(args.length>1){
-			verbose = args[1].equals("-v");
-			debug   = args[1].equals("-d");		
+		boolean mute = false;
+		if(args.length==0){
+			System.out.println("fyi, there are program options:");
+			System.out.println("[-v] verbose [-d] debug [-m] mute");
+		}else{
+			for(String arg : args){
+				System.out.println(arg);
+				try{
+					char c = arg.toCharArray()[1];
+					
+					switch(c){
+						case 'v': verbose = true; break;
+						case 'd': debug   = true; break;
+						case 'm': mute    = true; break;
+						default:
+							if(DEBUG_FLAG) System.out.println("Unknown option '" + arg +"'");
+					}
+				}catch(Exception e){
+					if(DEBUG_FLAG) System.out.println("unable to parse option '"+arg+"'");
+				}
+			}
 		}
 		
-		if(verbose) System.out.println("starting CLI" + (debug ? "in debug mode...":"..."));
-		AthmosCLI cli = new AthmosCLI(verbose,debug);
+		if(verbose) System.out.println("starting CLI, Mode: " + (debug ? "DEBUG ":" ") + (verbose ? "VERBOSE ":" ") + (mute ? "MUTE ":""));
+		AthmosCLI cli = new AthmosCLI(verbose,debug,mute);
 		cli.start();
 		
 		try {
