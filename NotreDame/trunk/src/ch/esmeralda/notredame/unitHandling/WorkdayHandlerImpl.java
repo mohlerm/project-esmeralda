@@ -17,14 +17,14 @@ import ch.esmeralda.DataExchange.TaskUnit;
  *
  */
 public class WorkdayHandlerImpl implements WorkdayHandler {
-
+	public static final boolean V = false;
 	private Workday workday;
 
 	public WorkdayHandlerImpl(Workday workday) {
 		if (workday==null)
 			System.err.println("Workday is null");
 		this.workday = workday;
-		System.out.println(workday.getList().size());
+		if(V) System.out.println("Size of the workday: " + workday.getList().size());
 	}
 	
 	@Override
