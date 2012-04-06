@@ -14,7 +14,7 @@ public class TimerJobImpl extends TimerJob{
 	@Override
 	public void run(){
 		if(D) System.out.println("running Timer...");
-		if(workday==null||streamJob==null) return;
+		if(workday==null) return;
 		//if(D) System.out.println("nothing is null");
 		/*
 		//Valid soundJob?
@@ -24,8 +24,12 @@ public class TimerJobImpl extends TimerJob{
 		
 		TaskUnit nextTask = workday.getActiveUnit(new Timestamp(System.currentTimeMillis()));
 		if(nextTask!=null&&!nextTask.equals(activeTask)){
-			streamJob.stopStream();
-			if(nextTask!=null)	streamJob.startStream(nextTask.getStreamURL());
+			if(streamJob!=null){
+				streamJob.stopStream();
+				if(nextTask!=null)	streamJob.startStream(nextTask.getStreamURL());
+			}else{
+				System.out.println("sound changed, but muted");
+			}
 			activeTask = nextTask;
 		}
 		//System.out.println("  end of run");

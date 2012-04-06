@@ -8,38 +8,36 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import ch.esmeralda.DataExchange.TaskUnit;
-import ch.esmeralda.notredame.jobs.AthmosStream;
-import ch.esmeralda.notredame.jobs.StreamJob;
-import ch.esmeralda.notredame.jobs.TimerJob;
-import ch.esmeralda.notredame.jobs.TimerJobImpl;
-import ch.esmeralda.notredame.net.NServer;
-import ch.esmeralda.notredame.net.NServerFactory;
-import ch.esmeralda.notredame.unitHandling.Workday;
-import ch.esmeralda.notredame.unitHandling.WorkdayHandler;
-import ch.esmeralda.notredame.unitHandling.WorkdayHandlerImpl;
-import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
+import ch.esmeralda.notredame.jobs.*;
+import ch.esmeralda.notredame.net.*;
+import ch.esmeralda.notredame.unitHandling.*;
 
 public class AthmosCLI extends Thread{
 	private static final int SERVERPORT = 10002;
 	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
-	private boolean L = false;
-	private boolean D = false;
+	
+	private static final int TimeOffset = -2;
+	
+	private boolean L = false;	// verbose flag
+	private boolean D = false;  // debug flag
+	private boolean M = false;  // mute flag
 	
 	private boolean clean_shutdown = false;
 	
-	private StreamJob streamJob;
-	private Workday workday;
-	private WorkdayHandler workdayHandler;
-	private TimerJob timerJob;
-	private ScheduledThreadPoolExecutor executor;
-	private NServer server = NServerFactory.createNewInstance(workdayHandler);
+	private StreamJob streamJob = null;
+	private Workday workday = null;
+	private WorkdayHandler workdayHandler = null;
+	private TimerJob timerJob = null;
+	private ScheduledThreadPoolExecutor executor = null;
+	private NServer server = null;
 	
 	public AthmosCLI(){
 
 	}
-	public AthmosCLI(boolean verbose,boolean debug){
+	public AthmosCLI(boolean verbose,boolean debug,boolean mute){
 		L = verbose;
 		D = debug;
+		M = mute;
 		if(L){
 			d("Welcome to the Notredame Server CLInterface!");
 			d("created new CLI!");
@@ -54,7 +52,7 @@ public class AthmosCLI extends Thread{
 		if(L) System.out.println("running CLI...");
 		
 		// ---- Welcome banner
-			d("    )                                        	");
+			d("    )                                  v0.9      ");
 			d(" ( /(        )         (                     	");
 			d(" )\\())    ( /((     (  )\\ )   )    )     (   	");
 			d("((_)\\  (  )\\())(   ))\\(()/(( /(   (     ))\\  	");
@@ -68,7 +66,7 @@ public class AthmosCLI extends Thread{
 		executor = new ScheduledThreadPoolExecutor(1);
 		
 		if(L) d("create streamJob...");
-		streamJob = new AthmosStream();
+		if(!M) streamJob = new AthmosStream();
 
 		if(L) d("create workday...");
 		workday = new WorkdayImpl();
@@ -104,13 +102,15 @@ public class AthmosCLI extends Thread{
 	        	 help();
 	         }else if(msg.equals("set default")){
 	        	p("starting hour: ");
-	        	int hour = in.nextInt();
-	        	while(hour<0||hour>23){	
-	        		hour = in.nextInt();
+	        	try{
+		        	int hour = in.nextInt();
+		        	while(hour<0||hour>23){	
+		        		hour = in.nextInt();
+		        	}
+		        	set_default(workday,hour);
+	        	}catch(Exception e){
+	        		d("Parse Exception");
 	        	}
-	        	p("my int is: "+hour);
-	            
-	        	set_default(workday,hour);
 	         }else if(msg.equals("show")){
 	            p(workday.toString());
 	         }else if(msg.equals("quit")){
@@ -118,19 +118,18 @@ public class AthmosCLI extends Thread{
 	         }else if(msg.equals("active")){
 	            active(workday);
 	         }else if(msg.equals("remove")){
-	        	 d("sorry, not implemented in CLI");
+	        	 d("sorry, not yet implemented in CLI");
 	            //remove();
 	         }else if(msg.equals("add")){
-	        	 d("sorry, not implemented in CLI");
+	        	 d("sorry, not yet implemented in CLI");
 	            //add();
 	         }else if(msg.equals("show stream")){
-	        	 d("sorry, not implemented in CLI");
+	        	 d("sorry, not yet implemented in CLI");
 	            //show_sounds();
 	         }else if(msg.equals("status")){
 	        	 status();
 	         }else{
-	            d("Unknown command!");
-	            help();
+	        	 if(L) d("unknown input: '" + msg + "'");
 	         }
 	      }
 		
@@ -261,12 +260,12 @@ public class AthmosCLI extends Thread{
 	}
 	
 	private void status(){
-	   	 d("Timerstatus:  \t" + (executor.isTerminated() ? "terminated" : "running"));
+	   	 d("Timerstatus:  \t" + (executor.isTerminated() ? "terminated" : "running") + (M ? "  MUTE":""));
 	   	 d("Serverstatus: \t" + (server.isRunning() ? "running" : "down"));
 	   	 List<Socket> connections= server.getConnections();
-	   	 d(" Connections: " + connections.size());
+	   	 d("|->Connections: " + connections.size());
 	   	for(Socket socket : connections){
-	   		d(" " + socket.getRemoteSocketAddress()+ ":"+socket.getPort());
+	   		d(" |->" + socket.getRemoteSocketAddress()+ ":"+socket.getPort());
 	   	}  
 	}
 	
