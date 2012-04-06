@@ -14,6 +14,8 @@ import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
  * Notes:
  * -http://www.javazoom.net/javalayer/sources.html
  * 
+ * %bin%/java -cp . ch.esmeralda.notredame.main.Main
+ * 
  * @author Thomas Richner
  *
  */
@@ -23,45 +25,33 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("starting...");
-		
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-		
-		StreamJob streamJob = new AthmosStream();
-
-		Workday workday = new WorkdayImpl();
-		
-		if(true){//args.length>0){
-			prefill(workday);
-			System.out.println(workday.toString());
+		boolean verbose = false;
+		boolean debug = false;
+		if(args.length>0){
+			verbose = args[0].equals("-v");
+			debug   = args[0].equals("-d");
+		}
+		if(args.length>1){
+			verbose = args[1].equals("-v");
+			debug   = args[1].equals("-d");		
 		}
 		
-		TimerJob timerJob = new TimerJobImpl(streamJob,workday);
+		if(verbose) System.out.println("starting CLI" + (debug ? "in debug mode...":"..."));
+		AthmosCLI cli = new AthmosCLI(verbose,debug);
+		cli.start();
 		
-		System.out.println("schedule jobs");
-		executor.scheduleAtFixedRate(timerJob, 500, 1000, TimeUnit.MILLISECONDS);
-		
-		
-		//Put here some UI Stuff if you like
 		try {
-			Thread.sleep(600000000);
-		} catch (InterruptedException e) {}
+			cli.join();
+		} catch (InterruptedException e) {
+			System.out.println("InterruptedException caught, terminating...");
+			System.exit(0);
+		}
 		
-
+		if(verbose) System.out.println("exiting...");
 		
-		System.out.println("stopping jobs");
-		executor.shutdownNow();
-		System.out.println("...bye, bye");
-	}
-	
-	private static void prefill(Workday workday){
-		System.out.println("prefill a debug workday");
-		long now = System.currentTimeMillis()+1000;
-		TaskUnit task;
-		for(int i=0;i<10;i++){
-			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, "http://u11aw.di.fm:80/di_trance");
-			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
-			workday.addUnit(task);
+		if(!cli.getCleanShutdownFlag()){
+			System.out.println("CLI hasn't terminated controlled, something went wrong...");
+			System.exit(0);
 		}
 	}
 }
