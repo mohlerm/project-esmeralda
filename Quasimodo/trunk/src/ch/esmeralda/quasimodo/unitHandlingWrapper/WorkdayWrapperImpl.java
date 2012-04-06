@@ -4,7 +4,6 @@ import java.io.NotActiveException;
 
 import ch.esmeralda.DataExchange.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,8 +21,6 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		this.listofTU = m_qtus;
 		this.connection = client;
 		if (!connection.isConnected()) {
-			System.err.println("Error, the connection is not set!");
-			Log.e("connection to server", "The QClient must be fully connected prior to create a WorkdayWrapper!");
 			throw new NotActiveException();
 		}
 		lastanswer = null;

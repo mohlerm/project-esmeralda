@@ -35,140 +35,93 @@ import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapperImpl;
 import ch.esmeralda.DataExchange.*;
 
 public class QuasimodoActivity extends Activity {
-	
+
 	// Various GUI Objects
-    private ProgressDialog m_ProgressDialog = null;
-    private Button addbutton;
-    private Button connectbutton;
-    private ListView lv_qtu;
+	private ProgressDialog m_ProgressDialog = null;
+	private Button addbutton;
+	private Button connectbutton;
+	private ListView lv_qtu;
 
-    // Data objects
-    private List<TaskUnit> m_qtus = null;
-    private TUAdapter m_adapter;
-    private SharedPreferences settings;
-    
-    // Connection specific values
-    private String ip;
-    private int port;
-    private QClient connection;
-    private WorkdayWrapper wrapper;
-    
-    // Public constants
-    public static final String PREFS_NAME = "EsmeraldaPrefsFile";
-    public static final String TU_NEW_KEY = "TUIFNEWTAGACTIVITY";
-    public static final String TU_OBJECT_KEY = "TUSTATUSTOEDITACTIVITY";
-    public static final String TU_DELETE_KEY = "TUTOBEDELETED"; 
-	
-    
-    
-    // ---------- initial Handling
-    
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	// android default
-        super.onCreate(savedInstanceState);   
-        setContentView(R.layout.main);
-        
-        // get ID's from various gui objects and initialize clickability
-        addbutton = (Button) findViewById(R.id.addbtn);
-        AddListenerClass addlistener = new AddListenerClass();
-        addbutton.setOnClickListener(addlistener);
-        
-        connectbutton = (Button) findViewById(R.id.connectbtn);
-        ConnectListenerClass connectlistener = new ConnectListenerClass();
-        connectbutton.setOnClickListener(connectlistener);
-        
-        // load previous Settings.
-        settings = getSharedPreferences(PREFS_NAME, 0);
-        readSettings();
-        
-        // load List and its adapter
-        lv_qtu = (ListView) findViewById(R.id.taskunitlist);
-        m_qtus = new ArrayList<TaskUnit>();
-        this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
-        lv_qtu.setAdapter(this.m_adapter);
-        
-        // Make Connection
-		connection = (QClient) new QClientImpl();
-        connectbutton.performClick();
-        
-        
-    }
+	// Data objects
+	private List<TaskUnit> m_qtus = null;
+	private TUAdapter m_adapter;
+	private SharedPreferences settings;
 
-    /**
-     * What happens when the "Add" button gets clicked?
-     * @author Marco
-     */
+	// Connection specific values
+	private String ip;
+	private int port;
+
+	// Public constants
+	public static final String PREFS_NAME = "EsmeraldaPrefsFile";
+	public static final String TU_NEW_KEY = "TUIFNEWTAGACTIVITY";
+	public static final String TU_OBJECT_KEY = "TUSTATUSTOEDITACTIVITY";
+	public static final String TU_DELETE_KEY = "TUTOBEDELETED"; 
+
+
+
+	// ---------- initial Handling
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// android default
+		super.onCreate(savedInstanceState);   
+		setContentView(R.layout.main);
+
+		// get ID's from various gui objects and initialize clickability
+		addbutton = (Button) findViewById(R.id.addbtn);
+		AddListenerClass addlistener = new AddListenerClass();
+		addbutton.setOnClickListener(addlistener);
+
+		connectbutton = (Button) findViewById(R.id.connectbtn);
+		ConnectListenerClass connectlistener = new ConnectListenerClass();
+		connectbutton.setOnClickListener(connectlistener);
+
+		// load previous Settings.
+		settings = getSharedPreferences(PREFS_NAME, 0);
+		readSettings();
+
+		// load List and its adapter
+		lv_qtu = (ListView) findViewById(R.id.taskunitlist);
+		lv_qtu.setEmptyView((TextView)findViewById(R.id.list_is_empty));
+		m_qtus = new ArrayList<TaskUnit>();
+		this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
+		lv_qtu.setAdapter(this.m_adapter);
+
+		// Make Connection
+		connectbutton.performClick();
+
+
+	}
+
+	/**
+	 * What happens when the "Add" button gets clicked?
+	 * @author Marco
+	 */
 	private class AddListenerClass implements OnClickListener{
 		public void onClick(View v) {
-			if (connection.isConnected()) {
-				startedit(0,0,true);
-			}
+			startedit(0,0,true);
 		}
-    }
-	
+	}
+
 	/**
 	 * What happens when the "Connect" button gets clicked?
 	 * @author Marco
 	 */
 	private class ConnectListenerClass implements OnClickListener{
 		public void onClick(View v) {
-			
+
 			// is the ip correct? if not, set it first in the settings
 			if (!ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || port < 1 || port > 65537) {
 				Toast.makeText(getApplicationContext(), "Please set the right IP and the right port in the Settings before connecting.", Toast.LENGTH_LONG).show();
 				return;
 			}
-			
-			// display progress dialog
-			runOnUiThread(connectprogress);
-			
-			// Make Connection thread
-	        Runnable connect = new Runnable(){
-	        	public void run() {
-					try {
-						connection.connect(ip, port);
-					} catch (UnableToConnectException e) {
-						Log.e("connection", "UnableToConnect Exception thrown, could not connect to server.");
-					}
-					if (connection.isConnected()) {
-						// were connected, initialize the workday wrapper!
-						try	{
-							wrapper = (WorkdayWrapper) new WorkdayWrapperImpl(connection,m_qtus);
-						} catch (NotActiveException e) {
-							Log.e("Qact connection","connection not set while making the workdaywrapper!");
-							e.printStackTrace();
-						}
-						// were connected, start the reading thread:
-						Thread net_thrd =  new Thread(null, GetWorkday, "GetDatafromServer");
-				        net_thrd.start();
-					} else {
-						// just dismiss the waiting circle and display error toast
-						runOnUiThread(connectionreturn);
-					}
-				}
-		        
-	        };
-	        
-	        // Start the thread
-	        Thread trd = new Thread(null, connect, "connecting Thread");
-	        trd.start();
+
+			Thread connect = new net_DoStuff(1); // action 1 = get New Workday List.
+			connect.start();
 		}
 	}
-	
-	
-	
-	/**
-	 * This gets called when the activity shuts down.
-	 */
-	protected void onDestroy() {
-		try {
-			connection.disconnect();
-		} catch (Exception e) { }
-		super.onDestroy();
-	}
-	
+
 	/**
 	 * Easy way to handle all the dialogs.
 	 */
@@ -181,320 +134,389 @@ public class QuasimodoActivity extends Activity {
 		}
 		return super.onCreateDialog(id);
 	}
-	
+
 	// ------------------------- custom ArrayList Adapter class
-	
+
 	/**
 	 * Adapter for the TaskUnit list.
 	 * @author Marco
 	 */
-    private class TUAdapter extends ArrayAdapter<TaskUnit> implements OnClickListener{
+	private class TUAdapter extends ArrayAdapter<TaskUnit> implements OnClickListener{
 
-        private List<TaskUnit> items;
+		private List<TaskUnit> items;
 
-        public TUAdapter(Context context, int textViewResourceId, List<TaskUnit> items) {
-                super(context, textViewResourceId, items);
-                this.items = items;
-        }
-        
-        /**
-         * This gets called whenever a new ListItem is created from the m_orders set.
-         * @param position the position of the listitem at which it is created
-         * @param convertView the View object of the ListItem.
-         */
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-                View v = convertView;
-                if (v == null) {
-                    LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    v = vi.inflate(R.layout.row, null);
-                }
-                TaskUnit o = items.get(position);
-                if (o != null) {
-                	// fill View with info
-	                	Log.d("QAct","adding TU to list: "+o.toString());
-	                // Button
-	                	Button btnRemove = (Button) v.findViewById(R.id.editbutton);
-	                	TUTag tag = new TUTag(position, o.getKey());
-	                    btnRemove.setTag(tag);
-	                    btnRemove.setOnClickListener(this);
-	                // TextView und ImageView
-	                	TextView tt = (TextView) v.findViewById(R.id.toptext);
-	                    TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-	                    ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
-                    // convert Time Data etc.
-	                    Date starttime = o.getStarttime();
-	                    Date endtime = new Date();
-	                    endtime.setTime(starttime.getTime() + o.getDuration());
-	                    String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String schön machen entsprechend 01:03 Uhr darstellen.
-		            // je nach pause/work einfï¿½llen
-	                	if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
-	                		icon.setImageResource(R.drawable.pause);
-	                		if (tt != null) { tt.setText(timestring); }
-	                        if(bt != null) { 
-	                        	bt.setText(o.getStreamURL());
-	                        	bt.setVisibility(View.VISIBLE);
-	                        }
-	                	} else {
-	                		icon.setImageResource(R.drawable.work);
-	                		if (tt != null) { tt.setText(timestring); }
-	                		if(bt != null) {
-	                			bt.setText("");
-	                			bt.setVisibility(View.GONE);
-	                		}
-	                	}
-                }
-                return v;
-        }
-        /**
-         * What happens on the edit buttons?
-         */
+		public TUAdapter(Context context, int textViewResourceId, List<TaskUnit> items) {
+			super(context, textViewResourceId, items);
+			this.items = items;
+		}
+
+		/**
+		 * This gets called whenever a new ListItem is created from the m_orders set.
+		 * @param position the position of the listitem at which it is created
+		 * @param convertView the View object of the ListItem.
+		 */
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View v = convertView;
+			if (v == null) {
+				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				v = vi.inflate(R.layout.row, null);
+			}
+			TaskUnit o = items.get(position);
+			if (o != null) {
+				// fill View with info
+				Log.d("QAct","adding TU to list: "+o.toString());
+				// Button
+				Button btnRemove = (Button) v.findViewById(R.id.editbutton);
+				TUTag tag = new TUTag(position, o.getKey());
+				btnRemove.setTag(tag);
+				btnRemove.setOnClickListener(this);
+				// TextView und ImageView
+				TextView tt = (TextView) v.findViewById(R.id.toptext);
+				TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+				ImageView icon = (ImageView) v.findViewById(R.id.rowicon);
+				// convert Time Data etc.
+				Date starttime = o.getStarttime();
+				Date endtime = new Date();
+				endtime.setTime(starttime.getTime() + o.getDuration());
+				String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String schön machen entsprechend 01:03 Uhr darstellen.
+				// je nach pause/work einfï¿½llen
+				if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
+					icon.setImageResource(R.drawable.pause);
+					if (tt != null) { tt.setText(timestring); }
+					if(bt != null) { 
+						bt.setText(o.getStreamURL());
+						bt.setVisibility(View.VISIBLE);
+					}
+				} else {
+					icon.setImageResource(R.drawable.work);
+					if (tt != null) { tt.setText(timestring); }
+					if(bt != null) {
+						bt.setText("");
+						bt.setVisibility(View.GONE);
+					}
+				}
+			}
+			return v;
+		}
+		/**
+		 * What happens on the edit buttons?
+		 */
 		public void onClick(View v) {
 			TUTag tag = (TUTag) v.getTag();
 			startedit(tag.position,tag.key,false);
 		}
-    }
-    
-    private class TUTag {
-    	public int position;
-    	public long key;
-    	public TUTag(int p, long k) {
-    		this.position = p; this.key = k;
-    	}
-    }
-    
-    
-    // ------------------------ Edit Screen related
-    
-   /**
-    * Function called when we want to edit or add a TaskUnit
-    * @param key	key of the TaskUnit to be edited.
-    * @param add	false if we edit, true if we add a new one TU
-    * @param index	position of the TU in the m_qtus
-    */
-    private long modified_key;
-    private void startedit(int index, long key ,boolean add) {
-    	TaskUnit orig;
-    	TaskUnit tu;
-    	final Intent i = new Intent(this, editActivity.class);
-    	if (!add) {
-    		orig = m_qtus.get(index);
-    		tu = new TaskUnit(orig.getStarttime(),orig.getDuration(),orig.getStreamURL());
-    		modified_key = key;
-        	i.putExtra(TU_OBJECT_KEY,tu);
-    	}
-	    i.putExtra(TU_NEW_KEY, add);
-    	startActivityForResult(i,0);
-    }
-    
-    private void notifyadapter() {
-    	m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
-		lv_qtu.setAdapter(m_adapter);
-    }
-    
-    
-    // 	------------------------ get results from subactivity
-    
-    /**
-     * RequestCode 	0: Back from Edit Activity.
-     *             	1: Back from Settings Activity
-     */
-   private Date glob_starttime;
-   private long glob_duration;
-   private String glob_StreamURL;
-   private boolean blockadd = false;  // dient dazu beim editieren eines TU den "Füge neue TU hinzu" Thread zu blocken bis die alte TU vom Server gelöscht wurde. 
-   @Override
-   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    switch (requestCode) {
-	    // back from edit activity.
-	    case 0:
-	    	if (resultCode == Activity.RESULT_OK) {
+	}
 
-	    		// get exras von intent
-			    	final Bundle extras = data.getExtras();
-			    	TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
-			    	boolean delete = (Boolean) extras.get(TU_DELETE_KEY);
-			    	boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
-		    	// lï¿½sche die aktuel modifizierende TU
-			    	if (delete) {
-		    			runOnUiThread(connectprogress);
-			    		Thread trd = new Thread(null, net_del, "Delete TU by key over network.");
-				        trd.start();
-			    	}
-		    	// wenn nicht gelï¿½scht, dann erstelle ein neues TU! (und lï¿½sche eventuell das alte)
-			    	else {
-			    		if (!justnew) {
-			    			runOnUiThread(connectprogress);
-			    			blockadd = true;
-			    			Thread trd = new Thread(null, net_del, "Delete TU by key over network.");
-					        trd.start();
-			    		}
-			    		if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dï¿½rfte!"); break; }
-			    		glob_starttime = TUret.getStarttime();
-			    		glob_duration = TUret.getDuration();
-			    		glob_StreamURL = TUret.getStreamURL();
-		    			runOnUiThread(connectprogress);
-		    			while (blockadd) {}
-			    		Thread trd = new Thread(null, net_add, "Add TU over network.");
-				        trd.start();
-			    	}
-	    	}
-	    	break;
-		 // Settings Activity
-	    case 1:
-	    	switch (resultCode) {
-	    	case Activity.RESULT_OK:
-				readSettings();
-	    	}
-		    break;
-		default:
-	    }
-   		
-   }   
-   
-    
-	// ------------------------- All Networking
-	
-	private Runnable GetWorkday = new Runnable(){
-		public void run() {
-			
-			QueryDataPkg req = new QueryDataPkg(0, null);
-			AnsDataPkg ans;
-			
-			try {
-				Log.d("connection","starting the sendrequest.");
-				ans = (AnsDataPkg) connection.sendRequest((Object)req);
-				Log.d("connection","got the ans package!");
-			} catch (Exception e) {
-				Log.e("connection", "Server sent not an AnsDataPkg as object.");
-				ans = null;
-				connection.disconnect();
-				runOnUiThread(connectionreturn);
-			}
-			
-			// debug
-				if (ans == null) {
-					Log.e("connection","ans is null");
-				} else {
-					if (ans.getworkday() == null) Log.e("connection","workday is null");
+	private class TUTag {
+		public int position;
+		public long key;
+		public TUTag(int p, long k) {
+			this.position = p; this.key = k;
+		}
+	}
+
+
+	// ------------------------ Edit Screen related
+
+	/**
+	 * Function called when we want to edit or add a TaskUnit
+	 * @param key	key of the TaskUnit to be edited.
+	 * @param add	false if we edit, true if we add a new one TU
+	 * @param index	position of the TU in the m_qtus
+	 */
+	private long modified_key;
+	private void startedit(int index, long key ,boolean add) {
+		TaskUnit orig;
+		TaskUnit tu;
+		final Intent i = new Intent(this, editActivity.class);
+		if (!add) {
+			orig = m_qtus.get(index);
+			tu = new TaskUnit(orig.getStarttime(),orig.getDuration(),orig.getStreamURL());
+			modified_key = key;
+			i.putExtra(TU_OBJECT_KEY,tu);
+		}
+		i.putExtra(TU_NEW_KEY, add);
+		startActivityForResult(i,0);
+	}
+
+
+	// 	------------------------ get results from subactivity
+
+	/**
+	 * RequestCode 	0: Back from Edit Activity.
+	 *             	1: Back from Settings Activity
+	 */
+	private Date glob_starttime;
+	private long glob_duration;
+	private String glob_StreamURL;
+	private boolean blockadd = false;  // dient dazu beim editieren eines TU den "Füge neue TU hinzu" Thread zu blocken bis die alte TU vom Server gelöscht wurde. 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		// back from edit activity.
+		case 0:
+			if (resultCode == Activity.RESULT_OK) {
+
+				// get exras von intent
+				final Bundle extras = data.getExtras();
+				TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
+				boolean delete = (Boolean) extras.get(TU_DELETE_KEY);
+				boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
+				// lï¿½sche die aktuel modifizierende TU
+				if (delete) {
+					// TODO: delete by key
 				}
-			
-			if (ans != null && ans.getworkday() != null){
-				Log.d("connection", "workdaysize: "+Integer.toString(ans.getworkday().size()));
-				m_qtus.clear();
-				m_qtus.addAll(ans.getworkday());
-				runOnUiThread(updateList);
-			} else {
-				connection.disconnect();
+				// wenn nicht gelï¿½scht, dann erstelle ein neues TU! (und lï¿½sche eventuell das alte)
+				else {
+					if (!justnew) {
+						// TODO: delete by key
+					}
+					if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dï¿½rfte!"); break; }
+					glob_starttime = TUret.getStarttime();
+					glob_duration = TUret.getDuration();
+					glob_StreamURL = TUret.getStreamURL();
+					// TODO: add new TU
+				}
 			}
-			runOnUiThread(connectionreturn);
+			break;
+			// Settings Activity
+		case 1:
+			switch (resultCode) {
+			case Activity.RESULT_OK:
+				readSettings();
+			}
+			break;
+		default:
 		}
-	};
-	// UI THREAD
-	private Runnable updateList = new Runnable(){
+
+	}   
+
+
+	// ------------------------- All Networking
+
+	/*
+	 * Prinzipiell läuft das ganze Networking so:
+	 * Es gibt 3 Threads die je einzeln aufgeruft werden.
+	 * 		net_GetWorkday (connected, empfängt workday, disconnected)
+	 * 		net_DeleteTU (connected, löscht TU, disconnected)
+	 * 		net_AddTU (connected, fügt eine neue TU hinzu, disconnected)
+	 * 		net_modTU (connected, löscht die alte TU, fügt die neue TU hinzu, disconnected)
+	 */
+	
+	
+	/**
+	 * Stellt eine Verbinung zum Server her (port/ip);
+	 * @return der verbundene QClient oder null falls die Verbindung nicht klappt.
+	 */
+	private QClient makeConn() {
+		QClient ret = new QClientImpl();
+		try {
+			ret.connect(ip, port);
+		} catch (UnableToConnectException e) {
+			runOnUiThread(dispFailToast);
+			return null;
+		}
+		return ret;
+	}
+	
+	
+	/**
+	 * Verbindet mit dem Server und macht eine Aktion und disconnected wieder.
+	 * int Action: 1 für GetWorkday
+	 *             2 für DeleteTU
+	 *             3 für AddTU
+	 *             4 für ModTU
+	 * @author Marco
+	 */
+	private class net_DoStuff extends Thread {
+		
+		private long key_to_delete;
+		private int action;
+		private Date starttime;
+		private long duration;
+		private String StreamURL;
+		
+		public net_DoStuff(int action){
+			super();
+			this.action = action;
+		}
+		
+		public net_DoStuff(int action, long key){
+			super();
+			this.action = action;
+			this.key_to_delete = key;
+		}
+		
+		public net_DoStuff(int action, Date starttime, long duration, String StreamURL){
+			super();
+			this.action = action;
+			this.starttime = starttime;
+			this.duration = duration;
+			this.StreamURL = StreamURL;
+		}
+		
+		public net_DoStuff(int action, int key, Date starttime, long duration, String StreamURL){
+			super();
+			this.action = action;
+			this.key_to_delete = key;
+			this.starttime = starttime;
+			this.duration = duration;
+			this.StreamURL = StreamURL;
+		}
+		
 		public void run() {
-			notifyadapter();
+			runOnUiThread(dispPleaseWaitmsg);
+			
+			QClient conn = makeConn();
+			if (conn == null) {
+				Log.e("QAct net","Connection could not be made to "+ip+":"+port);
+				runOnUiThread(dismissPleaseWaitmsg);
+				return;
+			}
+			
+			WorkdayWrapperImpl wrp;
+			try {
+				wrp = new WorkdayWrapperImpl(conn,m_qtus);
+			} catch (NotActiveException e) {
+				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
+				runOnUiThread(dispFailToast);
+				runOnUiThread(dismissPleaseWaitmsg);
+				return;
+			}
+			
+			switch (action) {
+			case 1: // Get New Workday.
+				GetWorkday(wrp);
+				break;
+			case 2: // Delete TU
+				DeleteTU(wrp,key_to_delete);
+				break;
+			case 3: // Add TU
+				AddTU(wrp, starttime, duration, StreamURL);
+				break;
+			case 4:	// delete and then add TU
+				DeleteTU(wrp,key_to_delete);
+				AddTU(wrp, starttime, duration, StreamURL);
+				break;
+			default:
+				Log.e("Qact net","Thread created with the wrong action number!");
+			}
+			
+			runOnUiThread(renewList);
+			runOnUiThread(dismissPleaseWaitmsg);
 		}
-	};
+		
+		private void GetWorkday(WorkdayWrapperImpl wrp){
+			if (!wrp.getNewList()) {
+				m_qtus.clear();
+				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
+				runOnUiThread(dispFailToast);
+			}
+		}
+		
+		private void DeleteTU(WorkdayWrapperImpl wrp, long key){
+			if (!wrp.removeUnitByKey(key)) {
+				m_qtus.clear();
+				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
+				runOnUiThread(dispFailToast);
+			}
+		}
+		
+		private void AddTU(WorkdayWrapperImpl wrp, Date strt, long dur, String URL) {
+			if (!wrp.addUnit(strt, dur, URL)) {
+				m_qtus.clear();
+				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
+				runOnUiThread(dispFailToast);
+			}
+		}
+	}
 	
-	
-	// UI Thread fï¿½r ProgressDialog
-	// UI THREAD
-	private Runnable connectprogress = new Runnable(){
+
+	// display the "Please Wait" circle thing.
+	// UI THREAD!
+	private Runnable dispPleaseWaitmsg = new Runnable(){
 		public void run() {
 			showDialog(0);
 		}
 	};
-	
-	// Benï¿½tigt damit der Thread wieder auf das UI zugreifen darf.
-	// UI THREAD
-	private Runnable connectionreturn = new Runnable(){
+
+	// dismiss the "Please Wait" circle thing.
+	// UI THREAD!
+	private Runnable dismissPleaseWaitmsg = new Runnable(){
 		public void run() {
 			m_ProgressDialog.dismiss();
 			removeDialog(0);
-			if (!connection.isConnected())  {
-				Toast.makeText(getApplicationContext(), "Error communicating with server.", Toast.LENGTH_LONG).show();
-				m_qtus.clear();
-				notifyadapter();
-			}
 		}
-    };
-    
-    
-    /**
-     * Network Thread zum hinzufügen einer neuen TU. die Infos für die TU sind in den glob_XXX Variablen gespeichert.
-     */
-    private Runnable net_add = new Runnable(){
+	};
+	
+	// update the List and renew Adapter.
+	// UI THREAD!
+	private Runnable renewList = new Runnable(){
 		public void run() {
-			boolean res = wrapper.addUnit(glob_starttime, glob_duration, glob_StreamURL);
-    		Log.d("Qact connect","resultat von wrapper.addunit(3): "+res);
-    		if (!res) {
-    			connection.disconnect();
-    			m_qtus.clear();
-    		}
-    		runOnUiThread(updateList);
-    		runOnUiThread(connectionreturn);
+			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
+			lv_qtu.setAdapter(m_adapter);
 		}
-    };
-    
-    /**
-     * Network Thread zum löschen einer TU by key. Muss die blockadd-semaphore auf false setzen.
-     */
-    private Runnable net_del = new Runnable(){
-    	public void run() {
-    		if (wrapper.removeUnitByKey(modified_key)) {
-    			Log.d("Qact connect","removed a TU by key!");	    
-    		} else {
-    			Log.e("Qact connect","could not remove TU by key!");
-    		}
-    		blockadd = false; // hebe die MUTEX auf.
-    		runOnUiThread(updateList);
-    		runOnUiThread(connectionreturn);
-    	}
-    };
+	};
 	
+	// Display the connection failed Toast.
+	// UI THREAD!
+	private Runnable dispFailToast = new Runnable(){
+		public void run() {
+			dispFailToast();
+		}
+	};
+	private void dispFailToast(){
+		Toast.makeText(this.getApplicationContext(), "Error while talking to server...", Toast.LENGTH_LONG).show();
+	}
 	
+	// Display the connection failed Toast.
+	// UI THREAD!
+	private Runnable dispDisconnectedToast = new Runnable(){
+		public void run() {
+			dispDisconnectedToast();
+		}
+	};
+	private void dispDisconnectedToast(){
+		Toast.makeText(this.getApplicationContext(), "Disconnected...", Toast.LENGTH_SHORT).show();
+	}
+
+
 	// ------------------------- Menu Funktionalitï¿½t
-	
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuInflater inflater = getMenuInflater();
-    	inflater.inflate(R.menu.menu, menu);
-    	return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	switch (item.getItemId()) {
-    	case R.id.menu_exit:
-    		finish();
-    		break;
-    	case R.id.menu_settings:
-    		connection.disconnect();
-    		Toast.makeText(this.getApplicationContext(), "disconnected", Toast.LENGTH_SHORT).show();
-    		final Intent intent = new Intent(this,SettingsActivity.class);
-    		startActivityForResult(intent,1);
-    		break;
-    	case R.id.menu_disconnect:
-    		connection.disconnect();
-    		Toast.makeText(this.getApplicationContext(), "disconnected", Toast.LENGTH_SHORT).show();
-    		break;
-    	default:
-    	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
 		return true;
-    }
-	
-    
-    // ------------------------- Shared Preferences
-    
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_exit:
+			finish();
+			break;
+		case R.id.menu_settings:
+			final Intent intent = new Intent(this,SettingsActivity.class);
+			startActivityForResult(intent,1);
+			break;
+		default:
+		}
+		return true;
+	}
+
+
+	// ------------------------- Shared Preferences
+
 
 	private void readSettings() {
-    	ip = settings.getString(SettingsActivity.SET_IP_KEY, "not set");
+		ip = settings.getString(SettingsActivity.SET_IP_KEY, "not set");
 		port = settings.getInt(SettingsActivity.SET_PORT_KEY, 99999);
 		Log.d("Settings","ip: "+ip);
 		Log.d("Settings","Port: "+Integer.toString(port));
-    }
-    
-	
+	}
+
+
 }
 

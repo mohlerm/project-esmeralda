@@ -23,7 +23,7 @@
             android:id="@+id/connectbtn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Connect"
+            android:text="Update"
             android:layout_weight="1" />
         <Button
             android:id="@+id/addbtn"
@@ -40,7 +40,7 @@
 	    android:layout_height="fill_parent" />
    
     <TextView
-        android:id="@+id/emptylist"
+        android:id="@+id/list_is_empty"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="There are no items to display." />
