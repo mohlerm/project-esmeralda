@@ -14,7 +14,8 @@ import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
  * Notes:
  * -http://www.javazoom.net/javalayer/sources.html
  * 
- * %bin%/java -cp . ch.esmeralda.notredame.main.Main
+ * running in console:
+ * %bin%/java -cp . ch.esmeralda.notredame.main.Main -i -m
  * 
  * @author Thomas Richner
  *
