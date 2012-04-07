@@ -1,3 +1,9 @@
+/**
+ * TODO: check if WIFI is enabled.
+ * TODO: edit activity: chose right radio stream in the spinner.
+ * TODO: have fun :D
+ */
+
 package ch.esmeralda.quasimodo;
 
 import java.io.NotActiveException;
@@ -334,17 +340,20 @@ public class QuasimodoActivity extends Activity {
 		private long duration;
 		private String StreamURL;
 		
+		// constructor für GetWorkday
 		public net_DoStuff(int action){
 			super();
 			this.action = action;
 		}
 		
+		// constructor für DeleteTU
 		public net_DoStuff(int action, long key){
 			super();
 			this.action = action;
 			this.key_to_delete = key;
 		}
-		
+
+		// constructor für AddTU		
 		public net_DoStuff(int action, Date starttime, long duration, String StreamURL){
 			super();
 			this.action = action;
@@ -353,6 +362,7 @@ public class QuasimodoActivity extends Activity {
 			this.StreamURL = StreamURL;
 		}
 		
+		// constructor für ModTU		
 		public net_DoStuff(int action, long key, Date starttime, long duration, String StreamURL){
 			super();
 			this.action = action;
