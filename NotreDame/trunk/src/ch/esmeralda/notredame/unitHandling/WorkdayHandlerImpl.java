@@ -57,16 +57,19 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 				TU.setDescription(data.getDescription());
 				TU.setKey(data.getKey());
 				workday.addUnit(TU);
-				ans = new AnsDataPkg(action,true,workday.getList());
+				List<TaskUnit> herp = workday.getList();
+				System.out.println("Sent Workday: ");
+				DispWorkday(herp);
+				ans = new AnsDataPkg(action,true,herp);
 				break;
 			case 2:		// remove tu by key
 				long key = data.getKey();
 				if (key != 0){
 					workday.removeUnitByKey((int) key);								// workaround!! Key just should be long type!
-					ans = new AnsDataPkg(action,false,workday.getList());
+					ans = new AnsDataPkg(action,true,workday.getList());
 				} else {
 					System.err.println("WorkdayHandlerImpl: Key to remove was default 0.");
-					ans = new AnsDataPkg(action,true,workday.getList());
+					ans = new AnsDataPkg(action,false,workday.getList());
 				}
 				break;
 			case 3:		// get active tu
@@ -84,7 +87,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 				break;
 			default:
 				ans = new AnsDataPkg(-1,false,null);
-				System.err.println("An invalid QueryDAtaPkg was sent.");
+				System.err.println("An invalid QueryDataPkg was sent.");
 				break;
 			}
 			
@@ -165,7 +168,14 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 		workday.addUnit(task);
 	}
 	
-	
+	/**
+	 * Debug funktion zum Ausgeben eines ganzen Workdays.
+	 */
+	private void DispWorkday(List<TaskUnit> wd){
+		for (TaskUnit tu : wd) {
+			System.out.println(tu.toString());
+		}
+	}
 
 }
 
