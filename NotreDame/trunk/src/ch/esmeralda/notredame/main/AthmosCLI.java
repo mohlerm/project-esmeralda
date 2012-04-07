@@ -15,7 +15,7 @@ import ch.esmeralda.notredame.unitHandling.*;
 public class AthmosCLI extends Thread{
 	private static final int SERVERPORT = 10002;
 	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
-	private static final String VERSION = "0.9";
+	private static final String VERSION = Main.VERSION;
 	
 	private static final int UTC_OFFSET = -2;
 	

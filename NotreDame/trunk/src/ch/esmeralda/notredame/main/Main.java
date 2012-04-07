@@ -1,14 +1,5 @@
 package ch.esmeralda.notredame.main;
 
-import java.util.Date;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import ch.esmeralda.notredame.jobs.*;
-import ch.esmeralda.DataExchange.TaskUnit;
-import ch.esmeralda.notredame.unitHandling.Workday;
-import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
-
 /**
  * The actual Main class of the whole Server.
  * Notes:
@@ -22,6 +13,9 @@ import ch.esmeralda.notredame.unitHandling.WorkdayImpl;
  */
 public class Main {
 	public static final boolean DEBUG_FLAG = false;
+	
+	public static final String VERSION = "0.9";
+	
 	/**
 	 * @param args
 	 */
@@ -33,7 +27,7 @@ public class Main {
 		
 		if(args.length==0){								//if no command line options given, display the possible ones
 			System.out.println("fyi, there are program options:");
-			System.out.println("verbose, debug, mute,commandline interface");
+			System.out.println("verbose, debug, mute, commandline interface");
 			System.out.println("Usage: [-v] [-d] [-m] [-i] ");
 		}else{											//parse the command line options
 			for(String arg : args){
@@ -55,7 +49,10 @@ public class Main {
 			}
 		}
 		
-		if(verbose) System.out.println("starting CLI, Mode: " + (debug ? "DEBUG ":" ") + (verbose ? "VERBOSE ":" ") + (mute ? "MUTE ":""));
+		if(verbose){
+			System.out.println("NotreDame, Version: " + VERSION);
+			System.out.println("started in Mode: " + (debug ? "DEBUG ":" ") + (verbose ? "VERBOSE ":" ") + (mute ? "MUTE ":""));
+		}
 		
 		if(clinterface){
 			AthmosCLI cli = new AthmosCLI(verbose,debug,mute);
@@ -65,7 +62,6 @@ public class Main {
 				cli.join();
 			} catch (InterruptedException e) {
 				System.out.println("InterruptedException caught, terminating...");
-				System.exit(0);
 			}
 			
 			if(verbose) System.out.println("exiting...");
@@ -81,7 +77,6 @@ public class Main {
 				ndi.join();
 			} catch (InterruptedException e) {
 				System.out.println("InterruptedException caught, terminating...");
-				System.exit(0);
 			}
 			
 			if(verbose) System.out.println("exiting...");
