@@ -74,6 +74,7 @@ public class NServerImplEppi implements NServer {
 			while (active) {
 				try {
 					Object o = in.readObject();
+					out.reset();
 					out.writeObject(workdayHandler.getResponse(o));
 					out.flush();
 				} catch (IOException e) {
@@ -86,6 +87,11 @@ public class NServerImplEppi implements NServer {
 					System.err.println("Error Transmitting: "+e.getMessage());
 					break;
 				}
+			}
+			try {
+				this.socket.close();
+			} catch (IOException e) {
+				System.err.println("Error closing socket.");
 			}
 		}
 	}
