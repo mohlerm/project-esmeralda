@@ -53,7 +53,7 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 
 	public boolean removeUnitByIndex(int index) {
 		// does nothing!
-		Log.d("Local","removeUnitByIndex is not implemented!");
+		Log.e("WorkdayWrapper","removeUnitByIndex is not implemented!");
 		return false;
 	}
 
@@ -98,10 +98,14 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		if (ans != null && ans.getaction() == datapkg.getaction()){
 			if (ans.getstate()) {
 				if (ans.getaction() == 0 || ans.getaction() == 1 || ans.getaction() == 2 || ans.getaction() == 4) {
-					Log.d("WorkdayWrapper","clearing and readding the list of TU!");
+					//Log.d("WorkdayWrapper","clearing and readding the list of TU!");
+					Log.d("WorkdayWrapper","I received a Workday of size:"+ans.getworkday().size()+" - here it is:");
+					DispWorkday(ans.getworkday());
 					listofTU.clear();
 					listofTU.addAll(ans.getworkday());
 				} else if (ans.getaction() == 3){
+					// not implemented since not used.
+					Log.d("WorkdayWrapper","getActiveUnit is not yet implemented in WorkdayWrapper since we don't ever use it.");
 				} else {
 					ErrIncorrectPackage();
 					return false;
@@ -124,6 +128,15 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 	private void ErrIncorrectPackage() {
 		System.out.println("Warning: I did not receive a proper Answer Data Package.");
 		Log.w("WorkdayWrapper", "I did not receive a proper Answer Data Package.");
+	}
+	
+	/**
+	 * Debug funktion zum Ausgeben eines ganzen Workdays.
+	 */
+	private void DispWorkday(List<TaskUnit> wd){
+		for (TaskUnit tu : wd) {
+			System.out.println(tu.toString());
+		}
 	}
 	
 }

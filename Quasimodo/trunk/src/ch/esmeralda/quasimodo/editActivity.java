@@ -208,7 +208,7 @@ public class editActivity extends Activity implements OnClickListener{
 	Runnable TPTimeout = new  Runnable() {
 		public void run() {
 			try {
-				Thread.sleep(500);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {}
 			semaphore = 0;
 		}

@@ -73,10 +73,10 @@ public class QFileIO {
 		}
 		
 		// present for debug reasons
-		if (liste.get(liste.size()-1).name == null || liste.get(liste.size()-1).url == null) {
-			liste.remove(liste.size()-1);
-			Log.e("File IO","Massive Fail, File is not propper formatted!");
-		}
+//		if (liste.get(liste.size()-1).name == null || liste.get(liste.size()-1).url == null) {
+//			liste.remove(liste.size()-1);
+//			Log.e("File IO","Massive Fail, File is not propper formatted!");
+//		}
 		
 		return true;
 	}

@@ -165,7 +165,7 @@ public class QuasimodoActivity extends Activity {
 			TaskUnit o = items.get(position);
 			if (o != null) {
 				// fill View with info
-				Log.d("QAct","adding TU to list: "+o.toString());
+				//Log.d("QAct","adding TU to list: "+o.toString());
 				// Button
 				Button btnRemove = (Button) v.findViewById(R.id.editbutton);
 				TUTag tag = new TUTag(position, o.getKey());
@@ -179,7 +179,7 @@ public class QuasimodoActivity extends Activity {
 				Date starttime = o.getStarttime();
 				Date endtime = new Date();
 				endtime.setTime(starttime.getTime() + o.getDuration());
-				String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String schön machen entsprechend 01:03 Uhr darstellen.
+				String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String schï¿½n machen entsprechend 01:03 Uhr darstellen.
 				// je nach pause/work einfï¿½llen
 				if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
 					icon.setImageResource(R.drawable.pause);
@@ -246,11 +246,7 @@ public class QuasimodoActivity extends Activity {
 	/**
 	 * RequestCode 	0: Back from Edit Activity.
 	 *             	1: Back from Settings Activity
-	 */
-	private Date glob_starttime;
-	private long glob_duration;
-	private String glob_StreamURL;
-	private boolean blockadd = false;  // dient dazu beim editieren eines TU den "Füge neue TU hinzu" Thread zu blocken bis die alte TU vom Server gelöscht wurde. 
+	 */ 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -265,18 +261,19 @@ public class QuasimodoActivity extends Activity {
 				boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
 				// lï¿½sche die aktuel modifizierende TU
 				if (delete) {
-					// TODO: delete by key
+					net_DoStuff trd = new net_DoStuff(2,modified_key);
+					trd.start();
 				}
 				// wenn nicht gelï¿½scht, dann erstelle ein neues TU! (und lï¿½sche eventuell das alte)
 				else {
-					if (!justnew) {
-						// TODO: delete by key
-					}
 					if (TUret == null) {Log.e("Qact connect","MAssive error: TUret = null obwohl es nicht sein dï¿½rfte!"); break; }
-					glob_starttime = TUret.getStarttime();
-					glob_duration = TUret.getDuration();
-					glob_StreamURL = TUret.getStreamURL();
-					// TODO: add new TU
+					if (justnew) {
+						net_DoStuff trd = new net_DoStuff(3,TUret.getStarttime(),TUret.getDuration(),TUret.getStreamURL());
+						trd.start();
+					} else {
+						net_DoStuff trd = new net_DoStuff(4,modified_key,TUret.getStarttime(),TUret.getDuration(),TUret.getStreamURL());
+						trd.start();
+					}
 				}
 			}
 			break;
@@ -296,12 +293,12 @@ public class QuasimodoActivity extends Activity {
 	// ------------------------- All Networking
 
 	/*
-	 * Prinzipiell läuft das ganze Networking so:
-	 * Es gibt 3 Threads die je einzeln aufgeruft werden.
-	 * 		net_GetWorkday (connected, empfängt workday, disconnected)
-	 * 		net_DeleteTU (connected, löscht TU, disconnected)
-	 * 		net_AddTU (connected, fügt eine neue TU hinzu, disconnected)
-	 * 		net_modTU (connected, löscht die alte TU, fügt die neue TU hinzu, disconnected)
+	 * Prinzipiell lï¿½uft das ganze Networking so:
+	 * Es gibt 4 Constructors:
+	 * 		net_GetWorkday (connected, empfï¿½ngt workday, disconnected)
+	 * 		net_DeleteTU (connected, lï¿½scht TU, disconnected)
+	 * 		net_AddTU (connected, fï¿½gt eine neue TU hinzu, disconnected)
+	 * 		net_modTU (connected, lï¿½scht die alte TU, fï¿½gt die neue TU hinzu, disconnected)
 	 */
 	
 	
@@ -323,10 +320,10 @@ public class QuasimodoActivity extends Activity {
 	
 	/**
 	 * Verbindet mit dem Server und macht eine Aktion und disconnected wieder.
-	 * int Action: 1 für GetWorkday
-	 *             2 für DeleteTU
-	 *             3 für AddTU
-	 *             4 für ModTU
+	 * int Action: 1 fï¿½r GetWorkday
+	 *             2 fï¿½r DeleteTU
+	 *             3 fï¿½r AddTU
+	 *             4 fï¿½r ModTU
 	 * @author Marco
 	 */
 	private class net_DoStuff extends Thread {
@@ -356,7 +353,7 @@ public class QuasimodoActivity extends Activity {
 			this.StreamURL = StreamURL;
 		}
 		
-		public net_DoStuff(int action, int key, Date starttime, long duration, String StreamURL){
+		public net_DoStuff(int action, long key, Date starttime, long duration, String StreamURL){
 			super();
 			this.action = action;
 			this.key_to_delete = key;
@@ -386,7 +383,7 @@ public class QuasimodoActivity extends Activity {
 			}
 			
 			switch (action) {
-			case 1: // Get New Workday.
+			case 1: // Get New Workday
 				GetWorkday(wrp);
 				break;
 			case 2: // Delete TU
@@ -402,6 +399,8 @@ public class QuasimodoActivity extends Activity {
 			default:
 				Log.e("Qact net","Thread created with the wrong action number!");
 			}
+			
+			conn.disconnect();
 			
 			runOnUiThread(renewList);
 			runOnUiThread(dismissPleaseWaitmsg);
