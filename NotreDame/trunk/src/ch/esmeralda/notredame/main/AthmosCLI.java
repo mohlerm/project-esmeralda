@@ -15,7 +15,6 @@ import ch.esmeralda.notredame.unitHandling.*;
 public class AthmosCLI extends Thread{
 	private static final int SERVERPORT = 10002;
 	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
-	private static final String VERSION = Main.VERSION;
 	
 	private static final int UTC_OFFSET = -2;
 	
@@ -31,14 +30,11 @@ public class AthmosCLI extends Thread{
 	private TimerJob timerJob = null;
 	private ScheduledThreadPoolExecutor executor = null;
 	private NServer server = null;
-	
-	public AthmosCLI(){
 
-	}
-	public AthmosCLI(boolean verbose,boolean debug,boolean mute){
-		L = verbose;
-		D = debug;
-		M = mute;
+	public AthmosCLI(){
+		L = Constants.V;
+		D = Constants.D;
+		M = Constants.M;
 		if(L){
 			d("Welcome to the Notredame Server CLInterface!");
 			d("created new CLI!");
@@ -53,7 +49,7 @@ public class AthmosCLI extends Thread{
 		if(L) System.out.println("running CLI...");
 		
 		// ---- Welcome banner
-			d("    )                                  v" + VERSION);
+			d("    )                                  v" + Constants.VERSION);
 			d(" ( /(        )         (                     	");
 			d(" )\\())    ( /((     (  )\\ )   )    )     (   	");
 			d("((_)\\  (  )\\())(   ))\\(()/(( /(   (     ))\\  	");
@@ -273,7 +269,7 @@ public class AthmosCLI extends Thread{
 	
 	private void about(){
 		nl();
-        d("NotreDame, Version: " + VERSION);
+        d("NotreDame, Version: " + Constants.VERSION);
         d("                 Authors:                ");
         d("                ~~~~~~~~~~               ");
         d("              Thomas Richner             ");

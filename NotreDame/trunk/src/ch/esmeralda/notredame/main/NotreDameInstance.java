@@ -1,8 +1,6 @@
 package ch.esmeralda.notredame.main;
 
-import java.net.Socket;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,14 +26,11 @@ public class NotreDameInstance extends Thread{
 		private TimerJob timerJob = null;
 		private ScheduledThreadPoolExecutor executor = null;
 		private NServer server = null;
-		
-		public NotreDameInstance(){
 
-		}
-		public NotreDameInstance(boolean verbose,boolean debug,boolean mute){
-			L = verbose;
-			D = debug;
-			M = mute;
+		public NotreDameInstance(){
+			L = Constants.V;
+			D = Constants.D;
+			M = Constants.M;
 			if(L){
 				d("Welcome to the Notredame Server!");
 			}
@@ -46,7 +41,7 @@ public class NotreDameInstance extends Thread{
 		 */
 		@Override
 		public void run() {
-			if(L) System.out.println("running CLI...");
+			if(L) System.out.println("running new instance...");
 			executor = new ScheduledThreadPoolExecutor(1);
 			
 			if(L) d("create streamJob...");
@@ -83,7 +78,7 @@ public class NotreDameInstance extends Thread{
 			boolean quit = false;
 			p("press q to exit:");
 			while(!quit){
-		         msg = in.nextLine();
+		         msg = in.next();
 		         quit = msg.equals("q");
 		    }
 			
