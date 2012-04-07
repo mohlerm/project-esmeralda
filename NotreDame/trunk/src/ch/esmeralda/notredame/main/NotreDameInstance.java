@@ -1,5 +1,6 @@
 package ch.esmeralda.notredame.main;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -13,6 +14,30 @@ import ch.esmeralda.notredame.unitHandling.*;
 public class NotreDameInstance extends Thread{
 		private static final int SERVERPORT = 10002;
 		private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
+		
+		private class Busy extends Thread{
+			public boolean q = true;
+			@Override
+			public void run(){
+				//nl();
+				while(q){
+					try {
+						p("\rpress ENTER to exit   ");
+						sleep(500);
+						p("\rpress ENTER to exit.");
+						sleep(500);
+						p("\rpress ENTER to exit.. ");
+						sleep(500);
+						p("\rpress ENTER to exit...");
+						sleep(500);
+					} catch (InterruptedException e) {}
+				}
+			}
+			public void quit(){
+				q = false;
+			}
+		}
+		
 		
 		private boolean L = false;	// verbose flag
 		private boolean D = false;  // debug flag
@@ -72,16 +97,18 @@ public class NotreDameInstance extends Thread{
 			server.start(SERVERPORT);
 			
 			if(L) d("start io...");
+
+			Busy busy = new Busy();
 			
-			Scanner in = new Scanner(System.in);
-			String msg;
-			boolean quit = false;
-			p("press q to exit:");
-			while(!quit){
-		         msg = in.next();
-		         quit = msg.equals("q");
-		    }
-			
+			busy.start();
+			try {
+				System.in.read();
+			} catch (IOException e) {}
+			busy.interrupt();
+			busy.quit();
+			try {
+				busy.join(1000);
+			} catch (InterruptedException e) {}
 			
 			if(L) System.out.println("stopping jobs");
 			executor.shutdownNow();
