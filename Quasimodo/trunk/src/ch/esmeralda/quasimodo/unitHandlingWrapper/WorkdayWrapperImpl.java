@@ -98,9 +98,8 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		if (ans != null && ans.getaction() == datapkg.getaction()){
 			if (ans.getstate()) {
 				if (ans.getaction() == 0 || ans.getaction() == 1 || ans.getaction() == 2 || ans.getaction() == 4) {
-					//Log.d("WorkdayWrapper","clearing and readding the list of TU!");
 					Log.d("WorkdayWrapper","I received a Workday of size:"+ans.getworkday().size()+" - here it is:");
-					DispWorkday(ans.getworkday());
+//					DispWorkday(ans.getworkday());
 					listofTU.clear();
 					listofTU.addAll(ans.getworkday());
 				} else if (ans.getaction() == 3){
@@ -110,7 +109,6 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 					ErrIncorrectPackage();
 					return false;
 				}
-				Log.d("WorkdayWrapper","The server completed the request " + Integer.toString(ans.getaction()) + " and sent a correct processed package.");
 				return true;
 			} else {
 				System.out.println("Warning: The Server could not complete the request.");
@@ -130,13 +128,13 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		Log.w("WorkdayWrapper", "I did not receive a proper Answer Data Package.");
 	}
 	
-	/**
-	 * Debug funktion zum Ausgeben eines ganzen Workdays.
-	 */
-	private void DispWorkday(List<TaskUnit> wd){
-		for (TaskUnit tu : wd) {
-			System.out.println(tu.toString());
-		}
-	}
+//	/**
+//	 * Debug funktion zum Ausgeben eines ganzen Workdays.
+//	 */
+//	private void DispWorkday(List<TaskUnit> wd){
+//		for (TaskUnit tu : wd) {
+//			System.out.println(tu.toString());
+//		}
+//	}
 	
 }

@@ -35,13 +35,9 @@ public class QClientImpl implements QClient {
 
 	public Object sendRequest(Object request) {
 		try {
-			Log.d("connection", "writing object:");
 			out.writeObject(request);
-			Log.d("connection", "writing object done, now flushing");
 			out.flush();
-			Log.d("connection", "flushing done, now reading");
 			Object o = in.readObject();
-			Log.d("connection", "reading done!");
 			return o;
 		} catch (Exception e) {
 			Log.e("connection","Could not complete sendRequest: " + e.getMessage());
@@ -49,3 +45,4 @@ public class QClientImpl implements QClient {
 		return null;
 	}
 }
+
