@@ -12,18 +12,11 @@ package ch.esmeralda.notredame.main;
  *
  */
 public class Main {
-	public static final boolean DEBUG_FLAG = false;
-	
-	public static final String VERSION = "0.9";
-	
+	public static final boolean DEBUG_FLAG = false;	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		boolean verbose = false;
-		boolean debug = false;
-		boolean mute = false;
-		boolean clinterface = false;
 		
 		if(args.length==0){								//if no command line options given, display the possible ones
 			System.out.println("fyi, there are program options:");
@@ -36,10 +29,10 @@ public class Main {
 					char c = arg.toCharArray()[1];		//might be OutOfBounds -> catch
 					
 					switch(c){
-						case 'v': verbose = true; break;
-						case 'd': debug   = true; break;
-						case 'm': mute    = true; break;
-						case 'i': clinterface    = true; break;
+						case 'v': Constants.V = true; break;
+						case 'd': Constants.D = true; break;
+						case 'm': Constants.M = true; break;
+						case 'i': Constants.I = true; break;
 						default:
 							if(DEBUG_FLAG) System.out.println("Unknown option '" + arg +"'");
 					}
@@ -49,13 +42,13 @@ public class Main {
 			}
 		}
 		
-		if(verbose){
-			System.out.println("NotreDame, Version: " + VERSION);
-			System.out.println("started in Mode: " + (debug ? "DEBUG ":" ") + (verbose ? "VERBOSE ":" ") + (mute ? "MUTE ":""));
+		if(Constants.V){
+			System.out.println("NotreDame, Version: " + Constants.VERSION);
+			System.out.println("started in Mode: " + (Constants.D ? "DEBUG ":" ") + (Constants.V ? "VERBOSE ":" ") + (Constants.M ? "MUTE ":""));
 		}
 		
-		if(clinterface){
-			AthmosCLI cli = new AthmosCLI(verbose,debug,mute);
+		if(Constants.I){
+			AthmosCLI cli = new AthmosCLI();
 			cli.start();
 			
 			try {
@@ -64,14 +57,14 @@ public class Main {
 				System.out.println("InterruptedException caught, terminating...");
 			}
 			
-			if(verbose) System.out.println("exiting...");
+			if(Constants.V) System.out.println("exiting...");
 			
 			if(!cli.getCleanShutdownFlag()){
 				System.out.println("CLI hasn't terminated clean, something went wrong...");
 				System.exit(0);
 			}
 		}else{
-			NotreDameInstance ndi = new NotreDameInstance(verbose, debug, mute);
+			NotreDameInstance ndi = new NotreDameInstance();
 			ndi.start();
 			try {
 				ndi.join();
@@ -79,7 +72,7 @@ public class Main {
 				System.out.println("InterruptedException caught, terminating...");
 			}
 			
-			if(verbose) System.out.println("exiting...");
+			if(Constants.V) System.out.println("exiting...");
 			
 			if(!ndi.getCleanShutdownFlag()){
 				System.out.println("CLI hasn't terminated clean, something went wrong...");
