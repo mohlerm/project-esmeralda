@@ -135,6 +135,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				editor.commit();
 				setResult(Activity.RESULT_OK, null);
 				finish();
+			return;
 		case R.id.creditsbtn:
 			showDialog(1);
 			break;
@@ -150,7 +151,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 		case 0:
 			LayoutInflater factory = LayoutInflater.from(this);
 	        final View textEntryView = factory.inflate(R.layout.newradioalertdialog, null);
-	        return new AlertDialog.Builder(SettingsActivity.this)
+	        AlertDialog NewRadio = new AlertDialog.Builder(SettingsActivity.this)
 	            .setTitle("New Radio entry:")
 	            .setView(textEntryView)
 	            .setPositiveButton("Done", new DialogInterface.OnClickListener() {
@@ -171,6 +172,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	                }
 	            })
 	            .create();
+	        return NewRadio;
 		case 1:
 			// show credits;
 			AlertDialog Credits = new AlertDialog.Builder(this).create();
