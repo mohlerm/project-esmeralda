@@ -35,6 +35,7 @@ public class QClientImpl implements QClient {
 
 	public Object sendRequest(Object request) {
 		try {
+			out.reset();
 			out.writeObject(request);
 			out.flush();
 			Object o = in.readObject();
