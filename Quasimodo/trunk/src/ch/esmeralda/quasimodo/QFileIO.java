@@ -1,11 +1,13 @@
 package ch.esmeralda.quasimodo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import android.app.Activity;
@@ -14,8 +16,11 @@ import android.util.Log;
 
 public class QFileIO {
 	/**
-	 * Fï¿½llt die RadioListe mit statischen werten.
-	 * Eventuell spï¿½ter noch dynamisch machen.
+	 * 
+	 * @param act 		Activity zu der etwas gelesen werden sollte.
+	 * @param liste		Liste mit RadioStation Objekten die aufgefüllt werden soll.
+	 * @param filename 	Filename für das lokale File.
+	 * @return boolean 	wert ob erfolgreich gelesen wurde.
 	 */
 	public static boolean loadRadioList(Activity act,List<RadioStation> liste,String filename) {
 		
@@ -48,7 +53,7 @@ public class QFileIO {
 				inline = brin.readLine(); // lesen
 				// abbruch bed.
 				if (inline == null) {
-					Log.d("Settings File IO","Received EOF.");
+					//Log.d("Settings File IO","Received EOF.");
 					break;
 				}
 				// liste auffï¿½llen.
@@ -60,13 +65,17 @@ public class QFileIO {
 					adder.url = inline;
 					liste.add(adder);
 				}
-				Log.d("File IO read",inline);
+				//Log.d("File IO read",inline);
 			}
 		} catch (Exception e) {
+			liste.clear();
+			RadioStation errobj = new RadioStation("ERROR","Error reading list!");
+			liste.add(errobj);
 			Log.e("IO","Cannot Read from the File!");
 			return false;
 		}
 		
+		// debug
 		if (liste.isEmpty()){
 			Log.e("File IO","read Radio List was empty! (Should never happen!)");
 			return false;
@@ -78,6 +87,37 @@ public class QFileIO {
 //			Log.e("File IO","Massive Fail, File is not propper formatted!");
 //		}
 		
+		return true;
+	}
+	
+	/**
+	 * Speichert die Radio Liste in ein lokales auf dem Handy gespeichertes File.
+	 * @param liste		Referenz zu der zu speichernden Radio Liste.
+	 * @param filename	Name des abzuspeichernden Files.
+	 * @param act		Activity zu der der FileOutput erzeugt werden soll.
+	 * @return 			boolean wert ob IO aktivität erfolgreich war.
+	 */
+	
+	public static boolean writeRadioList(Activity act, List<RadioStation> liste, String filename) {
+		FileOutputStream fos_rl = null;
+		//Log.d("Settings IO","Writing Radio list to File");
+		try {
+			fos_rl = act.openFileOutput(filename,Context.MODE_PRIVATE);  // überschreibt bisherige files!
+				BufferedWriter bwout = new BufferedWriter(new OutputStreamWriter(fos_rl));
+				//Log.d("Settings IO","RadioList hat: "+Integer.toString(liste.size())+" Einträge");
+				for (RadioStation rs : liste) {
+					bwout.write(rs.name);
+					bwout.newLine();
+					bwout.write(rs.url);
+					bwout.newLine();
+					bwout.flush();
+					//Log.d("Settings IO","wrote: "+rs.toString());
+				}
+			fos_rl.close();
+		} catch (Exception e) {
+			Log.e("Settings File IO","Strange things happened... (writeRadioList(...))");
+			return false;
+		}
 		return true;
 	}
 	

@@ -1,7 +1,6 @@
 /**
  * TODO: check if WIFI is enabled.
- * TODO: edit activity: chose right radio stream in the spinner.
- * TODO: have fun :D
+ * TODO: implement a Credits Button.
  */
 
 package ch.esmeralda.quasimodo;

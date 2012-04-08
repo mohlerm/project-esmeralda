@@ -1,10 +1,6 @@
 package ch.esmeralda.quasimodo;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,7 +121,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 			
 			// Alles ok, schreibe die Einstellungen und die RadioListe
 				RADIO_LIST.remove(RADIO_LIST.size()-1);
-				writeRadioList(RADIO_LIST,RadioListFilename);
+				QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
 				
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putString(SET_IP_KEY,ip);
@@ -236,34 +231,5 @@ public class SettingsActivity extends Activity implements OnClickListener{
 			
 	}
 	
-	/**
-	 * Speichert die Radio Liste in ein lokales auf dem Handy gespeichertes File.
-	 * eventuell Static machen.
-	 * @param liste		Referenz zu der zu speichernden Radio Liste.
-	 * @param filename	Name des abzuspeichernden Files.
-	 * @return 			boolean wert ob IO aktivität erfolgreich war.
-	 */
 	
-	private boolean writeRadioList(List<RadioStation> liste, String filename) {
-		FileOutputStream fos_rl = null;
-		Log.d("Settings IO","Writing Radio list to File");
-		try {
-			fos_rl = openFileOutput(filename,Context.MODE_PRIVATE);  // überschreibt bisherige files!
-				BufferedWriter bwout = new BufferedWriter(new OutputStreamWriter(fos_rl));
-				Log.d("Settings IO","RadioList hat: "+Integer.toString(liste.size())+" Einträge");
-				for (RadioStation rs : liste) {
-					bwout.write(rs.name);
-					bwout.newLine();
-					bwout.write(rs.url);
-					bwout.newLine();
-					bwout.flush();
-					Log.d("Settings IO","wrote: "+rs.toString());
-				}
-			fos_rl.close();
-		} catch (Exception e) {
-			Log.e("Settings File IO","Strange things happened... (writeRadioList(...))");
-			return false;
-		}
-		return true;
-	}
 }
