@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -38,6 +40,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	public final static String RadioListFilename = "RadioList.db";
 	
 	// Buttons and Texts
+	private Button creditsbtn;
 	private Button defaultbtn;
 	private Button savebtn;
 	private EditText editip;
@@ -58,6 +61,9 @@ public class SettingsActivity extends Activity implements OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
+        
+        creditsbtn = (Button) findViewById(R.id.creditsbtn);
+        creditsbtn.setOnClickListener(this);
         
         settings = getSharedPreferences(QuasimodoActivity.PREFS_NAME, 0);
         ip = settings.getString(SET_IP_KEY, "yet unset");
@@ -129,6 +135,9 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				editor.commit();
 				setResult(Activity.RESULT_OK, null);
 				finish();
+		case R.id.creditsbtn:
+			showDialog(1);
+			break;
 		default:
 		}
 	}
@@ -137,6 +146,46 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case 0:
+			LayoutInflater factory = LayoutInflater.from(this);
+	        final View textEntryView = factory.inflate(R.layout.newradioalertdialog, null);
+	        return new AlertDialog.Builder(SettingsActivity.this)
+	            .setTitle("New Radio entry:")
+	            .setView(textEntryView)
+	            .setPositiveButton("Done", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                	EditText name_edit = (EditText) textEntryView.findViewById(R.id.radioname_edit);
+	                	EditText url_edit = (EditText) textEntryView.findViewById(R.id.radiourl_edit);
+	                	RADIO_LIST.add(RADIO_LIST.size()-1, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
+	                	reinit_RadioList();
+	                	// lässt Tastatur verschwinden.
+		                	InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
+		        	        if (name_edit != null) 
+		        	        	inputManager.hideSoftInputFromWindow(name_edit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+	                }
+	            })
+	            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                		// Do nothing.
+	                }
+	            })
+	            .create();
+		case 1:
+			// show credits;
+			AlertDialog Credits = new AlertDialog.Builder(this).create();
+			Credits.setTitle("Quasimodo,\nthe Hunchback of NotreDame");
+			Credits.setMessage(getResources().getText(R.string.credits_string));
+			Credits.setIcon(R.drawable.icon);
+			Credits.setButton("Done", new DialogInterface.OnClickListener() {
+			   public void onClick(DialogInterface dialog, int which) {
+					// do nothing.
+			   }
+			});
+			return Credits;
+		default:
+			break;
+		}
 		LayoutInflater factory = LayoutInflater.from(this);
         final View textEntryView = factory.inflate(R.layout.newradioalertdialog, null);
         return new AlertDialog.Builder(SettingsActivity.this)

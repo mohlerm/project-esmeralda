@@ -201,7 +201,7 @@ public class editActivity extends Activity implements OnClickListener{
 	
 	
 	/**
-	 * Ergibt eine Endlosschleife!
+	 * Existiert um effektiv dafür zu sorgen, dass das Ende des TU nicht vor dem Start liegt.
 	 * @author Marco
 	 */
 	private class TPlistener implements TimePicker.OnTimeChangedListener {
