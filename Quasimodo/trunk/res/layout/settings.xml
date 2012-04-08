@@ -3,29 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1" >
-
-        <TextView
+
+        <LinearLayout
             android:id="@+id/top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dip"
             android:gravity="center"
-            android:text="Settings"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_alignParentTop="true" />
+            android:orientation="horizontal" >
+
+            <TextView
+
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:layout_weight="1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="center" />
+
+            <Button
+                android:id="@+id/creditsbtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:text="Credits" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/second"
-            android:layout_below="@+id/top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_below="@+id/top" >
 
             <TextView
                 android:id="@+id/textView1"
@@ -44,9 +61,9 @@
 
         <LinearLayout
             android:id="@+id/third"
-            android:layout_below="@+id/second"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/second"
             android:orientation="horizontal" >
 
             <TextView
@@ -67,9 +84,9 @@
 
         <TextView
             android:id="@+id/fourth"
-            android:layout_below="@+id/third"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/third"
             android:layout_marginTop="20dip"
             android:gravity="center"
             android:text="Radio Stations:"
@@ -79,9 +96,9 @@
             android:id="@+id/fifth"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:orientation="horizontal"
+            android:layout_above="@+id/sixth"
             android:layout_below="@+id/fourth"
-            android:layout_above="@+id/sixth" >
+            android:orientation="horizontal" >
 
             <ListView
                 android:id="@+id/RadioStationsLV"
@@ -93,9 +110,9 @@
 
         <LinearLayout
             android:id="@+id/sixth"
-            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="5dip"
             android:orientation="horizontal" >
 
@@ -113,7 +130,6 @@
                 android:layout_weight="1"
                 android:text="Save" />
         </LinearLayout>
-
     </RelativeLayout>
 
 </LinearLayout>

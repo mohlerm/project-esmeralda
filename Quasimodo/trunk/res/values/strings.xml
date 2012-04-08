@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Quasimodo, The Hunchback of Notre-Dame</string>
     <string name="app_name">Quasimodo</string>
+    <string name="credits_string">Android GUI, Networking: \n - Marco Eppenberger\nNetworking, Server Backend: \n - Thomas Richner\n - Sandro Sgier\nCommunication: \n - Stefan Mach</string>
 </resources>

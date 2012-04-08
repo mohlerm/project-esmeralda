@@ -1,6 +1,5 @@
 /**
- * TODO: check if WIFI is enabled.
- * TODO: implement a Credits Button.
+ * TODO: Do autoupdates every 5 secs.
  */
 
 package ch.esmeralda.quasimodo;
@@ -11,11 +10,16 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -92,6 +96,14 @@ public class QuasimodoActivity extends Activity {
 		m_qtus = new ArrayList<TaskUnit>();
 		this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
 		lv_qtu.setAdapter(this.m_adapter);
+		
+		
+		// Make sure, WIFI is turned on and connected.
+		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (!mWifi.isConnected()) {
+		    showDialog(1);
+		}
 
 		// Make Connection
 		connectbutton.performClick();
@@ -132,10 +144,33 @@ public class QuasimodoActivity extends Activity {
 	 */
 	protected Dialog onCreateDialog(int id) {
 		if (id == 0) {
+			// Progress Dialog.
 			m_ProgressDialog = new ProgressDialog(this);
 			m_ProgressDialog.setTitle("Please Wait...");
 			m_ProgressDialog.setMessage("Retrieving Data");
 			return m_ProgressDialog;
+		} else if (id == 1) {
+			// WIFI is disabled.
+			AlertDialog WIFIdisable = new AlertDialog.Builder(this).create();
+			WIFIdisable.setTitle("WIFI not connected.");
+			WIFIdisable.setMessage("Quasimodo needs WIFI enabled and connected. Please enable it.");
+			WIFIdisable.setButton("WIFI settings", new DialogInterface.OnClickListener() {
+			   public void onClick(DialogInterface dialog, int which) {
+					final Intent intent = new Intent(Intent.ACTION_MAIN, null);
+					intent.addCategory(Intent.CATEGORY_LAUNCHER);
+					final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.wifi.WifiSettings");
+					intent.setComponent(cn);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					startActivity( intent);
+			   }
+			});
+			WIFIdisable.setButton2("Dismiss", new DialogInterface.OnClickListener() {
+				   public void onClick(DialogInterface dialog, int which) {
+						// dont do shit.
+				   }
+				});
+			WIFIdisable.setIcon(R.drawable.icon);
+			return WIFIdisable;
 		}
 		return super.onCreateDialog(id);
 	}
