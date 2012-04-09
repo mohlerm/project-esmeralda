@@ -107,7 +107,6 @@ public class AthmosCLI extends Thread{
 		        	while(hour<0||hour>23){	
 		        		hour = in.nextInt();
 		        	}
-		        	hour += Constants.UTC_OFFSET;
 		        	p("starting minutes: ");
 		        	int minutes = in.nextInt();
 		        	while(minutes<0||minutes>59){	
@@ -127,6 +126,8 @@ public class AthmosCLI extends Thread{
 	            quit = true;
 	         }else if(msg.equals("active")||msg.equals("show stream")){
 	            active(workday);
+	         }else if(msg.equals("active")||msg.equals("show stream")){
+		        active(workday);
 	         }else if(msg.equals("remove")){
 	        	 d("sorry, not yet implemented in CLI");
 	            //remove();
