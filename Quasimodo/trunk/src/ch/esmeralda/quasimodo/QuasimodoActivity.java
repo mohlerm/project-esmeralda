@@ -39,7 +39,6 @@ import android.widget.Toast;
 import ch.esmeralda.quasimodo.net.QClient;
 import ch.esmeralda.quasimodo.net.QClient.UnableToConnectException;
 import ch.esmeralda.quasimodo.net.QClientImpl;
-import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapper;
 import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapperImpl;
 import ch.esmeralda.DataExchange.*;
 
@@ -103,11 +102,10 @@ public class QuasimodoActivity extends Activity {
 		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (!mWifi.isConnected()) {
 		    showDialog(1);
+		} else {
+			// Make Connection
+			connectbutton.performClick();
 		}
-
-		// Make Connection
-		connectbutton.performClick();
-
 
 	}
 
@@ -161,7 +159,7 @@ public class QuasimodoActivity extends Activity {
 					final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.wifi.WifiSettings");
 					intent.setComponent(cn);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					startActivity( intent);
+					startActivity(intent);
 			   }
 			});
 			WIFIdisable.setButton2("Dismiss", new DialogInterface.OnClickListener() {
@@ -267,6 +265,7 @@ public class QuasimodoActivity extends Activity {
 	 */
 	private long modified_key;
 	private void startedit(int index, long key ,boolean add) {
+		runOnUiThread(dispDisconnectedToast);
 		TaskUnit orig;
 		TaskUnit tu;
 		final Intent i = new Intent(this, editActivity.class);
@@ -374,20 +373,20 @@ public class QuasimodoActivity extends Activity {
 		private long duration;
 		private String StreamURL;
 		
-		// constructor für GetWorkday
+		// constructor fï¿½r GetWorkday
 		public net_DoStuff(int action){
 			super();
 			this.action = action;
 		}
 		
-		// constructor für DeleteTU
+		// constructor fï¿½r DeleteTU
 		public net_DoStuff(int action, long key){
 			super();
 			this.action = action;
 			this.key_to_delete = key;
 		}
 
-		// constructor für AddTU		
+		// constructor fï¿½r AddTU		
 		public net_DoStuff(int action, Date starttime, long duration, String StreamURL){
 			super();
 			this.action = action;
@@ -396,7 +395,7 @@ public class QuasimodoActivity extends Activity {
 			this.StreamURL = StreamURL;
 		}
 		
-		// constructor für ModTU		
+		// constructor fï¿½r ModTU		
 		public net_DoStuff(int action, long key, Date starttime, long duration, String StreamURL){
 			super();
 			this.action = action;
@@ -412,6 +411,8 @@ public class QuasimodoActivity extends Activity {
 			QClient conn = makeConn();
 			if (conn == null) {
 				Log.e("QAct net","Connection could not be made to "+ip+":"+port);
+				m_qtus.clear();
+				runOnUiThread(renewList);
 				runOnUiThread(dismissPleaseWaitmsg);
 				return;
 			}
