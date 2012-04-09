@@ -8,6 +8,7 @@ import ch.esmeralda.DataExchange.AnsDataPkg;
 import ch.esmeralda.DataExchange.QueryDataPkg;
 import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.main.Constants;
+import ch.esmeralda.notredame.utils.Minions;
 
 /**
  * implementation of WorkdayHandler
@@ -80,7 +81,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 				ans = new AnsDataPkg(action,true,(List<TaskUnit>)anslist);
 				break;
 			case 4:		// reset the workday
-				resetworkday();
+				Minions.set_default(workday, (int) data.getDuration());
 				ans = new AnsDataPkg(action,true,workday.getList());
 				break;
 			default:
@@ -92,80 +93,6 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 //			DispWorkday(ans.getworkday());
 			
 			return ans;
-	}
-	
-	/**
-	 * Resets the whole workday to the default values.
-	 */
-	private void resetworkday() {
-		
-		String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
-		
-		workday.reset();
-		
-		long a = System.currentTimeMillis();
-		a = a-a%(1000*3600*24);
-		long start = a + 9*3600*1000;
-		
-		TaskUnit task;
-		task = new TaskUnit(new Date(start), 75*60*1000, "");
-		task.setDescription("Work1");
-		workday.addUnit(task);
-		start += 75*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break1");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, "");
-		task.setDescription("Work2");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break2");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 45*60*1000, "");
-		task.setDescription("Work3");
-		workday.addUnit(task);
-		start += 45*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, DI_TRANCE);		
-		task.setDescription("supper");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 75*60*1000, "");
-		task.setDescription("Work1");
-		workday.addUnit(task);
-		start += 75*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break1");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, "");
-		task.setDescription("Work2");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break2");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 45*60*1000, "");
-		task.setDescription("Work3");
-		workday.addUnit(task);
-		start += 45*60*1000;
-		
-		task = new TaskUnit(new Date(start), 10*60*1000, DI_TRANCE);		
-		task.setDescription("end of day");
-		workday.addUnit(task);
 	}
 	
 //	/**
