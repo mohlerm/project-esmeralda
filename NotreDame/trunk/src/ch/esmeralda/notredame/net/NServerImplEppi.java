@@ -90,6 +90,7 @@ public class NServerImplEppi implements NServer {
 			}
 			try {
 				this.socket.close();
+				socketList.remove(socket);
 			} catch (IOException e) {
 				System.err.println("Error closing socket.");
 			}
