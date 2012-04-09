@@ -1,11 +1,8 @@
 package ch.esmeralda.notredame.main;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -18,11 +15,6 @@ import ch.esmeralda.notredame.unitHandling.*;
 import ch.esmeralda.notredame.utils.Minions;
 
 public class AthmosCLI extends Thread{
-	private static final int SERVERPORT = Constants.SERVERPORT;
-	private static final String DI_TRANCE = Constants.DI_TRANCE;
-	
-	private static final int UTC_OFFSET = -2;
-	
 	private boolean L = false;	// verbose flag
 	private boolean D = false;  // debug flag
 	private boolean M = false;  // mute flag
@@ -75,9 +67,9 @@ public class AthmosCLI extends Thread{
 		
 		if(D){
 			if(L) d("set a debug workday...");
-			set_debug(workday);
-			System.out.println(workday.toString());
-			System.out.println(workday.getList().size());
+			Minions.set_debug(workday);
+			if(L) System.out.println(workday.toString());
+			if(L) System.out.println(workday.getList().size());
 		}
 		
 		if(L) d("create workdayHandler...");
@@ -92,7 +84,7 @@ public class AthmosCLI extends Thread{
 		if(L) d("init server...");
 		server = NServerFactory.createNewInstance(workdayHandler);
 		if(L) d("start server...");
-		server.start(SERVERPORT);
+		server.start(Constants.SERVERPORT);
 		
 		if(L) d("start io...");
 		Scanner in = new Scanner(System.in);
@@ -109,26 +101,31 @@ public class AthmosCLI extends Thread{
 	         if(msg.equals("help")){
 	        	 help();
 	         }else if(msg.equals("set default")){
-	        	p("starting hour: ");
 	        	try{
+	        		p("starting hour: ");
 		        	int hour = in.nextInt();
 		        	while(hour<0||hour>23){	
 		        		hour = in.nextInt();
 		        	}
-		        	hour += UTC_OFFSET;
-		        	Minions.set_default(workday,hour,0);
+		        	hour += Constants.UTC_OFFSET;
+		        	p("starting minutes: ");
+		        	int minutes = in.nextInt();
+		        	while(minutes<0||minutes>59){	
+		        		hour = in.nextInt();
+		        	}
+		        	Minions.set_default(workday,hour,minutes);
 	        	}catch(Exception e){
-	        		d("Parse Exception");
+	        		if(Constants.V) d("Parse Exception");
 	        	}
 	         }else if(msg.equals("show")){
 	            p(workday.toString());
 	         }else if(msg.equals("about")){
 		        about();
 		     }else if(msg.equals("set debug")){
-		        set_debug(workday);
+		        Minions.set_debug(workday);
 		     }else if(msg.equals("quit")){
 	            quit = true;
-	         }else if(msg.equals("active")){
+	         }else if(msg.equals("active")||msg.equals("show stream")){
 	            active(workday);
 	         }else if(msg.equals("remove")){
 	        	 d("sorry, not yet implemented in CLI");
@@ -136,13 +133,10 @@ public class AthmosCLI extends Thread{
 	         }else if(msg.equals("add")){
 	        	 d("sorry, not yet implemented in CLI");
 	            //add();
-	         }else if(msg.equals("show stream")){
-	        	 d("sorry, not yet implemented in CLI");
-	            //show_sounds();
 	         }else if(msg.equals("status")){
 	        	 status();
 	         }else{
-	        	 if(L) d("unknown input: '" + msg + "'");
+	        	 if(L) d("unknown CLI command: '" + msg + "'");
 	         }
 	      }
 		
@@ -165,23 +159,13 @@ public class AthmosCLI extends Thread{
 	    System.out.println();
 	}
 	
-	private void set_debug(Workday workday){
-		workday.reset();
-		if(L) System.out.println("prefill a debug workday");
-		long now = System.currentTimeMillis()+1000;
-		TaskUnit task;
-		for(int i=0;i<10;i++){
-			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, DI_TRANCE);
-			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
-			task.setDescription("debug "+i);
-			workday.addUnit(task);
-		}
-	}
+
 	
 	
 	
 	private void active(Workday workday){
-		workday.getActiveUnit(new Date());
+		TaskUnit unit = workday.getActiveUnit(new Date());
+		d(unit.toString());
 	}
 	
 	private void help(){
