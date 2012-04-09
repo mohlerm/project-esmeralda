@@ -1,5 +1,6 @@
 package ch.esmeralda.notredame.net;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.net.*;
 
@@ -14,4 +15,5 @@ public interface NServer {
 	public void stop();
 	public boolean isRunning();
 	public List<Socket> getConnections();
+	public int getPort();
 }

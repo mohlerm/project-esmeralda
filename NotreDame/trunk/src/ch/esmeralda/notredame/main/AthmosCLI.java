@@ -1,7 +1,11 @@
 package ch.esmeralda.notredame.main;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -287,14 +291,50 @@ public class AthmosCLI extends Thread{
 	}
 	
 	private void status(){
+		String IP;
+		try {
+			InetAddress thisIp =InetAddress.getLocalHost();
+			IP = thisIp.getHostAddress();
+		}
+		catch(Exception e) {
+			IP = "NOT FOUND";
+		}
+		
+		
 	   	 d("Timerstatus:  \t" + (executor.isTerminated() ? "terminated" : "running") + (M ? "  MUTE":""));
-	   	 d("Serverstatus: \t" + (server.isRunning() ? "running" : "down"));
-	   	 List<Socket> connections= server.getConnections();
+	   	 d("Serverstatus: \t" + (server.isRunning() ? ("running on port " + server.getPort()): "down"));
+	   	 listInterfaces();
+	   	 List<Socket> connections = server.getConnections();
 	   	 d("|->Connections: " + connections.size());
 	   	for(Socket socket : connections){
 	   		d(" |->" + socket.getRemoteSocketAddress()+ ":"+socket.getPort());
 	   	}  
 	}
+	
+	private void listInterfaces(){
+	  try {
+        String wlan = "wlan0";
+        String eth = "eth0";
+        NetworkInterface Iwlan = NetworkInterface.getByName(wlan);
+        NetworkInterface Ieth  = NetworkInterface.getByName(eth);
+        //if(Constants.V) d("fetched Interfaces " + wlan + ", " + eth);
+        if(Iwlan != null && Iwlan.getInterfaceAddresses().size()>=2) 
+        	d(wlan+ "\t " + Iwlan.getInterfaceAddresses().get(1).getAddress().getHostAddress());
+        else
+        	d(wlan + " not found");
+        if(Ieth != null && Ieth.getInterfaceAddresses().size()>=2)
+        	d(eth + "\t " + Ieth.getInterfaceAddresses().get(1).getAddress().getHostAddress());
+        else
+        	d(eth + " not found");
+	  }
+	  catch (Exception e) {
+	     if(Constants.V){
+	    	 System.err.println(e.getMessage());     
+		     e.printStackTrace(System.err);
+	     }
+	  }
+	}
+	
 	
 	public boolean getCleanShutdownFlag(){
 		return clean_shutdown;

@@ -1,11 +1,17 @@
 package ch.esmeralda.notredame.net;
 
 import java.util.*;
+
+import ch.esmeralda.notredame.main.Constants;
 import ch.esmeralda.notredame.unitHandling.*;
 import java.io.*;
 import java.util.List;
 import java.net.*;
 
+/**
+ * @author thomas
+ *
+ */
 public class NServerImplEppi implements NServer {
 	private int port;
 	private boolean active = false;
@@ -29,7 +35,7 @@ public class NServerImplEppi implements NServer {
 	public void start(int port) {
 		this.port = port;
 		try {
-			System.out.print("listening on port "+port+"\n");
+			if(Constants.V) System.out.print("listening on port "+port+"\n");
 			serverSocket = new ServerSocket(port);
 			active = true;
 			listener = new Listener();
@@ -78,13 +84,13 @@ public class NServerImplEppi implements NServer {
 					out.writeObject(workdayHandler.getResponse(o));
 					out.flush();
 				} catch (IOException e) {
-					System.err.println("IOException: "+e.getMessage());
+					if(Constants.D) if(Constants.D) System.err.println("IOException: "+e.getMessage());
 					break;
 				} catch (ClassNotFoundException e) {
-					System.err.println("ClassNotFound: "+e.getMessage());
+					if(Constants.D) System.err.println("ClassNotFound: "+e.getMessage());
 					break;
 				} catch (Exception e) {
-					System.err.println("Error Transmitting: "+e.getMessage());
+					if(Constants.D) System.err.println("Error Transmitting: "+e.getMessage());
 					break;
 				}
 			}
@@ -92,8 +98,12 @@ public class NServerImplEppi implements NServer {
 				this.socket.close();
 				socketList.remove(socket);
 			} catch (IOException e) {
-				System.err.println("Error closing socket.");
+				if(Constants.D) System.err.println("Error closing socket.");
 			}
 		}
+	}
+
+	public int getPort() {
+		return port;
 	}
 }
