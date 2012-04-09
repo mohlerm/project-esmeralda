@@ -12,7 +12,7 @@
     <string name="set_save">Save</string>
     <string name="main_update">Update</string>
     <string name="main_add">Add Element</string>
-    <string name="main_emptylist">There are no items to display.</string>
+    <string name="main_emptylist">There are no items to display. Press Menu for more options...</string>
     <string name="radio_name">Radio Name</string>
     <string name="radio_url">Radio URL</string>
     <string name="radiorow_remove">del</string>
