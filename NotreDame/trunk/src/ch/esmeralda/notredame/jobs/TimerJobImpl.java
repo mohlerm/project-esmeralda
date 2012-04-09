@@ -3,17 +3,17 @@ package ch.esmeralda.notredame.jobs;
 import java.sql.Timestamp;
 
 import ch.esmeralda.DataExchange.TaskUnit;
+import ch.esmeralda.notredame.main.Constants;
 import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class TimerJobImpl extends TimerJob{
-	private static boolean D = false;
 	public TimerJobImpl(StreamJob streamJob,Workday workday) {
 		super(streamJob,workday);
 	}
 
 	@Override
 	public void run(){
-		if(D) System.out.println("running Timer...");
+		if(Constants.V) System.out.println("running Timer...");
 		if(workday==null) return;
 		//if(D) System.out.println("nothing is null");
 		/*

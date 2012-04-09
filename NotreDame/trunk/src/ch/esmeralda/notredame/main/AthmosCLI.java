@@ -317,11 +317,14 @@ public class AthmosCLI extends Thread{
         String eth = "eth0";
         NetworkInterface Iwlan = NetworkInterface.getByName(wlan);
         NetworkInterface Ieth  = NetworkInterface.getByName(eth);
-        //if(Constants.V) d("fetched Interfaces " + wlan + ", " + eth);
+        
+        if(Constants.V) d("fetched Interfaces " + wlan + ", " + eth);
+        
         if(Iwlan != null && Iwlan.getInterfaceAddresses().size()>=2) 
         	d(wlan+ "\t " + Iwlan.getInterfaceAddresses().get(1).getAddress().getHostAddress());
         else
         	d(wlan + " not found");
+        
         if(Ieth != null && Ieth.getInterfaceAddresses().size()>=2)
         	d(eth + "\t " + Ieth.getInterfaceAddresses().get(1).getAddress().getHostAddress());
         else
