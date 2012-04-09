@@ -59,7 +59,7 @@ public interface WorkdayWrapper {
 	/**
 	 * Resets a workday and removes everything
 	 */
-	public boolean reset();
+	public boolean reset(int hour);
 }
 
 
