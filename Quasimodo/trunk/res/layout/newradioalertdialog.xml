@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
+ 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,12 +25,13 @@
         android:layout_width="wrap_content"
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
-        android:text="Radio Name"
+        android:text="@string/radio_name"
         android:gravity="left"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/radioname_edit"
+        android:inputType="text"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginLeft="20dip"
@@ -45,12 +46,13 @@
         android:layout_width="wrap_content"
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
-        android:text="Radio URL"
+        android:text="@string/radio_url"
         android:gravity="left"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/radiourl_edit"
+        android:inputType="textUri"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginLeft="20dip"

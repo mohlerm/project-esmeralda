@@ -72,11 +72,11 @@ public class QuasimodoActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// android default
+		//---- android default
 		super.onCreate(savedInstanceState);   
 		setContentView(R.layout.main);
 
-		// get ID's from various gui objects and initialize clickability
+		//---- get ID's from various gui objects and initialize clickability
 		addbutton = (Button) findViewById(R.id.addbtn);
 		AddListenerClass addlistener = new AddListenerClass();
 		addbutton.setOnClickListener(addlistener);
@@ -85,11 +85,11 @@ public class QuasimodoActivity extends Activity {
 		ConnectListenerClass connectlistener = new ConnectListenerClass();
 		connectbutton.setOnClickListener(connectlistener);
 
-		// load previous Settings.
+		//---- load previous Settings.
 		settings = getSharedPreferences(PREFS_NAME, 0);
 		readSettings();
 
-		// load List and its adapter
+		//---- load List and its adapter
 		lv_qtu = (ListView) findViewById(R.id.taskunitlist);
 		lv_qtu.setEmptyView((TextView)findViewById(R.id.list_is_empty));
 		m_qtus = new ArrayList<TaskUnit>();
@@ -97,10 +97,11 @@ public class QuasimodoActivity extends Activity {
 		lv_qtu.setAdapter(this.m_adapter);
 		
 		
-		// Make sure, WIFI is turned on and connected.
+		//---- Make sure, WIFI is turned on and connected.
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (!mWifi.isConnected()) {
+			// wifi not connected, show info popup.
 		    showDialog(1);
 		} else {
 			// Make Connection
