@@ -13,7 +13,7 @@ public class TimerJobImpl extends TimerJob{
 
 	@Override
 	public void run(){
-		if(Constants.V) System.out.println("running Timer...");
+		if(false) System.out.println("running Timer...");
 		if(workday==null) return;
 		//if(D) System.out.println("nothing is null");
 		/*

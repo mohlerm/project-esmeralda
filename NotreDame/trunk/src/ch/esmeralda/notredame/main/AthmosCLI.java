@@ -15,10 +15,11 @@ import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.jobs.*;
 import ch.esmeralda.notredame.net.*;
 import ch.esmeralda.notredame.unitHandling.*;
+import ch.esmeralda.notredame.utils.Minions;
 
 public class AthmosCLI extends Thread{
-	private static final int SERVERPORT = 10002;
-	private static final String DI_TRANCE = "http://u11aw.di.fm:80/di_trance";
+	private static final int SERVERPORT = Constants.SERVERPORT;
+	private static final String DI_TRANCE = Constants.DI_TRANCE;
 	
 	private static final int UTC_OFFSET = -2;
 	
@@ -115,7 +116,7 @@ public class AthmosCLI extends Thread{
 		        		hour = in.nextInt();
 		        	}
 		        	hour += UTC_OFFSET;
-		        	set_default(workday,hour);
+		        	Minions.set_default(workday,hour);
 	        	}catch(Exception e){
 	        		d("Parse Exception");
 	        	}
@@ -177,82 +178,7 @@ public class AthmosCLI extends Thread{
 		}
 	}
 	
-	private void set_default(Workday workday,int hour){
-		//System.out.println("prefill a debug workday");
-		workday.reset();
-		//today at midnight
-		long a = System.currentTimeMillis();
-		a = a-a%(1000*3600*24);
-		long start = a + hour*3600*1000;
-		
-		
-		
-		//Calendar cal = new GregorianCalendar();
-		
-		TaskUnit task;
-		
-		task = new TaskUnit(new Date(start), 75*60*1000, "");
-		task.setDescription("Work1");
-		workday.addUnit(task);
-		start += 75*60*1000;
-		//a = a-a%(1000*3600*24);
-		//long start = a + hour*3600*1000;
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break1");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, "");
-		task.setDescription("Work2");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break2");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 45*60*1000, "");
-		task.setDescription("Work2");
-		workday.addUnit(task);
-		start += 45*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, DI_TRANCE);		
-		task.setDescription("supper");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 75*60*1000, "");
-		task.setDescription("Work1");
-		workday.addUnit(task);
-		start += 75*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break1");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 60*60*1000, "");
-		task.setDescription("Work2");
-		workday.addUnit(task);
-		start += 60*60*1000;
-		
-		task = new TaskUnit(new Date(start), 15*60*1000, DI_TRANCE);		
-		task.setDescription("break2");
-		workday.addUnit(task);
-		start += 15*60*1000;
-		
-		task = new TaskUnit(new Date(start), 45*60*1000, "");
-		task.setDescription("Work3");
-		workday.addUnit(task);
-		start += 45*60*1000;
-		
-		task = new TaskUnit(new Date(start), 10*60*1000, DI_TRANCE);		
-		task.setDescription("end of day");
-		workday.addUnit(task);
-		//start += 15*60*1000;
-			
-	}
+	
 	
 	private void active(Workday workday){
 		workday.getActiveUnit(new Date());
@@ -291,16 +217,6 @@ public class AthmosCLI extends Thread{
 	}
 	
 	private void status(){
-		String IP;
-		try {
-			InetAddress thisIp =InetAddress.getLocalHost();
-			IP = thisIp.getHostAddress();
-		}
-		catch(Exception e) {
-			IP = "NOT FOUND";
-		}
-		
-		
 	   	 d("Timerstatus:  \t" + (executor.isTerminated() ? "terminated" : "running") + (M ? "  MUTE":""));
 	   	 d("Serverstatus: \t" + (server.isRunning() ? ("running on port " + server.getPort()): "down"));
 	   	 listInterfaces();
