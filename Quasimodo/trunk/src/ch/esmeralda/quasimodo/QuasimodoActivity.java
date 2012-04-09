@@ -1,6 +1,5 @@
 /**
  * TODO: make an awesome icon.
- * TODO: make reset function.
  */
 
 package ch.esmeralda.quasimodo;
@@ -9,7 +8,6 @@ import java.io.NotActiveException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +15,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,10 +31,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -328,7 +323,6 @@ public class QuasimodoActivity extends Activity {
 	 */
 	private long modified_key;
 	private void startedit(int index, long key ,boolean add) {
-		runOnUiThread(dispDisconnectedToast);
 		TaskUnit orig;
 		TaskUnit tu;
 		final Intent i = new Intent(this, editActivity.class);
@@ -627,18 +621,6 @@ public class QuasimodoActivity extends Activity {
 		Toast.makeText(this.getApplicationContext(), "Error while talking to server...", Toast.LENGTH_LONG).show();
 	}
 	
-	// Display the connection failed Toast.
-	// UI THREAD!
-	private Runnable dispDisconnectedToast = new Runnable(){
-		public void run() {
-			updateable = false;
-			dispDisconnectedToast();
-		}
-	};
-	private void dispDisconnectedToast(){
-		Toast.makeText(this.getApplicationContext(), "Disconnected...", Toast.LENGTH_SHORT).show();
-	}
-
 
 	// ------------------------- Menu Funktionalit�t
 
