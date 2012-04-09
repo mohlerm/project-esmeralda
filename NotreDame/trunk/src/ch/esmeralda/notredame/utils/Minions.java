@@ -25,7 +25,7 @@ public class Minions {
 		//today at midnight
 		long a = System.currentTimeMillis();
 		a = a-a%(1000*3600*24);
-		long start = a + minutes*60*1000-(TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset())/(1000*3600);
+		long start = a + minutes*60*1000-(TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
 		
 		
 		
