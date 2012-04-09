@@ -126,8 +126,8 @@ public class AthmosCLI extends Thread{
 	            quit = true;
 	         }else if(msg.equals("active")||msg.equals("show stream")){
 	            active(workday);
-	         }else if(msg.equals("active")||msg.equals("show stream")){
-		        active(workday);
+	         }else if(msg.equals("reset")){
+		        workday.reset();
 	         }else if(msg.equals("remove")){
 	        	 d("sorry, not yet implemented in CLI");
 	            //remove();
@@ -144,6 +144,7 @@ public class AthmosCLI extends Thread{
 		
 		 if(L) System.out.println("stopping jobs");
 		executor.shutdownNow();
+		if(L) System.out.println("shutdown server");
 		server.stop();
 		if(L) System.out.println("...bye, bye");
 		clean_shutdown = true;

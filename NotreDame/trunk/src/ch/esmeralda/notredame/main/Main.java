@@ -62,6 +62,8 @@ public class Main {
 			if(!cli.getCleanShutdownFlag()){
 				System.out.println("CLI hasn't terminated clean, something went wrong...");
 				System.exit(0);
+			}else{
+				System.exit(0);
 			}
 		}else{
 			NotreDameInstance ndi = new NotreDameInstance();
@@ -76,6 +78,8 @@ public class Main {
 			
 			if(!ndi.getCleanShutdownFlag()){
 				System.out.println("CLI hasn't terminated clean, something went wrong...");
+				System.exit(0);
+			}else{
 				System.exit(0);
 			}
 		}

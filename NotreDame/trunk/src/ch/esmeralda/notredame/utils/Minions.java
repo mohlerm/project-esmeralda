@@ -8,6 +8,12 @@ import ch.esmeralda.notredame.main.Constants;
 import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class Minions {
+	/**
+	 * 
+	 * @param workday
+	 * @param hour
+	 * @param minutes
+	 */
 	public static void set_default(Workday workday,int hour,int minutes){
 		if(hour>=0 && hour<24 && minutes<60 && minutes>=0){
 			set_default(workday,hour*60+minutes);
@@ -15,6 +21,11 @@ public class Minions {
 			if(Constants.V) System.out.println("Invalid time  Hours: " + hour + "  Minutes: " + minutes);
 		}
 	}
+	/**
+	 * already UTC corrected
+	 * @param workday
+	 * @param minutes
+	 */
 	public static void set_default(Workday workday,int minutes){
 		if(minutes<0){
 			if(Constants.V) System.out.println("Invalid time  Minutes: " + minutes);
