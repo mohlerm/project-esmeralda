@@ -82,8 +82,19 @@ public class Minions {
 		
 		task = new TaskUnit(new Date(start), 10*60*1000, Constants.DI_TRANCE);		
 		task.setDescription("end of day");
-		workday.addUnit(task);
-		//start += 15*60*1000;
-			
+		workday.addUnit(task);	
+	}
+	
+	public static void set_debug(Workday workday){
+		workday.reset();
+		if(Constants.V) System.out.println("prefill a debug workday");
+		long now = System.currentTimeMillis()+1000;
+		TaskUnit task;
+		for(int i=0;i<10;i++){
+			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, Constants.DI_TRANCE);
+			else		task = new TaskUnit(new Date(now+i*10000), 10000, "no stream          ");
+			task.setDescription("debug "+i);
+			workday.addUnit(task);
+		}
 	}
 }

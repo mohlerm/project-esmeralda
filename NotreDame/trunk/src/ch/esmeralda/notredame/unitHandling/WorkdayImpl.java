@@ -130,11 +130,12 @@ public class WorkdayImpl implements Workday{
 		str.append("-----------------------------------------------\n");
 		str.append("start \t\t\t\tduration\t stream \tkey \tcomment\n");
 		for(TaskUnit unit:daylist){
-			str.append(unit.getStarttime().toString()+" \t");
-			str.append(unit.getDuration()+" \t");
-			str.append(unit.getStreamURL() + '\t');
-			str.append(unit.getKey()+" \t");
-			str.append(unit.getDescription() + '\n');
+			str.append(unit.toString() + '\n');
+//			str.append(unit.getStarttime().toString()+" \t");
+//			str.append(unit.getDuration()+" \t");
+//			str.append(unit.getStreamURL() + '\t');
+//			str.append(unit.getKey()+" \t");
+//			str.append(unit.getDescription() + '\n');
 		}
 		str.append('\n');
 		return str.toString();

@@ -82,4 +82,10 @@ public class NServerImpl implements NServer {
 			}
 		}
 	}
+
+	@Override
+	public int getPort() {
+		// TODO Auto-generated method stubd
+		return 0;
+	}
 }
