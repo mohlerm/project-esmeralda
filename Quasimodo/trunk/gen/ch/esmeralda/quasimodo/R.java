@@ -72,7 +72,30 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f040001;
         public static final int credits_string=0x7f040002;
+        public static final int edit_delete=0x7f040013;
+        public static final int edit_done=0x7f040012;
+        public static final int edit_end=0x7f040015;
+        public static final int edit_radiostream=0x7f040014;
+        public static final int edit_setbreak=0x7f040019;
+        public static final int edit_setwork=0x7f040018;
+        public static final int edit_start=0x7f040016;
+        public static final int edit_title=0x7f040017;
         public static final int hello=0x7f040000;
+        public static final int main_add=0x7f04000b;
+        public static final int main_emptylist=0x7f04000c;
+        public static final int main_update=0x7f04000a;
+        public static final int radio_name=0x7f04000d;
+        public static final int radio_url=0x7f04000e;
+        public static final int radiorow_remove=0x7f04000f;
+        public static final int set_credits=0x7f040004;
+        public static final int set_default=0x7f040008;
+        public static final int set_ip=0x7f040005;
+        public static final int set_port=0x7f040006;
+        public static final int set_radiostationscolon=0x7f040007;
+        public static final int set_save=0x7f040009;
+        public static final int set_title=0x7f040003;
+        public static final int turow_edit=0x7f040010;
+        public static final int turow_picdesc=0x7f040011;
     }
     public static final class style {
         public static final int BoldBlueText=0x7f050000;

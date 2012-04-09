@@ -10,7 +10,7 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
         android:src="@drawable/icon" 
-        android:contentDescription="Pause oder Arbeits icon"/>
+        android:contentDescription="@string/turow_picdesc"/>
      
     <LinearLayout
         android:orientation="vertical"
@@ -21,16 +21,16 @@
             android:id="@+id/toptext"
             android:layout_width="fill_parent"
             android:layout_height="0dip"
-            android:layout_weight="1"
             android:gravity="center_vertical"
+            android:layout_weight="1"
         />
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="0dip"
-            android:layout_weight="1" 
             android:id="@+id/bottomtext"
             android:singleLine="true"
             android:ellipsize="marquee"
+            android:layout_weight="1"
         />
     </LinearLayout>
     
@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="6dip"
-        android:text="edit"
+        android:text="@string/turow_edit"
         android:focusable="false"
         android:focusableInTouchMode="false" />
 

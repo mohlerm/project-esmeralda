@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -110,14 +108,14 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	     		reinit_RadioList();
 	        return;
 		case R.id.set_savebtn:
-			// Prüfe ob IP richtig eingegeben.
+			// Prï¿½fe ob IP richtig eingegeben.
 				if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
 					Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				ip = editip.getText().toString();
 				
-			// Prüfe ob Port richtig eingegeben.
+			// Prï¿½fe ob Port richtig eingegeben.
 				int tempport = Integer.parseInt(editport.getText().toString());
 				if (tempport < 0 || tempport > 65536) {
 					Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
@@ -160,7 +158,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	                	EditText url_edit = (EditText) textEntryView.findViewById(R.id.radiourl_edit);
 	                	RADIO_LIST.add(RADIO_LIST.size()-1, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
 	                	reinit_RadioList();
-	                	// lässt Tastatur verschwinden.
+	                	// lï¿½sst Tastatur verschwinden.
 		                	InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
 		        	        if (name_edit != null) 
 		        	        	inputManager.hideSoftInputFromWindow(name_edit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -199,7 +197,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
                 	EditText url_edit = (EditText) textEntryView.findViewById(R.id.radiourl_edit);
                 	RADIO_LIST.add(RADIO_LIST.size()-1, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
                 	reinit_RadioList();
-                	// lässt Tastatur verschwinden.
+                	// lï¿½sst Tastatur verschwinden.
 	                	InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
 	        	        if (name_edit != null) 
 	        	        	inputManager.hideSoftInputFromWindow(name_edit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -228,7 +226,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				}
 			}
         });
-        // lässt Tastatur verschwinden.
+        // lï¿½sst Tastatur verschwinden.
 	        InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
 	        View v = this.getCurrentFocus();
 	        if (v != null) 

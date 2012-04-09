@@ -2,5 +2,28 @@
 <resources>
     <string name="hello">Quasimodo, The Hunchback of Notre-Dame</string>
     <string name="app_name">Quasimodo</string>
-    <string name="credits_string">                 Authors:                \n                ~~~~~~~~~~               \n            Marco Eppenberger            \n         Android GUI, Networking         \n                                         \n              Thomas Richner             \n       Server &amp; Streamer Backend      \n                                         \n               Sandro Sgier              \n       Server &amp; Streamer Backend         \n	                                     \n               Stefan Mach               \n              Communication              \n                ~~~~~~~~~~               \n</string>
+    <string name="credits_string">Authors:\n~~~~~~~~~~\nMarco Eppenberger:\n - Android GUI\n - Networking\n\nThomas Richner:\n - Streaming\n - Server Backend\n\nSandro Sgier:\n - Networking\n - Server Backend\n\nStefan Mach:\n - Communication\n~~~~~~~~~~\n</string>
+    <string name="set_title">Settings</string>
+    <string name="set_credits">Credits</string>
+    <string name="set_ip">IP</string>
+    <string name="set_port">Port</string>
+    <string name="set_radiostationscolon">RadioStations:</string>
+    <string name="set_default">Default Values</string>
+    <string name="set_save">Save</string>
+    <string name="main_update">Update</string>
+    <string name="main_add">Add Element</string>
+    <string name="main_emptylist">There are no items to display.</string>
+    <string name="radio_name">Radio Name</string>
+    <string name="radio_url">Radio URL</string>
+    <string name="radiorow_remove">del</string>
+    <string name="turow_edit">edit</string>
+    <string name="turow_picdesc">Pause oder Arbeits Icon</string>
+    <string name="edit_done">Done</string>
+    <string name="edit_delete">Delete</string>
+    <string name="edit_radiostream">Radio Stream</string>
+    <string name="edit_end">End</string>
+    <string name="edit_start">Start</string>
+    <string name="edit_title">Edit TaskUnit</string>
+    <string name="edit_setwork">Work</string>
+    <string name="edit_setbreak">Break</string>
 </resources>

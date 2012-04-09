@@ -8,7 +8,7 @@
         android:id="@+id/titlebar"
         android:layout_width="fill_parent"
         android:layout_height="40dip"
-        android:text="Edit TaskUnit"
+        android:text="@string/edit_title"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
@@ -20,13 +20,13 @@
         	android:id="@+id/edit_workTU"
         	android:layout_height="wrap_content"
         	android:layout_width="fill_parent"
-        	android:text="Work"
+        	android:text="@string/edit_setwork"
         	android:layout_weight="1" />
 	    <Button
          	android:id="@+id/edit_breakTU"
          	android:layout_height="wrap_content"
          	android:layout_width="fill_parent"
-         	android:text="Break"
+         	android:text="@string/edit_setbreak"
          	android:layout_weight="1" />
 	</LinearLayout>
 
@@ -38,7 +38,7 @@
 			<TextView
                 android:layout_width="80dip"
                 android:layout_height="wrap_content"
-                android:text="Start"
+                android:text="@string/edit_start"
                 android:layout_margin="4dip"
                 android:layout_gravity="center"/>
 
@@ -59,7 +59,7 @@
               android:layout_width="80dip"
               android:layout_height="wrap_content"
               android:layout_margin="4dip"
-              android:text="End"
+              android:text="@string/edit_end"
               android:layout_gravity="center" />
 
           <TimePicker
@@ -81,7 +81,7 @@
               android:layout_height="wrap_content"
               android:layout_gravity="center"
               android:layout_margin="4dip"
-              android:text="Radio Stream" />
+              android:text="@string/edit_radiostream" />
 
           <Spinner
               android:id="@+id/RadioStationSpinner"
@@ -103,13 +103,13 @@
         	android:id="@+id/edit_deletebtn"
         	android:layout_height="wrap_content"
         	android:layout_width="fill_parent"
-        	android:text="Delete"
+        	android:text="@string/edit_delete"
         	android:layout_weight="1" />
 	    <Button
          	android:id="@+id/edit_donebtn"
          	android:layout_height="wrap_content"
          	android:layout_width="fill_parent"
-         	android:text="Done"
+         	android:text="@string/edit_done"
          	android:layout_weight="1" />
 	</LinearLayout>
 
