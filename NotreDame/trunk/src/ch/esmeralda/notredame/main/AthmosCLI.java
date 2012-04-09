@@ -116,7 +116,7 @@ public class AthmosCLI extends Thread{
 		        		hour = in.nextInt();
 		        	}
 		        	hour += UTC_OFFSET;
-		        	Minions.set_default(workday,hour);
+		        	Minions.set_default(workday,hour,0);
 	        	}catch(Exception e){
 	        		d("Parse Exception");
 	        	}
