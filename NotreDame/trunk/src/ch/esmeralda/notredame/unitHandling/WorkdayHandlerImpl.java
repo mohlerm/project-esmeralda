@@ -7,6 +7,7 @@ import java.util.List;
 import ch.esmeralda.DataExchange.AnsDataPkg;
 import ch.esmeralda.DataExchange.QueryDataPkg;
 import ch.esmeralda.DataExchange.TaskUnit;
+import ch.esmeralda.notredame.main.Constants;
 
 /**
  * implementation of WorkdayHandler
@@ -22,9 +23,9 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 
 	public WorkdayHandlerImpl(Workday workday) {
 		if (workday==null)
-			System.err.println("Workday is null");
+			if(Constants.V) System.err.println("Workday is null");
 		this.workday = workday;
-		if(V) System.out.println("Size of the workday: " + workday.getList().size());
+		if(Constants.V) System.out.println("Size of the workday: " + workday.getList().size());
 	}
 	
 	@Override
@@ -37,22 +38,22 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 		
 			QueryDataPkg req = null;
 			AnsDataPkg ans = null;
-			System.out.println("WorkdayHandler got a request!");
+			if(Constants.V) System.out.println("WorkdayHandler got a request!");
 			
 			try {
 				req = (QueryDataPkg) request;
 			} catch (Exception e) {
-				System.err.println("The client sent a not valid QueryDataPkg!");
+				if(Constants.V) System.err.println("The client sent a not valid QueryDataPkg!");
 			}
 			int action = req.getaction();
 			TaskUnit data = req.getTU();
 			switch (action) {
 			case 0:		// get the actual workday
-				System.out.println("Action: get actual workday: "+Integer.toString(workday.getList().size()));
+				if(Constants.V) System.out.println("Action: get actual workday: "+Integer.toString(workday.getList().size()));
 				ans = new AnsDataPkg(action,true,workday.getList());
 				break;
 			case 1:		// add new tu
-				System.out.println("Action: add new TU, size of Workday before adding: "+Integer.toString(workday.getList().size()));
+				if(Constants.V) System.out.println("Action: add new TU, size of Workday before adding: "+Integer.toString(workday.getList().size()));
 				TaskUnit TU = new TaskUnit(data.getStarttime(),data.getDuration(),data.getStreamURL());
 				TU.setDescription(data.getDescription());
 				TU.setKey(data.getKey());
@@ -65,7 +66,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 					workday.removeUnitByKey((int) key);								// workaround!! Key just should be long type! ##########################################
 					ans = new AnsDataPkg(action,true,workday.getList());
 				} else {
-					System.err.println("WorkdayHandlerImpl: Key to remove was default 0.");
+					if(Constants.V) System.err.println("WorkdayHandlerImpl: Key to remove was default 0.");
 					ans = new AnsDataPkg(action,false,workday.getList());
 				}
 				break;
@@ -84,7 +85,7 @@ public class WorkdayHandlerImpl implements WorkdayHandler {
 				break;
 			default:
 				ans = new AnsDataPkg(-1,false,null);
-				System.err.println("An invalid QueryDataPkg was sent.");
+				if(Constants.V) System.err.println("An invalid QueryDataPkg was sent.");
 				break;
 			}
 			
