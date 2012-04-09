@@ -76,8 +76,9 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 		return null;
 	}
 
-	public boolean reset() {
-		QueryDataPkg req = new QueryDataPkg(4, null);
+	public boolean reset(int minutes) {
+		TaskUnit reqdata = new TaskUnit(null, minutes);
+		QueryDataPkg req = new QueryDataPkg(4, reqdata);
 		return sendAndHandleAns(req);
 	}
 	

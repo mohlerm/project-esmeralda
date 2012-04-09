@@ -98,11 +98,11 @@ public class editActivity extends Activity implements OnClickListener{
 		        		}
 			        }
 		        	// Wenn der Radio schon existiert, setze Spinner auf ihn.
-		        	// Wenn nicht: füge die Radio Station der Liste hinzu.
+		        	// Wenn nicht: fï¿½ge die Radio Station der Liste hinzu.
 		        	if (RS_exists) {
 		        		radiospinner.setSelection(i);
 		        	} else {
-		        		RadioStation adder = new RadioStation(getBaseDomain(tu.getStreamURL()),tu.getStreamURL());
+		        		RadioStation adder = new RadioStation(getStreamName(tu.getStreamURL()),tu.getStreamURL());
 		        		Radio_List.add(adder);
 		        		QFileIO.writeRadioList(this, Radio_List, SettingsActivity.RadioListFilename);
 		        		// and redo all the important parts again from general initialization
@@ -201,7 +201,7 @@ public class editActivity extends Activity implements OnClickListener{
 	
 	
 	/**
-	 * Existiert um effektiv dafür zu sorgen, dass das Ende des TU nicht vor dem Start liegt.
+	 * Existiert um effektiv dafï¿½r zu sorgen, dass das Ende des TU nicht vor dem Start liegt.
 	 * @author Marco
 	 */
 	private class TPlistener implements TimePicker.OnTimeChangedListener {
@@ -274,54 +274,15 @@ public class editActivity extends Activity implements OnClickListener{
 	}
 	
 	
-	
 	/**
-	 * Stinkfreche Kopie eines Codes aus Stackoverflow zum herausfiltern eines Hostnames aus einer URL.
-	 */
-	
-	/**
-	 * Will take a url such as http://www.stackoverflow.com and return www.stackoverflow.com
-	 * 
+	 * Returns the StreamName (last part of url)
 	 * @param url
-	 * @return
+	 * @return the last part of the url
 	 */
-	private String getHost(String url){
-	    if(url == null || url.length() == 0)
-	        return "";
-
-	    int doubleslash = url.indexOf("//");
-	    if(doubleslash == -1)
-	        doubleslash = 0;
-	    else
-	        doubleslash += 2;
-
-	    int end = url.indexOf('/', doubleslash);
-	    end = end >= 0 ? end : url.length();
-
-	    return url.substring(doubleslash, end);
-	}
-	
-	/**  Based on : http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3.3_r1/android/webkit/CookieManager.java#CookieManager.getBaseDomain%28java.lang.String%29
-	 * Get the base domain for a given host or url. E.g. mail.google.com will return google.com
-	 * @param host 
-	 * @return the shortened URL, eg from http://scfire-ntc-aa04.stream.aol.com:80/stream/1003 it returns aol.com
-	 */
-	private String getBaseDomain(String url) {
-	    String host = getHost(url);
-	    if(url == null || url.length() == 0)
-	        return "";
-
-	    int startIndex = 0;
-	    int nextIndex = host.indexOf('.');
-	    int lastIndex = host.lastIndexOf('.');
-	    while (nextIndex < lastIndex) {
-	        startIndex = nextIndex + 1;
-	        nextIndex = host.indexOf('.', startIndex);
-	    }
-	    if (startIndex > 0) {
-	        return host.substring(startIndex);
-	    } else {
-	        return host;
-	    }
+	private String getStreamName(String url) {
+		int lastslash = url.lastIndexOf("/");
+		if (lastslash >= url.length()-2)
+			return "Stream";
+		return url.substring(lastslash+1);
 	}
 }

@@ -1,5 +1,6 @@
 /**
- * TODO: Do autoupdates every 5 secs.
+ * TODO: make an awesome icon.
+ * TODO: make reset function.
  */
 
 package ch.esmeralda.quasimodo;
@@ -8,11 +9,15 @@ import java.io.NotActiveException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,11 +34,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import ch.esmeralda.quasimodo.net.QClient;
@@ -43,9 +51,9 @@ import ch.esmeralda.quasimodo.unitHandlingWrapper.WorkdayWrapperImpl;
 import ch.esmeralda.DataExchange.*;
 
 public class QuasimodoActivity extends Activity {
-
+	
 	// Various GUI Objects
-	private ProgressDialog m_ProgressDialog = null;
+	private ProgressDialog m_ProgressDialog;
 	private Button addbutton;
 	private Button connectbutton;
 	private ListView lv_qtu;
@@ -65,7 +73,10 @@ public class QuasimodoActivity extends Activity {
 	public static final String TU_OBJECT_KEY = "TUSTATUSTOEDITACTIVITY";
 	public static final String TU_DELETE_KEY = "TUTOBEDELETED"; 
 
-
+	// Autoupdater
+	ScheduledThreadPoolExecutor executor;
+	Updater updater;
+	private boolean updateable;
 
 	// ---------- initial Handling
 
@@ -96,6 +107,9 @@ public class QuasimodoActivity extends Activity {
 		this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
 		lv_qtu.setAdapter(this.m_adapter);
 		
+		//---- AutoUpdater
+		updater = new Updater();
+		updateable = true;
 		
 		//---- Make sure, WIFI is turned on and connected.
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -103,12 +117,28 @@ public class QuasimodoActivity extends Activity {
 		if (!mWifi.isConnected()) {
 			// wifi not connected, show info popup.
 		    showDialog(1);
+		    updateable = false;
 		} else {
 			// Make Connection
 			connectbutton.performClick();
 		}
-
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		updateable = true;
+		executor = new ScheduledThreadPoolExecutor(1);
+		executor.scheduleAtFixedRate(updater, 10, 10, TimeUnit.SECONDS);
+	}
+	
+	@Override
+	public void onPause() {
+		executor.shutdownNow();
+		updateable = false;
+		super.onPause();
+	}
+	
 
 	/**
 	 * What happens when the "Add" button gets clicked?
@@ -133,7 +163,7 @@ public class QuasimodoActivity extends Activity {
 				return;
 			}
 
-			Thread connect = new net_DoStuff(1); // action 1 = get New Workday List.
+			Thread connect = new net_DoStuff(false,1); // action 1 = get New Workday List.
 			connect.start();
 		}
 	}
@@ -170,8 +200,40 @@ public class QuasimodoActivity extends Activity {
 				});
 			WIFIdisable.setIcon(R.drawable.icon);
 			return WIFIdisable;
+		} else if (id == 2) {
+			//---- RESET button pressed
+			LayoutInflater factory = LayoutInflater.from(this);
+	        final View tpdview = factory.inflate(R.layout.resettimepickerdialog, null);
+	        TimePicker tp = (TimePicker)tpdview.findViewById(R.id.resetTimePicker);
+	        tp.setCurrentHour(9);
+	        tp.setCurrentMinute(0);
+	        tp.setIs24HourView(true);
+	        AlertDialog ResetDialog = new AlertDialog.Builder(QuasimodoActivity.this)
+	            .setTitle("Set new Workday Starttime:")
+	            .setView(tpdview)
+	            .setPositiveButton("Reset!", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                	TimePicker rtp = (TimePicker) tpdview.findViewById(R.id.resetTimePicker);
+	                	ResetWorkday_init(rtp.getCurrentHour(),rtp.getCurrentMinute());
+	                }
+	            })
+	            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                		// Do nothing.
+	                }
+	            })
+	            .create();
+	        return ResetDialog;
 		}
 		return super.onCreateDialog(id);
+	}
+	
+	/**
+	 * Helper Function für einen Workday Reset ############################################################## TO BE TESTED!!!
+	 */
+	private void ResetWorkday_init(int hour, int minute) {
+		Thread reset = new net_DoStuff(5,hour*60+minute); // eventuell anpassen für UTC
+		reset.start();
 	}
 
 	// ------------------------- custom ArrayList Adapter class
@@ -299,7 +361,7 @@ public class QuasimodoActivity extends Activity {
 				TaskUnit TUret = (TaskUnit) extras.get(TU_OBJECT_KEY);
 				boolean delete = (Boolean) extras.get(TU_DELETE_KEY);
 				boolean justnew = (Boolean) extras.get(TU_NEW_KEY);
-				// l�sche die aktuel modifizierende TU
+				// loesche die aktuel modifizierende TU
 				if (delete) {
 					net_DoStuff trd = new net_DoStuff(2,modified_key);
 					trd.start();
@@ -359,11 +421,25 @@ public class QuasimodoActivity extends Activity {
 	
 	
 	/**
+	 * Autoupdater class.
+	 * @author marco
+	 */
+	private class Updater implements Runnable {
+		public void run() {
+			if (!updateable) return;
+			Thread connect = new net_DoStuff(true,1); // action 1 = get New Workday List.
+			connect.start();
+		}
+	}
+	
+	
+	/**
 	 * Verbindet mit dem Server und macht eine Aktion und disconnected wieder.
-	 * int Action: 1 f�r GetWorkday
-	 *             2 f�r DeleteTU
-	 *             3 f�r AddTU
-	 *             4 f�r ModTU
+	 * int Action: 1 fuer GetWorkday
+	 *             2 fuer DeleteTU
+	 *             3 fuer AddTU
+	 *             4 fuer ModTU
+	 *             5 fuer Reset
 	 * @author Marco
 	 */
 	private class net_DoStuff extends Thread {
@@ -373,11 +449,14 @@ public class QuasimodoActivity extends Activity {
 		private Date starttime;
 		private long duration;
 		private String StreamURL;
+		private boolean quietmode;
+		private int minutes;
 		
 		// constructor f�r GetWorkday
-		public net_DoStuff(int action){
+		public net_DoStuff(boolean quiet,int action){
 			super();
 			this.action = action;
+			this.quietmode = quiet;
 		}
 		
 		// constructor f�r DeleteTU
@@ -406,15 +485,23 @@ public class QuasimodoActivity extends Activity {
 			this.StreamURL = StreamURL;
 		}
 		
+		// constructor fuer Reset
+		public net_DoStuff(int action, int minutes){
+			super();
+			this.action = action;
+			this.minutes = minutes;
+		}
+		
 		public void run() {
-			runOnUiThread(dispPleaseWaitmsg);
+			if (!quietmode) runOnUiThread(dispPleaseWaitmsg);
 			
 			QClient conn = makeConn();
 			if (conn == null) {
 				Log.e("QAct net","Connection could not be made to "+ip+":"+port);
 				m_qtus.clear();
 				runOnUiThread(renewList);
-				runOnUiThread(dismissPleaseWaitmsg);
+				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
+				updateable = false;
 				return;
 			}
 			
@@ -424,7 +511,8 @@ public class QuasimodoActivity extends Activity {
 			} catch (NotActiveException e) {
 				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
 				runOnUiThread(dispFailToast);
-				runOnUiThread(dismissPleaseWaitmsg);
+				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
+				updateable = false;
 				return;
 			}
 			
@@ -442,6 +530,9 @@ public class QuasimodoActivity extends Activity {
 				DeleteTU(wrp,key_to_delete);
 				AddTU(wrp, starttime, duration, StreamURL);
 				break;
+			case 5:
+				Reset(wrp, this.minutes);
+				break;
 			default:
 				Log.e("Qact net","Thread created with the wrong action number!");
 			}
@@ -449,7 +540,7 @@ public class QuasimodoActivity extends Activity {
 			conn.disconnect();
 			
 			runOnUiThread(renewList);
-			runOnUiThread(dismissPleaseWaitmsg);
+			if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
 		}
 		
 		private void GetWorkday(WorkdayWrapperImpl wrp){
@@ -457,6 +548,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
 				runOnUiThread(dispFailToast);
+				updateable = false;
+			} else {
+				updateable = true;
 			}
 		}
 		
@@ -465,6 +559,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
 				runOnUiThread(dispFailToast);
+				updateable = false;
+			} else {
+				updateable = true;
 			}
 		}
 		
@@ -473,6 +570,20 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
 				runOnUiThread(dispFailToast);
+				updateable = false;
+			} else {
+				updateable = true;
+			}
+		}
+		
+		private void Reset(WorkdayWrapperImpl wrp, int minutes) {
+			if (!wrp.reset(minutes)) {
+				m_qtus.clear();
+				Log.e("QAct net Reset","wrapper could not Reset the Workday.");
+				runOnUiThread(dispFailToast);
+				updateable = false;
+			} else {
+				updateable = true;
 			}
 		}
 	}
@@ -512,6 +623,7 @@ public class QuasimodoActivity extends Activity {
 		}
 	};
 	private void dispFailToast(){
+		updateable = false;
 		Toast.makeText(this.getApplicationContext(), "Error while talking to server...", Toast.LENGTH_LONG).show();
 	}
 	
@@ -519,6 +631,7 @@ public class QuasimodoActivity extends Activity {
 	// UI THREAD!
 	private Runnable dispDisconnectedToast = new Runnable(){
 		public void run() {
+			updateable = false;
 			dispDisconnectedToast();
 		}
 	};
@@ -545,6 +658,9 @@ public class QuasimodoActivity extends Activity {
 		case R.id.menu_settings:
 			final Intent intent = new Intent(this,SettingsActivity.class);
 			startActivityForResult(intent,1);
+			break;
+		case R.id.menu_reset:
+			showDialog(2);
 			break;
 		default:
 		}

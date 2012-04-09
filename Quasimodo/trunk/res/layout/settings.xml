@@ -47,6 +47,11 @@
             android:layout_margin="4dip"
             android:layout_weight="5"
             android:text="@string/set_ip" />
+        
+        <!--  dummy layout damit das editText keinen focus bekommt. -->
+        <LinearLayout
+   		 	android:focusable="true" android:focusableInTouchMode="true"
+    		android:layout_width="0px" android:layout_height="0px"/>
 
         <EditText
             android:id="@+id/setText_IP"
@@ -54,7 +59,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:selectAllOnFocus="true"
-            android:hint="@string/set_ip" />
+            android:hint="@string/set_ip"
+            android:nextFocusUp="@id/setText_IP"
+            android:nextFocusLeft="@id/setText_IP" />
     </LinearLayout>
 
     <LinearLayout
