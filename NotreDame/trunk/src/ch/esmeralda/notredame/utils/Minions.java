@@ -1,6 +1,7 @@
 package ch.esmeralda.notredame.utils;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.notredame.main.Constants;
@@ -8,15 +9,23 @@ import ch.esmeralda.notredame.unitHandling.Workday;
 
 public class Minions {
 	public static void set_default(Workday workday,int hour,int minutes){
-		set_default(workday,hour*60+minutes);
+		if(hour>=0 && hour<24 && minutes<60 && minutes>=0){
+			set_default(workday,hour*60+minutes);
+		}else{
+			if(Constants.V) System.out.println("Invalid time  Hours: " + hour + "  Minutes: " + minutes);
+		}
 	}
 	public static void set_default(Workday workday,int minutes){
+		if(minutes<0){
+			if(Constants.V) System.out.println("Invalid time  Minutes: " + minutes);
+			return;
+		}
 		//System.out.println("prefill a debug workday");
 		workday.reset();
 		//today at midnight
 		long a = System.currentTimeMillis();
 		a = a-a%(1000*3600*24);
-		long start = a + minutes*60*1000;
+		long start = a + minutes*60*1000-(TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset())/(1000*3600);
 		
 		
 		
@@ -92,7 +101,7 @@ public class Minions {
 		TaskUnit task;
 		for(int i=0;i<10;i++){
 			if(i%2==0)	task = new TaskUnit(new Date(now+i*10000), 10000, Constants.DI_TRANCE);
-			else		task = new TaskUnit(new Date(now+i*10000), 10000, "no stream          ");
+			else		task = new TaskUnit(new Date(now+i*10000), 10000, "");
 			task.setDescription("debug "+i);
 			workday.addUnit(task);
 		}
