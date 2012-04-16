@@ -1,7 +1,3 @@
-/**
- * TODO: make an awesome icon.
- */
-
 package ch.esmeralda.quasimodo;
 
 import java.io.NotActiveException;
