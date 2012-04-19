@@ -43,6 +43,7 @@
         android:id="@+id/list_is_empty"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="@string/main_emptylist" />
+        android:text="@string/main_emptylist"
+        android:layout_margin="5dip"/>
 
 </LinearLayout>

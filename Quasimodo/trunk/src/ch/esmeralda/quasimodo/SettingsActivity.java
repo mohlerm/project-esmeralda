@@ -31,11 +31,15 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	// public static values
 	public final static String SET_IP_KEY = "settingsipkey";
 	public final static String SET_PORT_KEY = "settingsportkey";
-	
 	public final static String DefaultIP = "192.168.1.15";
 	public final static int DefaultPORT = 10002;
-	
 	public final static String RadioListFilename = "RadioList.db";
+	
+	// private static values
+	private final static int DIALOG_NEW_RADIO = 0;
+	private final static int DIALOG_EDIT_RADIO = 1;
+	private final static int DIALOG_CREDITS = 2;
+	private final static int DIALOG_ASK_DEFAULT = 3;
 	
 	// Buttons and Texts
 	private Button creditsbtn;
@@ -92,20 +96,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.set_defaultbtn:
-			// default ip and port
-				ip = DefaultIP;
-				port = DefaultPORT;
-				editip.setText(ip);
-		        editport.setText(Integer.toString(port));
-	        // clear Radio List
-		        RADIO_LIST.clear();
-		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
-		        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
-		        // add the last button
-			        RadioStation adder = new RadioStation("","New Radio...");
-		     		adder.newtag = true;
-		     		RADIO_LIST.add(adder);
-	     		reinit_RadioList();
+				showDialog(DIALOG_ASK_DEFAULT);
 	        return;
 		case R.id.set_savebtn:
 			// Pr�fe ob IP richtig eingegeben.
@@ -124,7 +115,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				port = tempport;
 			
 			// Alles ok, schreibe die Einstellungen und die RadioListe
-				RADIO_LIST.remove(RADIO_LIST.size()-1);
+				RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
 				QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
 				
 				SharedPreferences.Editor editor = settings.edit();
@@ -135,7 +126,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 				finish();
 			return;
 		case R.id.creditsbtn:
-			showDialog(1);
+			showDialog(DIALOG_CREDITS);
 			break;
 		default:
 		}
@@ -146,7 +137,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	@Override
     protected Dialog onCreateDialog(int id) {
 		switch (id) {
-		case 0:
+		case DIALOG_NEW_RADIO:
 			LayoutInflater factory = LayoutInflater.from(this);
 	        final View textEntryView = factory.inflate(R.layout.newradioalertdialog, null);
 	        AlertDialog NewRadio = new AlertDialog.Builder(SettingsActivity.this)
@@ -166,12 +157,13 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	            })
 	            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 	                public void onClick(DialogInterface dialog, int whichButton) {
-	                		// Do nothing.
+	                	EditText temp = (EditText) textEntryView.findViewById(R.id.radioname_edit);
+	                	hidekeyboard(temp);
 	                }
 	            })
 	            .create();
 	        return NewRadio;
-		case 1:
+		case DIALOG_CREDITS:
 			// show credits;
 			AlertDialog Credits = new AlertDialog.Builder(this).create();
 			Credits.setTitle("Quasimodo,\nthe Hunchback of NotreDame");
@@ -183,33 +175,84 @@ public class SettingsActivity extends Activity implements OnClickListener{
 			   }
 			});
 			return Credits;
-		default:
-			break;
-		}
-		LayoutInflater factory = LayoutInflater.from(this);
-        final View textEntryView = factory.inflate(R.layout.newradioalertdialog, null);
-        return new AlertDialog.Builder(SettingsActivity.this)
-            .setTitle("New Radio entry:")
-            .setView(textEntryView)
-            .setPositiveButton("Done", new DialogInterface.OnClickListener() {
+		//---- edit radio station.
+		case DIALOG_EDIT_RADIO:
+			LayoutInflater factory1 = LayoutInflater.from(this);
+	        final View textEntryView1 = factory1.inflate(R.layout.newradioalertdialog, null);
+	        return new AlertDialog.Builder(SettingsActivity.this)
+	            .setTitle("Edit Radio entry:")
+	            .setView(textEntryView1)
+	            .setPositiveButton("Done", new DialogInterface.OnClickListener() {
+	            	//--- on click listener for positive button.
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                	EditText name_edit = (EditText) textEntryView1.findViewById(R.id.radioname_edit);
+	                	EditText url_edit = (EditText) textEntryView1.findViewById(R.id.radiourl_edit);
+	                	RADIO_LIST.remove(rs_mod_index);
+	                	RADIO_LIST.add(rs_mod_index, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
+	                	reinit_RadioList();
+	                	// laesst Tastatur verschwinden.
+		                hidekeyboard(name_edit);
+	                }
+	            })
+	            .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                		RADIO_LIST.remove(rs_mod_index);
+	                		reinit_RadioList();
+	                }
+	            })
+	            .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	                	EditText name_edit = (EditText) textEntryView1.findViewById(R.id.radioname_edit);
+                		hidekeyboard(name_edit);
+	                }
+                })
+	            .create();
+		case DIALOG_ASK_DEFAULT:
+			//---- really sure if you want to default all settings?
+			return new AlertDialog.Builder(SettingsActivity.this)
+            .setTitle("Set default?")
+            .setPositiveButton("Yes!", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                	EditText name_edit = (EditText) textEntryView.findViewById(R.id.radioname_edit);
-                	EditText url_edit = (EditText) textEntryView.findViewById(R.id.radiourl_edit);
-                	RADIO_LIST.add(RADIO_LIST.size()-1, new RadioStation(name_edit.getText().toString(), url_edit.getText().toString()));
-                	reinit_RadioList();
-                	// l�sst Tastatur verschwinden.
-	                	InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
-	        	        if (name_edit != null) 
-	        	        	inputManager.hideSoftInputFromWindow(name_edit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        			// default ip and port
+	    				ip = DefaultIP;
+	    				port = DefaultPORT;
+	    				editip.setText(ip);
+	    		        editport.setText(Integer.toString(port));
+    		        // clear Radio List
+	    		        RADIO_LIST.clear();
+	    		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
+	    		        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
+    		        // add the last button
+    			        RadioStation adder = new RadioStation("","New Radio...");
+    		     		adder.newtag = true;
+    		     		RADIO_LIST.add(adder);
+    	     		reinit_RadioList();
                 }
             })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            .setNegativeButton("Nah...", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                		// Do nothing.
+                	// do nothing...
                 }
             })
             .create();
+		default:
+			return super.onCreateDialog(id);
+		}
 	}
+	
+	//---- fill 
+	@Override
+    protected void onPrepareDialog (int id, Dialog dialog){ 
+         if(id == DIALOG_EDIT_RADIO){ 
+            AlertDialog adlg = (AlertDialog)dialog;
+            EditText name_edit = (EditText) adlg.findViewById(R.id.radioname_edit);
+        	EditText url_edit = (EditText) adlg.findViewById(R.id.radiourl_edit);
+            name_edit.setText(RADIO_LIST.get(rs_mod_index).name);
+            url_edit.setText(RADIO_LIST.get(rs_mod_index).url);
+         } else {
+            super.onPrepareDialog(id, dialog);
+         }             
+    }
 	
 	
 	
@@ -222,7 +265,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
         radioLV.setOnItemClickListener(new OnItemClickListener(){
 			public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
 				if (position == RADIO_LIST.size()-1) {
-					showDialog(0);
+					showDialog(DIALOG_NEW_RADIO);
 				}
 			}
         });
@@ -233,6 +276,7 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	        	inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 	
+	private int rs_mod_index;
 	private class RadioAdapter extends ArrayAdapter<RadioStation> implements OnClickListener {
 		
 		 private ArrayList<RadioStation> radiostations;
@@ -272,13 +316,17 @@ public class SettingsActivity extends Activity implements OnClickListener{
 
 			public void onClick(View v) {
 				Button in = (Button) v;
-				int pos = (Integer) in.getTag();
-				RADIO_LIST.remove(pos);
-				reinit_RadioList();
+				rs_mod_index = (Integer) in.getTag();
+				showDialog(DIALOG_EDIT_RADIO);
 			}
 		
 			
 	}
 	
+	private void hidekeyboard(View v) {
+		InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
+        if (v != null) 
+        	inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+	}
 	
 }
