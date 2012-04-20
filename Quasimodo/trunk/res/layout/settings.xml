@@ -29,7 +29,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:text="@string/set_credits" />
+            android:text="@string/set_credits"
+            android:onClick="CreditsButtonClick" />
 
     </LinearLayout>
 
@@ -126,13 +127,15 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/set_default" />
+            android:text="@string/set_default"
+            android:onClick="DefaultButtonClick" />
 
         <Button
             android:id="@+id/set_savebtn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/set_save" />
+            android:text="@string/set_save"
+            android:onClick="SaveButtonClick" />
     </LinearLayout>
 </RelativeLayout>

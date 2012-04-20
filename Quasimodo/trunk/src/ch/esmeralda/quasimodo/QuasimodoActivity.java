@@ -100,7 +100,7 @@ public class QuasimodoActivity extends Activity {
 		
 		//---- AutoUpdater
 		updater = new Updater();
-		updateable = true;
+		enableAutoUpdate();
 		
 		//---- Make sure, WIFI is turned on and connected.
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -108,17 +108,19 @@ public class QuasimodoActivity extends Activity {
 		if (!mWifi.isConnected()) {
 			// wifi not connected, show info popup.
 		    showDialog(1);
-		    updateable = false;
+		    disableAutoUpdate();
 		} else {
 			// Make Connection
 			connectbutton.performClick();
 		}
 	}
 	
+	// ----------------------  Autoupdater
+	
 	@Override
 	public void onResume() {
 		super.onResume();
-		updateable = true;
+		enableAutoUpdate();
 		executor = new ScheduledThreadPoolExecutor(1);
 		executor.scheduleAtFixedRate(updater, 10, 10, TimeUnit.SECONDS);
 	}
@@ -126,10 +128,19 @@ public class QuasimodoActivity extends Activity {
 	@Override
 	public void onPause() {
 		executor.shutdownNow();
-		updateable = false;
+		disableAutoUpdate();
 		super.onPause();
 	}
 	
+	public void disableAutoUpdate() {
+		updateable = false;
+	}
+	
+	public void enableAutoUpdate() {
+		updateable = true;
+	}
+	
+	// ----------------------- Buttons
 
 	/**
 	 * What happens when the "Add" button gets clicked?
@@ -158,6 +169,8 @@ public class QuasimodoActivity extends Activity {
 			connect.start();
 		}
 	}
+	
+	// ----------------------------------- Handle Dialogs
 
 	/**
 	 * Easy way to handle all the dialogs.
@@ -220,10 +233,10 @@ public class QuasimodoActivity extends Activity {
 	}
 	
 	/**
-	 * Helper Function für einen Workday Reset ############################################################## TO BE TESTED!!!
+	 * Helper Function für einen Workday Reset
 	 */
 	private void ResetWorkday_init(int hour, int minute) {
-		Thread reset = new net_DoStuff(5,hour*60+minute); // eventuell anpassen für UTC
+		Thread reset = new net_DoStuff(5,hour*60+minute);
 		reset.start();
 	}
 
@@ -491,7 +504,7 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				runOnUiThread(renewList);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
-				updateable = false;
+				disableAutoUpdate();
 				return;
 			}
 			
@@ -502,7 +515,7 @@ public class QuasimodoActivity extends Activity {
 				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
 				runOnUiThread(dispFailToast);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
-				updateable = false;
+				disableAutoUpdate();
 				return;
 			}
 			
@@ -520,7 +533,7 @@ public class QuasimodoActivity extends Activity {
 				DeleteTU(wrp,key_to_delete);
 				AddTU(wrp, starttime, duration, StreamURL);
 				break;
-			case 5:
+			case 5: // ResetWorkday
 				Reset(wrp, this.minutes);
 				break;
 			default:
@@ -538,9 +551,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
 				runOnUiThread(dispFailToast);
-				updateable = false;
+				disableAutoUpdate();
 			} else {
-				updateable = true;
+				enableAutoUpdate();
 			}
 		}
 		
@@ -549,9 +562,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
 				runOnUiThread(dispFailToast);
-				updateable = false;
+				disableAutoUpdate();
 			} else {
-				updateable = true;
+				enableAutoUpdate();
 			}
 		}
 		
@@ -560,9 +573,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
 				runOnUiThread(dispFailToast);
-				updateable = false;
+				disableAutoUpdate();
 			} else {
-				updateable = true;
+				enableAutoUpdate();
 			}
 		}
 		
@@ -571,9 +584,9 @@ public class QuasimodoActivity extends Activity {
 				m_qtus.clear();
 				Log.e("QAct net Reset","wrapper could not Reset the Workday.");
 				runOnUiThread(dispFailToast);
-				updateable = false;
+				disableAutoUpdate();
 			} else {
-				updateable = true;
+				enableAutoUpdate();
 			}
 		}
 	}
@@ -613,7 +626,7 @@ public class QuasimodoActivity extends Activity {
 		}
 	};
 	private void dispFailToast(){
-		updateable = false;
+		disableAutoUpdate();
 		Toast.makeText(this.getApplicationContext(), "Error while talking to server...", Toast.LENGTH_LONG).show();
 	}
 	

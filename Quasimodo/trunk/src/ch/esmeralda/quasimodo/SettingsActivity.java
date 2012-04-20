@@ -26,7 +26,7 @@ import android.widget.Toast;
 import ch.esmeralda.quasimodo.RadioStation;
 
 
-public class SettingsActivity extends Activity implements OnClickListener{
+public class SettingsActivity extends Activity{
 	
 	// public static values
 	public final static String SET_IP_KEY = "settingsipkey";
@@ -42,9 +42,6 @@ public class SettingsActivity extends Activity implements OnClickListener{
 	private final static int DIALOG_ASK_DEFAULT = 3;
 	
 	// Buttons and Texts
-	private Button creditsbtn;
-	private Button defaultbtn;
-	private Button savebtn;
 	private EditText editip;
 	private EditText editport;
 	
@@ -64,17 +61,9 @@ public class SettingsActivity extends Activity implements OnClickListener{
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         
-        creditsbtn = (Button) findViewById(R.id.creditsbtn);
-        creditsbtn.setOnClickListener(this);
-        
         settings = getSharedPreferences(QuasimodoActivity.PREFS_NAME, 0);
         ip = settings.getString(SET_IP_KEY, "yet unset");
         port = settings.getInt(SET_PORT_KEY, 0);
-        
-        defaultbtn = (Button) findViewById(R.id.set_defaultbtn);
-        savebtn = (Button) findViewById(R.id.set_savebtn);
-        defaultbtn.setOnClickListener(this);
-        savebtn.setOnClickListener(this);
         
         editip = (EditText) findViewById(R.id.setText_IP);
         editport = (EditText) findViewById(R.id.setText_PORT);
@@ -92,44 +81,41 @@ public class SettingsActivity extends Activity implements OnClickListener{
         reinit_RadioList();
         
 	}
-
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.set_defaultbtn:
-				showDialog(DIALOG_ASK_DEFAULT);
-	        return;
-		case R.id.set_savebtn:
-			// Pr�fe ob IP richtig eingegeben.
-				if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
-					Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
-					return;
-				}
-				ip = editip.getText().toString();
-				
-			// Pr�fe ob Port richtig eingegeben.
-				int tempport = Integer.parseInt(editport.getText().toString());
-				if (tempport < 0 || tempport > 65536) {
-					Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
-					return;
-				}
-				port = tempport;
-			
-			// Alles ok, schreibe die Einstellungen und die RadioListe
-				RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
-				QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
-				
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putString(SET_IP_KEY,ip);
-				editor.putInt(SET_PORT_KEY,port);
-				editor.commit();
-				setResult(Activity.RESULT_OK, null);
-				finish();
+	
+	public void DefaultButtonClick(View v) {
+		showDialog(DIALOG_ASK_DEFAULT);
+	}
+	
+	public void SaveButtonClick(View v) {
+		// Pr�fe ob IP richtig eingegeben.
+		if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
+			Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
 			return;
-		case R.id.creditsbtn:
-			showDialog(DIALOG_CREDITS);
-			break;
-		default:
 		}
+		ip = editip.getText().toString();
+		
+	// Pr�fe ob Port richtig eingegeben.
+		int tempport = Integer.parseInt(editport.getText().toString());
+		if (tempport < 0 || tempport > 65536) {
+			Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
+			return;
+		}
+		port = tempport;
+	
+	// Alles ok, schreibe die Einstellungen und die RadioListe
+		RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
+		QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
+		
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(SET_IP_KEY,ip);
+		editor.putInt(SET_PORT_KEY,port);
+		editor.commit();
+		setResult(Activity.RESULT_OK, null);
+		finish();
+	}
+	
+	public void CreditsButtonClick(View v) {
+		showDialog(DIALOG_CREDITS);
 	}
 	
 	// ************************************************* popup
