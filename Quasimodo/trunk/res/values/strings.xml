@@ -2,7 +2,7 @@
 <resources>
     <string name="hello">Quasimodo, The Hunchback of Notre-Dame</string>
     <string name="app_name">Quasimodo</string>
-    <string name="credits_string">Authors:\n~~~~~~~~~~\nMarco Eppenberger:\n - Android GUI\n - Networking\n\nThomas Richner:\n - Streaming\n - Server Backend\n\nSandro Sgier:\n - Networking - Server Backend\n\nStefan Mach:\n - Communication\n\nPhilipp Bösch:\n - graphical engineering\n~~~~~~~~~~\n
+    <string name="credits_string">Authors:\n~~~~~~~~~~\nMarco Eppenberger:\n - Android GUI\n - Networking\n\nThomas Richner:\n - Streaming\n - Server Backend\n\nSandro Sgier:\n - Networking\n - Server Backend\n\nStefan Mach:\n - Communication\n\nPhilipp Bösch:\n - graphical engineering\n~~~~~~~~~~\n
 </string>
     <string name="set_title">Settings</string>
     <string name="set_credits">Credits</string>
