@@ -23,7 +23,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ch.esmeralda.quasimodo.RadioStation;
+import ch.esmeralda.quasimodo.radiostation.QFileIO;
+import ch.esmeralda.quasimodo.radiostation.RadioStation;
 
 
 public class SettingsActivity extends Activity{
@@ -41,14 +42,15 @@ public class SettingsActivity extends Activity{
 	private final static int DIALOG_CREDITS = 2;
 	private final static int DIALOG_ASK_DEFAULT = 3;
 	
+	// App
+	private QuasimodoApp app; 
+	
 	// Buttons and Texts
 	private EditText editip;
 	private EditText editport;
 	
 	// Shared preferences
 	private SharedPreferences settings;
-	private String ip;
-	private int port;
 	
 	// Radio ListView / Arrayliste und adapter
 	private ListView radioLV;
@@ -61,14 +63,16 @@ public class SettingsActivity extends Activity{
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         
+        app = (QuasimodoApp) getApplicationContext();
+        
         settings = getSharedPreferences(QuasimodoActivity.PREFS_NAME, 0);
-        ip = settings.getString(SET_IP_KEY, "yet unset");
-        port = settings.getInt(SET_PORT_KEY, 0);
+        app.ip = settings.getString(SET_IP_KEY, "yet unset");
+        app.port = settings.getInt(SET_PORT_KEY, 0);
         
         editip = (EditText) findViewById(R.id.setText_IP);
         editport = (EditText) findViewById(R.id.setText_PORT);
-        editip.setText(ip);
-        editport.setText(Integer.toString(port));
+        editip.setText(app.ip);
+        editport.setText(Integer.toString(app.port));
         
         // Radio List
         RADIO_LIST = new ArrayList<RadioStation>();
@@ -92,7 +96,7 @@ public class SettingsActivity extends Activity{
 			Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
 			return;
 		}
-		ip = editip.getText().toString();
+		app.ip = editip.getText().toString();
 		
 	// Pr�fe ob Port richtig eingegeben.
 		int tempport = Integer.parseInt(editport.getText().toString());
@@ -100,15 +104,15 @@ public class SettingsActivity extends Activity{
 			Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
 			return;
 		}
-		port = tempport;
+		app.port = tempport;
 	
 	// Alles ok, schreibe die Einstellungen und die RadioListe
 		RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
 		QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
 		
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(SET_IP_KEY,ip);
-		editor.putInt(SET_PORT_KEY,port);
+		editor.putString(SET_IP_KEY,app.ip);
+		editor.putInt(SET_PORT_KEY,app.port);
 		editor.commit();
 		setResult(Activity.RESULT_OK, null);
 		finish();
@@ -200,14 +204,20 @@ public class SettingsActivity extends Activity{
             .setPositiveButton("Yes!", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
         			// default ip and port
-	    				ip = DefaultIP;
-	    				port = DefaultPORT;
-	    				editip.setText(ip);
-	    		        editport.setText(Integer.toString(port));
+	    				app.ip = DefaultIP;
+	    				app.port = DefaultPORT;
+	    				editip.setText(app.ip);
+	    		        editport.setText(Integer.toString(app.port));
     		        // clear Radio List
 	    		        RADIO_LIST.clear();
 	    		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
 	    		        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
+	    		        RADIO_LIST.add(new RadioStation("DI Vocal Trance","http://u11aw.di.fm:80/di_vocaltrance"));
+	    		        RADIO_LIST.add(new RadioStation("DI Chillout","http://u11aw.di.fm:80/di_chillout"));
+	    		        RADIO_LIST.add(new RadioStation("DI Lounge","http://u11aw.di.fm:80/di_lounge"));
+	    		        RADIO_LIST.add(new RadioStation("DI Classic Eurodance","http://u11aw.di.fm:80/di_classiceurodance"));
+	    		        RADIO_LIST.add(new RadioStation("DI Disco House","http://u11aw.di.fm:80/di_discohouse"));
+	    		        RADIO_LIST.add(new RadioStation("DI Drum n Bass","http://u11aw.di.fm:80/di_drumandbass"));
     		        // add the last button
     			        RadioStation adder = new RadioStation("","New Radio...");
     		     		adder.newtag = true;

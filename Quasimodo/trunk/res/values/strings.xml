@@ -27,4 +27,7 @@
     <string name="edit_title">Edit TaskUnit</string>
     <string name="edit_setwork">Work</string>
     <string name="edit_setbreak">Break</string>
+    <string name="set_notif_tbtn_dis">disabled</string>
+    <string name="set_notif_tbtn_en">enabled</string>
+    <string name="set_notif_desc">Enable Notifications?</string>
 </resources>

@@ -18,7 +18,7 @@ public final class R {
     public static final class id {
         public static final int RadioSpinnerTitle=0x7f070005;
         public static final int RadioStationSpinner=0x7f070006;
-        public static final int RadioStationsLV=0x7f070025;
+        public static final int RadioStationsLV=0x7f070027;
         public static final int TimePicker_End=0x7f070004;
         public static final int TimePicker_Start=0x7f070003;
         public static final int addbtn=0x7f07000c;
@@ -30,13 +30,14 @@ public final class R {
         public static final int edit_donebtn=0x7f070008;
         public static final int edit_workTU=0x7f070001;
         public static final int editbutton=0x7f07001a;
-        public static final int fifth=0x7f070023;
-        public static final int fourth=0x7f070022;
+        public static final int fifth=0x7f070025;
+        public static final int fourth=0x7f070024;
         public static final int linearLayout1=0x7f07000a;
         public static final int list_is_empty=0x7f07000e;
-        public static final int menu_exit=0x7f070028;
-        public static final int menu_reset=0x7f070029;
-        public static final int menu_settings=0x7f07002a;
+        public static final int menu_exit=0x7f07002a;
+        public static final int menu_reset=0x7f07002b;
+        public static final int menu_settings=0x7f07002c;
+        public static final int notifications_tbtn=0x7f070023;
         public static final int radioname_edit=0x7f070010;
         public static final int radioname_view=0x7f07000f;
         public static final int radiostationname=0x7f070013;
@@ -50,12 +51,13 @@ public final class R {
         public static final int second=0x7f07001e;
         public static final int setText_IP=0x7f07001f;
         public static final int setText_PORT=0x7f070021;
-        public static final int set_defaultbtn=0x7f070026;
-        public static final int set_savebtn=0x7f070027;
-        public static final int sixth=0x7f070024;
+        public static final int set_defaultbtn=0x7f070028;
+        public static final int set_savebtn=0x7f070029;
+        public static final int sixth=0x7f070026;
         public static final int taskunitlist=0x7f07000d;
         public static final int textView1=0x7f070009;
         public static final int third=0x7f070020;
+        public static final int thirdandhalf=0x7f070022;
         public static final int titlebar=0x7f070000;
         public static final int top=0x7f07001c;
         public static final int toptext=0x7f070018;
@@ -93,6 +95,9 @@ public final class R {
         public static final int set_credits=0x7f040004;
         public static final int set_default=0x7f040008;
         public static final int set_ip=0x7f040005;
+        public static final int set_notif_desc=0x7f04001c;
+        public static final int set_notif_tbtn_dis=0x7f04001a;
+        public static final int set_notif_tbtn_en=0x7f04001b;
         public static final int set_port=0x7f040006;
         public static final int set_radiostationscolon=0x7f040007;
         public static final int set_save=0x7f040009;

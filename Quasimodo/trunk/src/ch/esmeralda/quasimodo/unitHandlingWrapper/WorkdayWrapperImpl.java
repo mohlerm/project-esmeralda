@@ -101,8 +101,10 @@ public class WorkdayWrapperImpl implements WorkdayWrapper {
 				if (ans.getaction() == 0 || ans.getaction() == 1 || ans.getaction() == 2 || ans.getaction() == 4) {
 					Log.d("WorkdayWrapper","I received a Workday of size:"+ans.getworkday().size()+" - here it is:");
 //					DispWorkday(ans.getworkday());
-					listofTU.clear();
-					listofTU.addAll(ans.getworkday());
+					synchronized (listofTU) {
+						listofTU.clear();
+						listofTU.addAll(ans.getworkday());
+					}
 				} else if (ans.getaction() == 3){
 					// not implemented since not used.
 					Log.d("WorkdayWrapper","getActiveUnit is not yet implemented in WorkdayWrapper since we don't ever use it.");

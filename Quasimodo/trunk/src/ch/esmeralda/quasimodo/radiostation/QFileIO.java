@@ -1,4 +1,4 @@
-package ch.esmeralda.quasimodo;
+package ch.esmeralda.quasimodo.radiostation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

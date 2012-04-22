@@ -50,13 +50,11 @@ public class QuasimodoActivity extends Activity {
 	private ListView lv_qtu;
 
 	// Data objects
-	private List<TaskUnit> m_qtus = null;
+	private List<TaskUnit> m_qtus_local;
+	private List<TaskUnit> m_qtus_global;
 	private TUAdapter m_adapter;
 	private SharedPreferences settings;
-
-	// Connection specific values
-	private String ip;
-	private int port;
+	private QuasimodoApp app;
 
 	// Public constants
 	public static final String PREFS_NAME = "EsmeraldaPrefsFile";
@@ -77,6 +75,11 @@ public class QuasimodoActivity extends Activity {
 		//---- android default
 		super.onCreate(savedInstanceState);   
 		setContentView(R.layout.main);
+		
+		//---- Application init
+		app = (QuasimodoApp)getApplicationContext();
+		m_qtus_global = app.getWD();
+		m_qtus_local = (List<TaskUnit>) new ArrayList<TaskUnit>();
 
 		//---- get ID's from various gui objects and initialize clickability
 		addbutton = (Button) findViewById(R.id.addbtn);
@@ -94,8 +97,7 @@ public class QuasimodoActivity extends Activity {
 		//---- load List and its adapter
 		lv_qtu = (ListView) findViewById(R.id.taskunitlist);
 		lv_qtu.setEmptyView((TextView)findViewById(R.id.list_is_empty));
-		m_qtus = new ArrayList<TaskUnit>();
-		this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus);
+		this.m_adapter = new TUAdapter(this, R.layout.row, m_qtus_local);
 		lv_qtu.setAdapter(this.m_adapter);
 		
 		//---- AutoUpdater
@@ -119,14 +121,16 @@ public class QuasimodoActivity extends Activity {
 	
 	@Override
 	public void onResume() {
+		app.updateBackground = false;
 		super.onResume();
 		enableAutoUpdate();
 		executor = new ScheduledThreadPoolExecutor(1);
-		executor.scheduleAtFixedRate(updater, 10, 10, TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(updater, 2, 10, TimeUnit.SECONDS);
 	}
 	
 	@Override
 	public void onPause() {
+		app.updateBackground = true;
 		executor.shutdownNow();
 		disableAutoUpdate();
 		super.onPause();
@@ -160,7 +164,7 @@ public class QuasimodoActivity extends Activity {
 		public void onClick(View v) {
 
 			// is the ip correct? if not, set it first in the settings
-			if (!ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || port < 1 || port > 65537) {
+			if (!app.ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || app.port < 1 || app.port > 65537) {
 				Toast.makeText(getApplicationContext(), "Please set the right IP and the right port in the Settings before connecting.", Toast.LENGTH_LONG).show();
 				return;
 			}
@@ -328,7 +332,7 @@ public class QuasimodoActivity extends Activity {
 	 * Function called when we want to edit or add a TaskUnit
 	 * @param key	key of the TaskUnit to be edited.
 	 * @param add	false if we edit, true if we add a new one TU
-	 * @param index	position of the TU in the m_qtus
+	 * @param index	position of the TU in the m_qtus_local
 	 */
 	private long modified_key;
 	private void startedit(int index, long key ,boolean add) {
@@ -336,7 +340,7 @@ public class QuasimodoActivity extends Activity {
 		TaskUnit tu;
 		final Intent i = new Intent(this, editActivity.class);
 		if (!add) {
-			orig = m_qtus.get(index);
+			orig = m_qtus_local.get(index);
 			tu = new TaskUnit(orig.getStarttime(),orig.getDuration(),orig.getStreamURL());
 			modified_key = key;
 			i.putExtra(TU_OBJECT_KEY,tu);
@@ -414,7 +418,7 @@ public class QuasimodoActivity extends Activity {
 	private QClient makeConn() {
 		QClient ret = new QClientImpl();
 		try {
-			ret.connect(ip, port);
+			ret.connect(app.ip, app.port);
 		} catch (UnableToConnectException e) {
 			runOnUiThread(dispFailToast);
 			return null;
@@ -500,8 +504,8 @@ public class QuasimodoActivity extends Activity {
 			
 			QClient conn = makeConn();
 			if (conn == null) {
-				Log.e("QAct net","Connection could not be made to "+ip+":"+port);
-				m_qtus.clear();
+				Log.e("QAct net","Connection could not be made to "+app.ip+":"+app.port);
+				m_qtus_local.clear();
 				runOnUiThread(renewList);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
 				disableAutoUpdate();
@@ -510,7 +514,7 @@ public class QuasimodoActivity extends Activity {
 			
 			WorkdayWrapperImpl wrp;
 			try {
-				wrp = new WorkdayWrapperImpl(conn,m_qtus);
+				wrp = new WorkdayWrapperImpl(conn,m_qtus_local);
 			} catch (NotActiveException e) {
 				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
 				runOnUiThread(dispFailToast);
@@ -548,44 +552,60 @@ public class QuasimodoActivity extends Activity {
 		
 		private void GetWorkday(WorkdayWrapperImpl wrp){
 			if (!wrp.getNewList()) {
-				m_qtus.clear();
+				m_qtus_local.clear();
 				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
 				runOnUiThread(dispFailToast);
 				disableAutoUpdate();
 			} else {
+				synchronized (m_qtus_global) {
+					m_qtus_global.clear();
+					m_qtus_global.addAll(m_qtus_local);
+				}
 				enableAutoUpdate();
 			}
 		}
 		
 		private void DeleteTU(WorkdayWrapperImpl wrp, long key){
 			if (!wrp.removeUnitByKey(key)) {
-				m_qtus.clear();
+				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
 				runOnUiThread(dispFailToast);
 				disableAutoUpdate();
 			} else {
+				synchronized (m_qtus_global) {
+					m_qtus_global.clear();
+					m_qtus_global.addAll(m_qtus_local);
+				}
 				enableAutoUpdate();
 			}
 		}
 		
 		private void AddTU(WorkdayWrapperImpl wrp, Date strt, long dur, String URL) {
 			if (!wrp.addUnit(strt, dur, URL)) {
-				m_qtus.clear();
+				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
 				runOnUiThread(dispFailToast);
 				disableAutoUpdate();
 			} else {
+				synchronized (m_qtus_global) {
+					m_qtus_global.clear();
+					m_qtus_global.addAll(m_qtus_local);
+				}
 				enableAutoUpdate();
 			}
 		}
 		
 		private void Reset(WorkdayWrapperImpl wrp, int minutes) {
 			if (!wrp.reset(minutes)) {
-				m_qtus.clear();
+				m_qtus_local.clear();
 				Log.e("QAct net Reset","wrapper could not Reset the Workday.");
 				runOnUiThread(dispFailToast);
 				disableAutoUpdate();
 			} else {
+				synchronized (m_qtus_global) {
+					m_qtus_global.clear();
+					m_qtus_global.addAll(m_qtus_local);
+				}
 				enableAutoUpdate();
 			}
 		}
@@ -613,7 +633,7 @@ public class QuasimodoActivity extends Activity {
 	// UI THREAD!
 	private Runnable renewList = new Runnable(){
 		public void run() {
-			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus);
+			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus_local);
 			lv_qtu.setAdapter(m_adapter);
 		}
 	};
@@ -663,10 +683,10 @@ public class QuasimodoActivity extends Activity {
 
 
 	private void readSettings() {
-		ip = settings.getString(SettingsActivity.SET_IP_KEY, "not set");
-		port = settings.getInt(SettingsActivity.SET_PORT_KEY, 99999);
-		Log.d("Settings","ip: "+ip);
-		Log.d("Settings","Port: "+Integer.toString(port));
+		app.ip = settings.getString(SettingsActivity.SET_IP_KEY, "not set");
+		app.port = settings.getInt(SettingsActivity.SET_PORT_KEY, 99999);
+		Log.d("Settings","ip: "+app.ip);
+		Log.d("Settings","Port: "+Integer.toString(app.port));
 	}
 
 
