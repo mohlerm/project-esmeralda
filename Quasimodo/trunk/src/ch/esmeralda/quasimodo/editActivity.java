@@ -17,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import ch.esmeralda.DataExchange.TaskUnit;
+import ch.esmeralda.quasimodo.radiostation.QFileIO;
+import ch.esmeralda.quasimodo.radiostation.RadioStation;
 
 public class editActivity extends Activity implements OnClickListener{
 	

@@ -1,4 +1,4 @@
-package ch.esmeralda.quasimodo;
+package ch.esmeralda.quasimodo.radiostation;
 
 public class RadioStation {
 	public RadioStation(String name, String url) {
