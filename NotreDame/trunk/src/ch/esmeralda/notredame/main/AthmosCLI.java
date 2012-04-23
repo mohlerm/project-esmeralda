@@ -27,6 +27,8 @@ public class AthmosCLI extends Thread{
 	private TimerJob timerJob = null;
 	private ScheduledThreadPoolExecutor executor = null;
 	private NServer server = null;
+	
+	private Scanner in;
 
 	public AthmosCLI(){
 		L = Constants.V;
@@ -87,7 +89,7 @@ public class AthmosCLI extends Thread{
 		server.start(Constants.SERVERPORT);
 		
 		if(L) d("start io...");
-		Scanner in = new Scanner(System.in);
+		in = new Scanner(System.in);
 		String msg;
 		boolean quit = false;
 		/*
@@ -129,8 +131,7 @@ public class AthmosCLI extends Thread{
 	         }else if(msg.equals("reset")){
 		        workday.reset();
 	         }else if(msg.equals("remove")){
-	        	 d("sorry, not yet implemented in CLI");
-	            //remove();
+	        	 remove();
 	         }else if(msg.equals("add")){
 	        	 d("sorry, not yet implemented in CLI");
 	            //add();
@@ -162,6 +163,25 @@ public class AthmosCLI extends Thread{
 	}
 	
 
+	private void remove() {
+		String msg;
+		int key;
+		while (true) {
+			p("Enter ID: ");
+			msg = in.nextLine();
+			if (msg.toLowerCase().equals("cancel") || msg.toLowerCase().equals("exit")) {
+				return;
+			}
+			try {
+				key = Integer.parseInt(msg);
+				break;
+			} catch (Exception e) {
+				d(" Try again! (or type cancel)");
+				continue;
+			}
+		}
+		workday.removeUnitByKey(key);
+	}
 	
 	
 	
