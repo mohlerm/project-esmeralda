@@ -78,8 +78,10 @@ public class QuasimodoActivity extends Activity {
 		
 		//---- Application init
 		app = (QuasimodoApp)getApplicationContext();
+		
+		//---- fill the lists
 		m_qtus_global = app.getWD();
-		m_qtus_local = (List<TaskUnit>) new ArrayList<TaskUnit>();
+		m_qtus_local = (List<TaskUnit>) new ArrayList<TaskUnit>(m_qtus_global);
 
 		//---- get ID's from various gui objects and initialize clickability
 		addbutton = (Button) findViewById(R.id.addbtn);

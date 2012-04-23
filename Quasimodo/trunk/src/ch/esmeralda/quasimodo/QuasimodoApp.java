@@ -11,9 +11,10 @@ import android.app.Application;
 public class QuasimodoApp extends Application {
 
 	//---- saved vars
-	
 	private List<TaskUnit> workday; // a synchronized list to be used by all other classes!
 	
+	
+	// public vars
 	public String ip;
 	public int port;
 	
