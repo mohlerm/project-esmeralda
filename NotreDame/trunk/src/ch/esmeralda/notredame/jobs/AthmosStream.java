@@ -47,7 +47,7 @@ public class AthmosStream implements StreamJob{
 			return;
 		player.close();							//close the player
 		try {
-			playSound.join();					//wait for the Thread to exit clean, be aware: possible block
+			playSound.join(5000);					//wait for the Thread to exit clean, be aware: possible block
 		} catch (InterruptedException e) {}
 	}
 
