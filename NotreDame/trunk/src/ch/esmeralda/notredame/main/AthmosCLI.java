@@ -133,8 +133,7 @@ public class AthmosCLI extends Thread{
 	         }else if(msg.equals("remove")){
 	        	 remove();
 	         }else if(msg.equals("add")){
-	        	 d("sorry, not yet implemented in CLI");
-	            //add();
+	             add();
 	         }else if(msg.equals("status")){
 	        	 status();
 	         }else{
@@ -162,7 +161,54 @@ public class AthmosCLI extends Thread{
 	    System.out.println();
 	}
 	
-
+	/**
+	 * von Eppi
+	 */
+	private void add() {
+		String msg;
+		int minutes;
+		long duration;
+		int temp;
+		String URL;
+		while (true) {
+			try {
+				p("New Starttime? (+/- minutes from now?): ");
+				msg = in.nextLine();
+				if (msg.toLowerCase().equals("cancel") || msg.toLowerCase().equals("exit")) {
+					return;
+				}
+				minutes = Integer.parseInt(msg);
+				
+				p("New Duration? (minutes): ");
+				msg = in.nextLine();
+				if (msg.toLowerCase().equals("cancel") || msg.toLowerCase().equals("exit")) {
+					return;
+				}
+				temp = Integer.parseInt(msg);
+				duration = temp*60000;
+				
+				p("StreamURL? (empty for Worktime): ");
+				msg = in.nextLine();
+				if (msg.toLowerCase().equals("cancel") || msg.toLowerCase().equals("exit")) {
+					return;
+				}
+				URL = msg;
+				break;
+			} catch (Exception e) {
+				d(" Try again! (or type cancel)");
+				continue;
+			}
+		}
+		Date start = new Date(System.currentTimeMillis()+minutes*60000);
+		TaskUnit unit = new TaskUnit(start,duration,URL);
+		workday.addUnit(unit);
+		d("TU added.");
+	}
+	
+	
+	/**
+	 * von Eppi
+	 */
 	private void remove() {
 		String msg;
 		int key;
@@ -182,8 +228,6 @@ public class AthmosCLI extends Thread{
 		}
 		workday.removeUnitByKey(key);
 	}
-	
-	
 	
 	private void active(Workday workday){
 		TaskUnit unit = workday.getActiveUnit(new Date());

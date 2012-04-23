@@ -128,8 +128,9 @@ public class WorkdayImpl implements Workday{
 		}
 		str.append("Workday Starts at: " + starttime + '\n');
 		str.append("-----------------------------------------------\n");
-		str.append("start \t\t\t\tduration\t stream \tkey \tcomment\n");
+		str.append("id\tstart \t\t\t\tduration\t stream \tkey \tcomment\n");
 		for(TaskUnit unit:daylist){
+			str.append(unit.getKey() + " \t"); 								// added by eppi for Debug stuff!
 			str.append(unit.toString() + '\n');
 //			str.append(unit.getStarttime().toString()+" \t");
 //			str.append(unit.getDuration()+" \t");
