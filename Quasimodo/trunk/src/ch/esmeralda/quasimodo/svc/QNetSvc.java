@@ -1,6 +1,9 @@
 package ch.esmeralda.quasimodo.svc;
 
 import java.io.NotActiveException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -26,29 +29,33 @@ import android.widget.Toast;
 
 public class QNetSvc extends Service {
 	
-	public static final int NOTIF_UPDATE_TIME = 60;
+	// public statics
+	public static final int NOTIF_UPDATE_TIME = 5;
 	
+	// private statics
+	private static final String TAG = "Background Service";
+	
+	// Updater stuffs
 	private ScheduledThreadPoolExecutor exec_upd;
 	private Updater upd;
 	private List<TaskUnit> QTUlist;
 	
+	// Notifier stuffs
 	private ScheduledThreadPoolExecutor exec_ntf;
 	private Notifier notify;
 	NotificationManager mNotificationManager;
+	private List<Long> allready_notified;
 	
+	// Application
 	private QuasimodoApp app;
-
-	// dont use this
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
 	
 	//---- Lifecycle methods
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		Log.d(TAG, "Service created.");
 		
 		app = (QuasimodoApp) this.getApplicationContext();
 		
@@ -59,17 +66,7 @@ public class QNetSvc extends Service {
 		// notifier
 		notify = new Notifier();
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-	}
-
-	@Override
-	public void onDestroy() {
-		// debug
-		Toast toast = Toast.makeText(this, "Service stopped", Toast.LENGTH_SHORT);
-		toast.show();
-		
-		exec_upd.shutdown();
-		app.serviceRunning = false;
-		super.onDestroy();
+		allready_notified = (List<Long>) new ArrayList<Long>();
 	}
 
 	@Override
@@ -77,8 +74,9 @@ public class QNetSvc extends Service {
 		super.onStartCommand(intent, flag, startId);
 		
 		// debug
-		Toast toast = Toast.makeText(this, "Service started", Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(this, "Notifications enabled", Toast.LENGTH_SHORT);
 		toast.show();
+		Log.d(TAG, "Service started.");
 		
 		upd = new Updater();
 		exec_upd = new ScheduledThreadPoolExecutor(1);
@@ -90,6 +88,19 @@ public class QNetSvc extends Service {
 		
 		app.serviceRunning = true;
 		return Service.START_STICKY;
+	}
+	
+	@Override
+	public void onDestroy() {
+		// debug
+		Toast toast = Toast.makeText(this, "Notifications disabled", Toast.LENGTH_SHORT);
+		toast.show();
+		Log.d(TAG, "Service shutdown.");
+		
+		exec_upd.shutdown();
+		exec_ntf.shutdown();
+		app.serviceRunning = false;
+		super.onDestroy();
 	}
 	
 	// -----------------------------------------
@@ -106,50 +117,85 @@ public class QNetSvc extends Service {
 	private class NotifScheduler extends Thread {
 		public void run() {
 			TaskUnit current = null;
+			long startTime = System.currentTimeMillis();
 			synchronized (QTUlist) {
-				long startTime = System.currentTimeMillis();
 				for (TaskUnit tu : QTUlist) {
-					if(isWithinRange(tu, startTime, NOTIF_UPDATE_TIME*1000)) {
+					if(isWithinRange(tu.getStarttime().getTime(), startTime, NOTIF_UPDATE_TIME*1000)) {
 						current=tu;
 						break;
 					}
 				}
 			}
 			
-			if (current == null) return;  // Keine TU ist innerhalb der nächsten Minute geplant.
+			if (current == null) {
+				Log.d(TAG,"No Notifications comming up...");
+				return;  // Keine TU ist innerhalb der nächsten Minute geplant.
+			}
 			
 			// ---- Notification.			
+
+			// datum an heute anpassen.
+			Date notifDate = setHoursMinsToday(current.getStarttime(),startTime);
+			
+			// check ob die Notification in der Vergangenheit liegt
+			if (notifDate.before(new Date(startTime))) {
+				Log.d(TAG,"Got a new Date, but it is in the past.");
+				return;
+			}
+			
+			// check ob wir den gefundenen schon gezeigt haben.
+			if (allready_notified.contains(current.getKey())) {
+				Log.d(TAG,"The Date to be notified was allready shown!");
+				return;
+			} else {
+				allready_notified.add(current.getKey());
+			}
+			
+			// wenn alles gut ist: baue notification und schicke sie los.
+			
+			Log.d(TAG, "Sending Notifications.");
+			
 			String tickerText;
 			String titleText;
 			String bodyText;
+			
 			if (current.getStreamURL().trim().length() > 0) // pause
 			{
 				tickerText = "Pause fängt an!";
-				titleText = "Quasimodo";
-				bodyText = "Pause fängt an. Stream: "+current.getStreamURL();
+				titleText = "Pause fängt an!";
+				bodyText = "Stream: "+current.getStreamURL();
 			} else {
 				tickerText = "An die Arbeit!";
-				titleText = "Quasimodo";
-				bodyText = "Arbeit, Arbeit...";
+				titleText = "Arbeit, Arbeit...";
+				bodyText = "Viel Erfolg!";
 			}
-
-			long when = current.getStarttime().getTime();
+			
 			int icon = R.drawable.icon;
-			Notification notification = new Notification(icon, tickerText, when);
+			Notification notification = new Notification(icon, tickerText, notifDate.getTime());
 			
 			Context context = getApplicationContext();
 			Intent notificationIntent = new Intent(QNetSvc.this, QuasimodoActivity.class);
+			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);  // damit die Activity nicht ein zweites Mal gestartet wird.
 			PendingIntent contentIntent = PendingIntent.getActivity(QNetSvc.this, 0, notificationIntent, 0);
 			notification.setLatestEventInfo(context, titleText, bodyText, contentIntent);
 			notification.defaults = Notification.DEFAULT_ALL;
+			notification.flags |= Notification.FLAG_AUTO_CANCEL;  // damit beim klicken auf die Notification die auch verschwindet.
 
 			mNotificationManager.notify(0, notification);
 		}
 	}
 	
-	private boolean isWithinRange(TaskUnit tu, long startTime, long duration) {
-		   return ((startTime <= tu.getStarttime().getTime()) && (tu.getStarttime().getTime() > startTime+duration));
-		}
+	private boolean isWithinRange(long current, long startTime, long duration) {
+		return ((startTime <= current) && (current < startTime+duration));
+	}
+	
+	private Date setHoursMinsToday(Date input, long today) {
+		Date temp_when = new Date(today);
+		temp_when.setHours(input.getHours());
+		temp_when.setMinutes(input.getMinutes());
+		temp_when.setSeconds(input.getSeconds());
+		return temp_when;
+	}
 	
 	// -----------------------------------------
 	// ---- Net update thread
@@ -166,7 +212,7 @@ public class QNetSvc extends Service {
 		public void run() {
 			QClient conn = makeConn();
 			if (conn == null) {
-				Log.e("Background Svc","Connection could not be made to "+app.ip+":"+app.port);
+				Log.e(TAG,"Connection could not be made to "+app.ip+":"+app.port);
 				return;
 			}
 			
@@ -174,12 +220,12 @@ public class QNetSvc extends Service {
 			try {
 				wrp = new WorkdayWrapperImpl(conn,QTUlist);
 			} catch (NotActiveException e) {
-				Log.e("Background Svc","connection not active while creating new WorkdayWrapperImpl.");
+				Log.e(TAG,"connection not active while creating new WorkdayWrapperImpl.");
 				return;
 			}
 			
 			if (!wrp.getNewList()) {
-				Log.e("Background Svc","wrapper could not get New List from Server.");
+				Log.e(TAG,"wrapper could not get New List from Server.");
 			}
 			conn.disconnect();
 		}
@@ -198,5 +244,11 @@ public class QNetSvc extends Service {
 			return ret;
 		}
 	}
+	
+	// dont use this
+		@Override
+		public IBinder onBind(Intent arg0) {
+			return null;
+		}
 
 }
