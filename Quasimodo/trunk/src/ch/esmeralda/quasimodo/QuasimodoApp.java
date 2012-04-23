@@ -18,6 +18,7 @@ public class QuasimodoApp extends Application {
 	public int port;
 	
 	public boolean updateBackground;
+	public boolean serviceRunning;
 	
 	//---- get the workday
 	public List<TaskUnit> getWD() {

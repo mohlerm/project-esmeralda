@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,9 +23,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import ch.esmeralda.quasimodo.radiostation.QFileIO;
 import ch.esmeralda.quasimodo.radiostation.RadioStation;
+import ch.esmeralda.quasimodo.svc.QNetSvc;
 
 
 public class SettingsActivity extends Activity{
@@ -48,6 +51,7 @@ public class SettingsActivity extends Activity{
 	// Buttons and Texts
 	private EditText editip;
 	private EditText editport;
+	private ToggleButton notiftgl;
 	
 	// Shared preferences
 	private SharedPreferences settings;
@@ -63,18 +67,25 @@ public class SettingsActivity extends Activity{
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         
+        // ---- app class
         app = (QuasimodoApp) getApplicationContext();
         
+        // ---- shared prefs
         settings = getSharedPreferences(QuasimodoActivity.PREFS_NAME, 0);
         app.ip = settings.getString(SET_IP_KEY, "yet unset");
         app.port = settings.getInt(SET_PORT_KEY, 0);
         
+        // ---- Find IP and Port View
         editip = (EditText) findViewById(R.id.setText_IP);
         editport = (EditText) findViewById(R.id.setText_PORT);
         editip.setText(app.ip);
         editport.setText(Integer.toString(app.port));
         
-        // Radio List
+        // ---- ToggleButton
+        notiftgl = (ToggleButton) findViewById(R.id.notifications_tbtn);
+        notiftgl.setChecked(app.serviceRunning);
+        
+        // ---- Radio List
         RADIO_LIST = new ArrayList<RadioStation>();
         QFileIO.loadRadioList(this, RADIO_LIST, RadioListFilename);
         // add the NEW button
@@ -86,11 +97,24 @@ public class SettingsActivity extends Activity{
         
 	}
 	
+	// ---- Button click Functions / Handlers
+	
 	public void DefaultButtonClick(View v) {
 		showDialog(DIALOG_ASK_DEFAULT);
 	}
 	
 	public void SaveButtonClick(View v) {
+		// Service starten oder stoppen:
+		if (app.serviceRunning != notiftgl.isChecked()) {
+			if (notiftgl.isChecked()) {
+				// start service und zeige Info Dialog
+				startService(new Intent(this, QNetSvc.class));
+			} else {
+				// stop service
+				stopService(new Intent(this, QNetSvc.class));
+			}
+		}
+		
 		// Pr�fe ob IP richtig eingegeben.
 		if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
 			Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
@@ -208,6 +232,7 @@ public class SettingsActivity extends Activity{
 	    				app.port = DefaultPORT;
 	    				editip.setText(app.ip);
 	    		        editport.setText(Integer.toString(app.port));
+	    		        notiftgl.setChecked(false);
     		        // clear Radio List
 	    		        RADIO_LIST.clear();
 	    		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
