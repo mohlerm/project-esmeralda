@@ -34,9 +34,9 @@ public class Main {
 						case 'm': Constants.M = true; break;
 						case 'i': Constants.I = true; break;
 						default:
-							if(DEBUG_FLAG) System.out.println("Unknown option '" + arg +"'");
+							if(DEBUG_FLAG) System.out.println("Unknown option '" + c +"'");
 					}
-				}catch(Exception e){
+				}catch(Exception e){					// we don't care about 
 					if(DEBUG_FLAG) System.out.println("unable to parse option '"+arg+"'");	//probably OutOfBounds
 				}
 			}
@@ -52,19 +52,12 @@ public class Main {
 			cli.start();
 			
 			try {
-				cli.join();
+				cli.join(5000);					// Timeout, kill if it doesn't stop properly
 			} catch (InterruptedException e) {
 				System.out.println("InterruptedException caught, terminating...");
 			}
 			
-			if(Constants.V) System.out.println("exiting...");
-			
-			if(!cli.getCleanShutdownFlag()){
-				System.out.println("CLI hasn't terminated clean, something went wrong...");
-				System.exit(0);
-			}else{
-				System.exit(0);
-			}
+
 		}else{
 			NotreDameInstance ndi = new NotreDameInstance();
 			ndi.start();
@@ -76,12 +69,13 @@ public class Main {
 			
 			if(Constants.V) System.out.println("exiting...");
 			
-			if(!ndi.getCleanShutdownFlag()){
+			if(!ndi.getCleanShutdownFlag()){	
 				System.out.println("CLI hasn't terminated clean, something went wrong...");
 				System.exit(0);
 			}else{
-				System.exit(0);
+				System.exit(0);  // just for safety
 			}
 		}
+		
 	}
 }
