@@ -89,6 +89,7 @@ public final class R {
         public static final int main_add=0x7f04000b;
         public static final int main_emptylist=0x7f04000c;
         public static final int main_update=0x7f04000a;
+        public static final int notifinfo=0x7f04001d;
         public static final int radio_name=0x7f04000d;
         public static final int radio_url=0x7f04000e;
         public static final int radiorow_remove=0x7f04000f;

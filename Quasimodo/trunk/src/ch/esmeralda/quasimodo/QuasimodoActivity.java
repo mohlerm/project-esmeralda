@@ -290,7 +290,7 @@ public class QuasimodoActivity extends Activity {
 				Date starttime = o.getStarttime();
 				Date endtime = new Date();
 				endtime.setTime(starttime.getTime() + o.getDuration());
-				String timestring = new String(String.format("%02d:%02d Uhr - %02d:%02d Uhr",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String sch�n machen entsprechend 01:03 Uhr darstellen.
+				String timestring = new String(String.format("%02d:%02d - %02d:%02d",starttime.getHours(),starttime.getMinutes(),endtime.getHours(),endtime.getMinutes()));  // String sch�n machen entsprechend 01:03 Uhr darstellen.
 				// je nach pause/work einf�llen
 				if (o.getStreamURL().trim().length() > 0) {  // checks if streamURL is not only whitespaces
 					icon.setImageResource(R.drawable.pause);

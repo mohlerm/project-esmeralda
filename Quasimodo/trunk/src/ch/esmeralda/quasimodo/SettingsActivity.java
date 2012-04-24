@@ -44,6 +44,8 @@ public class SettingsActivity extends Activity{
 	private final static int DIALOG_EDIT_RADIO = 1;
 	private final static int DIALOG_CREDITS = 2;
 	private final static int DIALOG_ASK_DEFAULT = 3;
+	private final static int DIALOG_INFO_NOTIF = 4;
+	private final static String SET_FIRSTTIME = "kadjhfiahjsdgfikajhdsgfiaezfbakcfhjv"; 
 	
 	// App
 	private QuasimodoApp app; 
@@ -55,6 +57,7 @@ public class SettingsActivity extends Activity{
 	
 	// Shared preferences
 	private SharedPreferences settings;
+	private boolean firsttime;
 	
 	// Radio ListView / Arrayliste und adapter
 	private ListView radioLV;
@@ -74,6 +77,7 @@ public class SettingsActivity extends Activity{
         settings = getSharedPreferences(QuasimodoActivity.PREFS_NAME, 0);
         app.ip = settings.getString(SET_IP_KEY, "yet unset");
         app.port = settings.getInt(SET_PORT_KEY, 0);
+        firsttime = settings.getBoolean(SET_FIRSTTIME, true);
         
         // ---- Find IP and Port View
         editip = (EditText) findViewById(R.id.setText_IP);
@@ -113,11 +117,15 @@ public class SettingsActivity extends Activity{
 				// stop service
 				stopService(new Intent(this, QNetSvc.class));
 			}
+			if (firsttime) {
+				showDialog(DIALOG_INFO_NOTIF);
+				return;
+			}
 		}
 		
 		// Pr�fe ob IP richtig eingegeben.
 		if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
-			Toast.makeText(getApplicationContext(), "Die IP hat keine korrekte IPv4 Form!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Please enter a correct IP address.", Toast.LENGTH_LONG).show();
 			return;
 		}
 		app.ip = editip.getText().toString();
@@ -125,7 +133,7 @@ public class SettingsActivity extends Activity{
 	// Pr�fe ob Port richtig eingegeben.
 		int tempport = Integer.parseInt(editport.getText().toString());
 		if (tempport < 0 || tempport > 65536) {
-			Toast.makeText(getApplicationContext(), "Der Port ist nicht korrekt gesetzt!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Please set a valid port.", Toast.LENGTH_LONG).show();
 			return;
 		}
 		app.port = tempport;
@@ -137,6 +145,7 @@ public class SettingsActivity extends Activity{
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(SET_IP_KEY,app.ip);
 		editor.putInt(SET_PORT_KEY,app.port);
+		editor.putBoolean(SET_FIRSTTIME, false);
 		editor.commit();
 		setResult(Activity.RESULT_OK, null);
 		finish();
@@ -256,6 +265,16 @@ public class SettingsActivity extends Activity{
                 }
             })
             .create();
+		case DIALOG_INFO_NOTIF:
+			return new AlertDialog.Builder(SettingsActivity.this)
+			.setTitle("Notifications")
+			.setMessage(R.string.notifinfo)
+			.setIcon(R.drawable.icon)
+			.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					// dont do shit
+				}
+			}).create();
 		default:
 			return super.onCreateDialog(id);
 		}
