@@ -1,7 +1,6 @@
 package ch.esmeralda.quasimodo.svc;
 
 import java.io.NotActiveException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,17 +22,20 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
 public class QNetSvc extends Service {
 	
 	// public statics
-	public static final int NOTIF_UPDATE_TIME = 5;
+	public static final int NOTIF_UPDATE_TIME = 60;
 	
 	// private statics
 	private static final String TAG = "Background Service";
+	private static final int MSG_NOTIF_ID = R.id.notifications_tbtn;
 	
 	// Updater stuffs
 	private ScheduledThreadPoolExecutor exec_upd;
@@ -45,6 +47,7 @@ public class QNetSvc extends Service {
 	private Notifier notify;
 	NotificationManager mNotificationManager;
 	private List<Long> allready_notified;
+	private NotifPoster notifposter;
 	
 	// Application
 	private QuasimodoApp app;
@@ -67,6 +70,9 @@ public class QNetSvc extends Service {
 		notify = new Notifier();
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		allready_notified = (List<Long>) new ArrayList<Long>();
+		
+		notifposter = new NotifPoster();
+		
 	}
 
 	@Override
@@ -107,6 +113,17 @@ public class QNetSvc extends Service {
 	// ---- Notification Handler
 	// -----------------------------------------
 	
+	private class NotifPoster extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			if (msg.what == MSG_NOTIF_ID) {
+				mNotificationManager.notify(0, (Notification)msg.obj);
+			} else {
+				super.handleMessage(msg);
+			}
+		}
+	}
+	
 	private class Notifier implements Runnable {
 		public void run() {
 			Thread ntftrd = new NotifScheduler();
@@ -130,6 +147,7 @@ public class QNetSvc extends Service {
 			
 			if (startTime.getHours() >= 23 && startTime.getMinutes() >= 55) {
 				Log.d(TAG,"Service stopping, its the end of the day.");
+				QTUlist.clear();
 				QNetSvc.this.stopSelf();
 			}
 			
@@ -187,7 +205,9 @@ public class QNetSvc extends Service {
 			notification.defaults = Notification.DEFAULT_ALL;
 			notification.flags |= Notification.FLAG_AUTO_CANCEL;  // damit beim klicken auf die Notification die auch verschwindet.
 
-			mNotificationManager.notify(0, notification);
+			Message msg = Message.obtain(notifposter,MSG_NOTIF_ID,notification);
+			long delay = notifDate.getTime()-startTime.getTime();
+			notifposter.sendMessageDelayed(msg,delay);
 		}
 	}
 	
