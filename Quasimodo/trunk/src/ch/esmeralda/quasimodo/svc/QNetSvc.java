@@ -116,15 +116,21 @@ public class QNetSvc extends Service {
 	
 	private class NotifScheduler extends Thread {
 		public void run() {
+			
 			TaskUnit current = null;
-			long startTime = System.currentTimeMillis();
+			Date startTime = new Date(System.currentTimeMillis());
 			synchronized (QTUlist) {
 				for (TaskUnit tu : QTUlist) {
-					if(isWithinRange(tu.getStarttime().getTime(), startTime, NOTIF_UPDATE_TIME*1000)) {
+					if(isWithinRange(tu.getStarttime().getTime(), startTime.getTime(), NOTIF_UPDATE_TIME*1000)) {
 						current=tu;
 						break;
 					}
 				}
+			}
+			
+			if (startTime.getHours() >= 23 && startTime.getMinutes() >= 55) {
+				Log.d(TAG,"Service stopping, its the end of the day.");
+				QNetSvc.this.stopSelf();
 			}
 			
 			if (current == null) {
@@ -138,7 +144,7 @@ public class QNetSvc extends Service {
 			Date notifDate = setHoursMinsToday(current.getStarttime(),startTime);
 			
 			// check ob die Notification in der Vergangenheit liegt
-			if (notifDate.before(new Date(startTime))) {
+			if (notifDate.before(startTime)) {
 				Log.d(TAG,"Got a new Date, but it is in the past.");
 				return;
 			}
@@ -189,8 +195,8 @@ public class QNetSvc extends Service {
 		return ((startTime <= current) && (current < startTime+duration));
 	}
 	
-	private Date setHoursMinsToday(Date input, long today) {
-		Date temp_when = new Date(today);
+	private Date setHoursMinsToday(Date input, Date today) {
+		Date temp_when = new Date(today.getTime());
 		temp_when.setHours(input.getHours());
 		temp_when.setMinutes(input.getMinutes());
 		temp_when.setSeconds(input.getSeconds());
