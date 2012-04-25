@@ -47,6 +47,7 @@ public class QuasimodoActivity extends Activity {
 	private ProgressDialog m_ProgressDialog;
 	private Button addbutton;
 	private Button connectbutton;
+	private Button settingsbutton;
 	private ListView lv_qtu;
 
 	// Data objects
@@ -91,6 +92,10 @@ public class QuasimodoActivity extends Activity {
 		connectbutton = (Button) findViewById(R.id.connectbtn);
 		ConnectListenerClass connectlistener = new ConnectListenerClass();
 		connectbutton.setOnClickListener(connectlistener);
+		
+		settingsbutton = (Button) findViewById(R.id.defaultbtn);
+		DefaultListenerClass deflistener = new DefaultListenerClass();
+		settingsbutton.setOnClickListener(deflistener);
 
 		//---- load previous Settings.
 		settings = getSharedPreferences(PREFS_NAME, 0);
@@ -112,10 +117,8 @@ public class QuasimodoActivity extends Activity {
 		if (!mWifi.isConnected()) {
 			// wifi not connected, show info popup.
 		    showDialog(1);
-		    disableAutoUpdate();
 		} else {
-			// Make Connection
-			connectbutton.performClick();
+			enableAutoUpdate();
 		}
 	}
 	
@@ -127,7 +130,7 @@ public class QuasimodoActivity extends Activity {
 		super.onResume();
 		enableAutoUpdate();
 		executor = new ScheduledThreadPoolExecutor(1);
-		executor.scheduleAtFixedRate(updater, 2, 10, TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(updater, 2, 8, TimeUnit.SECONDS);
 	}
 	
 	@Override
@@ -164,15 +167,16 @@ public class QuasimodoActivity extends Activity {
 	 */
 	private class ConnectListenerClass implements OnClickListener{
 		public void onClick(View v) {
+			final Intent intent = new Intent(QuasimodoActivity.this,SettingsActivity.class);
+			startActivityForResult(intent,1);
 
-			// is the ip correct? if not, set it first in the settings
-			if (!app.ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || app.port < 1 || app.port > 65537) {
-				Toast.makeText(getApplicationContext(), "Please set the right IP and the right port in the Settings before connecting.", Toast.LENGTH_LONG).show();
-				return;
-			}
 
-			Thread connect = new net_DoStuff(false,1); // action 1 = get New Workday List.
-			connect.start();
+		}
+	}
+	
+	private class DefaultListenerClass implements OnClickListener{
+		public void onClick(View v) {
+			showDialog(2);
 		}
 	}
 	
@@ -417,12 +421,12 @@ public class QuasimodoActivity extends Activity {
 	 * Stellt eine Verbinung zum Server her (port/ip);
 	 * @return der verbundene QClient oder null falls die Verbindung nicht klappt.
 	 */
-	private QClient makeConn() {
+	private QClient makeConn(boolean quietmode) {
 		QClient ret = new QClientImpl();
 		try {
 			ret.connect(app.ip, app.port);
 		} catch (UnableToConnectException e) {
-			runOnUiThread(dispFailToast);
+			if (!quietmode) runOnUiThread(dispFailToast);
 			return null;
 		}
 		return ret;
@@ -504,13 +508,12 @@ public class QuasimodoActivity extends Activity {
 		public void run() {
 			if (!quietmode) runOnUiThread(dispPleaseWaitmsg);
 			
-			QClient conn = makeConn();
+			QClient conn = makeConn(quietmode);
 			if (conn == null) {
 				Log.e("QAct net","Connection could not be made to "+app.ip+":"+app.port);
 				m_qtus_local.clear();
 				runOnUiThread(renewList);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
-				disableAutoUpdate();
 				return;
 			}
 			
@@ -519,15 +522,16 @@ public class QuasimodoActivity extends Activity {
 				wrp = new WorkdayWrapperImpl(conn,m_qtus_local);
 			} catch (NotActiveException e) {
 				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
-				runOnUiThread(dispFailToast);
+				if (!quietmode) runOnUiThread(dispFailToast);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
-				disableAutoUpdate();
 				return;
 			}
 			
+			ArrayList<TaskUnit> oldsave = new ArrayList<TaskUnit>(m_qtus_local);
+			
 			switch (action) {
 			case 1: // Get New Workday
-				GetWorkday(wrp);
+				GetWorkday(quietmode,wrp);
 				break;
 			case 2: // Delete TU
 				DeleteTU(wrp,key_to_delete);
@@ -548,16 +552,18 @@ public class QuasimodoActivity extends Activity {
 			
 			conn.disconnect();
 			
-			runOnUiThread(renewList);
+			if (!oldsave.equals(m_qtus_local)) { // update list only if something changed. ############ WORKING
+				runOnUiThread(renewList);
+			}
+			
 			if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
 		}
 		
-		private void GetWorkday(WorkdayWrapperImpl wrp){
+		private void GetWorkday(boolean quietmode, WorkdayWrapperImpl wrp){
 			if (!wrp.getNewList()) {
 				m_qtus_local.clear();
 				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
-				runOnUiThread(dispFailToast);
-				disableAutoUpdate();
+				if (!quietmode) runOnUiThread(dispFailToast);
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
@@ -572,7 +578,6 @@ public class QuasimodoActivity extends Activity {
 				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
 				runOnUiThread(dispFailToast);
-				disableAutoUpdate();
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
@@ -587,7 +592,6 @@ public class QuasimodoActivity extends Activity {
 				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
 				runOnUiThread(dispFailToast);
-				disableAutoUpdate();
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
@@ -602,7 +606,6 @@ public class QuasimodoActivity extends Activity {
 				m_qtus_local.clear();
 				Log.e("QAct net Reset","wrapper could not Reset the Workday.");
 				runOnUiThread(dispFailToast);
-				disableAutoUpdate();
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
@@ -648,7 +651,6 @@ public class QuasimodoActivity extends Activity {
 		}
 	};
 	private void dispFailToast(){
-		disableAutoUpdate();
 		Toast.makeText(this.getApplicationContext(), "Error while talking to server...", Toast.LENGTH_LONG).show();
 	}
 	
@@ -673,7 +675,14 @@ public class QuasimodoActivity extends Activity {
 			startActivityForResult(intent,1);
 			break;
 		case R.id.menu_reset:
-			showDialog(2);
+			// is the ip correct? if not, set it first in the settings
+			if (!app.ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || app.port < 1 || app.port > 65537) {
+				Toast.makeText(getApplicationContext(), "Please set the right IP and the right port in the Settings before connecting.", Toast.LENGTH_LONG).show();
+				break;
+			}
+
+			Thread connect = new net_DoStuff(false,1); // action 1 = get New Workday List.
+			connect.start();
 			break;
 		default:
 		}
