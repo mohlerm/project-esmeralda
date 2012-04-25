@@ -56,8 +56,6 @@ public class Main {
 			} catch (InterruptedException e) {
 				System.out.println("InterruptedException caught, terminating...");
 			}
-			
-
 		}else{
 			NotreDameInstance ndi = new NotreDameInstance();
 			ndi.start();
