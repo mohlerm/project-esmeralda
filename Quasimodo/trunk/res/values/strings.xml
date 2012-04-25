@@ -31,4 +31,5 @@
     <string name="set_notif_tbtn_en">enabled</string>
     <string name="set_notif_desc">Enable Notifications?</string>
     <string name="main_default">Default</string>
+    <string name="notifinfo">You enabled the notifications. When enabled you will get notified about break and worktimes from the last successful update from the server.\nAlso, your data gets updated every five minutes so you will never miss out on something.</string>
 </resources>
