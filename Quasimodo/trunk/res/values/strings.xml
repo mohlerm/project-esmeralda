@@ -11,9 +11,9 @@
     <string name="set_radiostationscolon">RadioStations:</string>
     <string name="set_default">Default Values</string>
     <string name="set_save">Save</string>
-    <string name="main_update">Update</string>
+    <string name="main_update">Settings</string>
     <string name="main_add">Add Element</string>
-    <string name="main_emptylist">There are no items to display.\nPress Menu for more options...</string>
+    <string name="main_emptylist">Not connected to server...\nPress Menu for more options.</string>
     <string name="radio_name">Radio Name</string>
     <string name="radio_url">Radio URL</string>
     <string name="radiorow_remove">edit</string>
@@ -30,5 +30,5 @@
     <string name="set_notif_tbtn_dis">disabled</string>
     <string name="set_notif_tbtn_en">enabled</string>
     <string name="set_notif_desc">Enable Notifications?</string>
-    <string name="notifinfo">You enabled the notifications. When enabled you will get notified about break and worktimes from the last successful update from the server.\nAlso, your data gets updated every five minutes so you will never miss out on something.</string>
+    <string name="main_default">Default</string>
 </resources>

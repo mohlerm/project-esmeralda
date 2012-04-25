@@ -25,6 +25,14 @@
             android:layout_height="wrap_content"
             android:text="@string/main_update"
             android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/defaultbtn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/main_default" />
+
         <Button
             android:id="@+id/addbtn"
             android:layout_width="fill_parent"

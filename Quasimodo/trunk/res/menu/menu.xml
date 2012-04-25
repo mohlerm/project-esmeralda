@@ -3,7 +3,7 @@
 	<item
 	    android:id="@+id/menu_exit"
 	    android:title="Exit" />
-	<item android:id="@+id/menu_reset" android:title="Reset Workday" />
+	<item android:id="@+id/menu_reset" android:title="Connect" />
 	<item
 	    android:id="@+id/menu_settings"
 	    android:title="Settings" />
