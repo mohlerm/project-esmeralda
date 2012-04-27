@@ -97,6 +97,13 @@ public class SettingsActivity extends Activity{
      		adder.newtag = true;
      		RADIO_LIST.add(adder);
         radioLV = (ListView) findViewById(R.id.RadioStationsLV);
+        
+        // set default values after installation
+        if (app.port == 0) {
+        	setDefault();
+        	editip.setText("your server IP");
+        }
+        
         reinit_RadioList();
         
 	}
@@ -119,6 +126,7 @@ public class SettingsActivity extends Activity{
 			}
 			if (firsttime) {
 				showDialog(DIALOG_INFO_NOTIF);
+				firsttime = false;
 				return;
 			}
 		}
@@ -236,26 +244,7 @@ public class SettingsActivity extends Activity{
             .setTitle("Set default?")
             .setPositiveButton("Yes!", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-        			// default ip and port
-	    				app.ip = DefaultIP;
-	    				app.port = DefaultPORT;
-	    				editip.setText(app.ip);
-	    		        editport.setText(Integer.toString(app.port));
-	    		        notiftgl.setChecked(false);
-    		        // clear Radio List
-	    		        RADIO_LIST.clear();
-	    		        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
-	    		        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
-	    		        RADIO_LIST.add(new RadioStation("DI Vocal Trance","http://u11aw.di.fm:80/di_vocaltrance"));
-	    		        RADIO_LIST.add(new RadioStation("DI Chillout","http://u11aw.di.fm:80/di_chillout"));
-	    		        RADIO_LIST.add(new RadioStation("DI Lounge","http://u11aw.di.fm:80/di_lounge"));
-	    		        RADIO_LIST.add(new RadioStation("DI Classic Eurodance","http://u11aw.di.fm:80/di_classiceurodance"));
-	    		        RADIO_LIST.add(new RadioStation("DI Disco House","http://u11aw.di.fm:80/di_discohouse"));
-	    		        RADIO_LIST.add(new RadioStation("DI Drum n Bass","http://u11aw.di.fm:80/di_drumandbass"));
-    		        // add the last button
-    			        RadioStation adder = new RadioStation("","New Radio...");
-    		     		adder.newtag = true;
-    		     		RADIO_LIST.add(adder);
+        			setDefault();
     	     		reinit_RadioList();
                 }
             })
@@ -363,10 +352,35 @@ public class SettingsActivity extends Activity{
 			
 	}
 	
+	// ----  Helpers
+	
 	private void hidekeyboard(View v) {
 		InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
         if (v != null) 
         	inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+	}
+	
+	public void setDefault() {
+		// default ip and port
+		app.ip = DefaultIP;
+		app.port = DefaultPORT;
+		editip.setText(app.ip);
+        editport.setText(Integer.toString(app.port));
+        notiftgl.setChecked(false);
+    // clear Radio List
+        RADIO_LIST.clear();
+        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
+        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
+        RADIO_LIST.add(new RadioStation("DI Vocal Trance","http://u11aw.di.fm:80/di_vocaltrance"));
+        RADIO_LIST.add(new RadioStation("DI Chillout","http://u11aw.di.fm:80/di_chillout"));
+        RADIO_LIST.add(new RadioStation("DI Lounge","http://u11aw.di.fm:80/di_lounge"));
+        RADIO_LIST.add(new RadioStation("DI Classic Eurodance","http://u11aw.di.fm:80/di_classiceurodance"));
+        RADIO_LIST.add(new RadioStation("DI Disco House","http://u11aw.di.fm:80/di_discohouse"));
+        RADIO_LIST.add(new RadioStation("DI Drum n Bass","http://u11aw.di.fm:80/di_drumandbass"));
+    // add the last button
+        RadioStation adder = new RadioStation("","New Radio...");
+ 		adder.newtag = true;
+ 		RADIO_LIST.add(adder);
 	}
 	
 }
