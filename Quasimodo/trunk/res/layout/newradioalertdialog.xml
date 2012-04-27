@@ -27,7 +27,7 @@
         android:layout_marginRight="20dip"
         android:text="@string/radio_name"
         android:gravity="left"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:hint="@string/radio_name" />
 
     <EditText
         android:id="@+id/radioname_edit"
@@ -48,7 +48,7 @@
         android:layout_marginRight="20dip"
         android:text="@string/radio_url"
         android:gravity="left"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:hint="@string/radio_url" />
 
     <EditText
         android:id="@+id/radiourl_edit"

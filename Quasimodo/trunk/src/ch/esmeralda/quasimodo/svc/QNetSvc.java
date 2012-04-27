@@ -126,14 +126,6 @@ public class QNetSvc extends Service {
 	
 	private class Notifier implements Runnable {
 		public void run() {
-			Thread ntftrd = new NotifScheduler();
-			ntftrd.start();
-		}
-	}
-	
-	private class NotifScheduler extends Thread {
-		public void run() {
-			
 			TaskUnit current = null;
 			Date startTime = new Date(System.currentTimeMillis());
 			synchronized (QTUlist) {
@@ -185,8 +177,8 @@ public class QNetSvc extends Service {
 			
 			if (current.getStreamURL().trim().length() > 0) // pause
 			{
-				tickerText = "Pause fängt an!";
-				titleText = "Pause fängt an!";
+				tickerText = "Pause faengt an!";
+				titleText = "Pause faengt an!";
 				bodyText = "Stream: "+current.getStreamURL();
 			} else {
 				tickerText = "An die Arbeit!";

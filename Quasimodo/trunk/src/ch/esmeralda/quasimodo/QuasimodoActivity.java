@@ -1,3 +1,8 @@
+/*
+ * TODO: Action Bar
+ * TODO: Projekt auf Android 4 umschnallen.
+ */
+
 package ch.esmeralda.quasimodo;
 
 import java.io.NotActiveException;
