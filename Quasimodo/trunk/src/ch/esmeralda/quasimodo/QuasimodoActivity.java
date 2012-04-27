@@ -49,6 +49,7 @@ public class QuasimodoActivity extends Activity {
 	private Button connectbutton;
 	private Button settingsbutton;
 	private ListView lv_qtu;
+	private TextView updateerrtxt;
 
 	// Data objects
 	private List<TaskUnit> m_qtus_local;
@@ -96,6 +97,8 @@ public class QuasimodoActivity extends Activity {
 		settingsbutton = (Button) findViewById(R.id.defaultbtn);
 		DefaultListenerClass deflistener = new DefaultListenerClass();
 		settingsbutton.setOnClickListener(deflistener);
+		
+		updateerrtxt = (TextView) findViewById(R.id.UpdateErrorText);
 
 		//---- load previous Settings.
 		settings = getSharedPreferences(PREFS_NAME, 0);
@@ -130,7 +133,7 @@ public class QuasimodoActivity extends Activity {
 		super.onResume();
 		enableAutoUpdate();
 		executor = new ScheduledThreadPoolExecutor(1);
-		executor.scheduleAtFixedRate(updater, 2, 8, TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(updater, 2, 4, TimeUnit.SECONDS);
 	}
 	
 	@Override
@@ -147,6 +150,22 @@ public class QuasimodoActivity extends Activity {
 	
 	public void enableAutoUpdate() {
 		updateable = true;
+	}
+	
+	private void setUpdateErr() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				updateerrtxt.setTextAppearance(QuasimodoActivity.this, R.style.RedText);
+			}
+		});
+	}
+	
+	private void clearUpdateErr() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				updateerrtxt.setTextAppearance(QuasimodoActivity.this, R.style.TransparentText);
+			}
+		});
 	}
 	
 	// ----------------------- Buttons
@@ -169,8 +188,6 @@ public class QuasimodoActivity extends Activity {
 		public void onClick(View v) {
 			final Intent intent = new Intent(QuasimodoActivity.this,SettingsActivity.class);
 			startActivityForResult(intent,1);
-
-
 		}
 	}
 	
@@ -511,23 +528,22 @@ public class QuasimodoActivity extends Activity {
 			QClient conn = makeConn(quietmode);
 			if (conn == null) {
 				Log.e("QAct net","Connection could not be made to "+app.ip+":"+app.port);
-				m_qtus_local.clear();
-				runOnUiThread(renewList);
+				setUpdateErr();
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
 				return;
 			}
 			
+			ArrayList<TaskUnit> oldsave = new ArrayList<TaskUnit>(m_qtus_local);
+			
 			WorkdayWrapperImpl wrp;
 			try {
-				wrp = new WorkdayWrapperImpl(conn,m_qtus_local);
+				wrp = new WorkdayWrapperImpl(conn,oldsave);
 			} catch (NotActiveException e) {
 				Log.e("QAct net","connection not active while creating new WorkdayWrapperImpl.");
 				if (!quietmode) runOnUiThread(dispFailToast);
 				if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
 				return;
 			}
-			
-			ArrayList<TaskUnit> oldsave = new ArrayList<TaskUnit>(m_qtus_local);
 			
 			switch (action) {
 			case 1: // Get New Workday
@@ -552,8 +568,13 @@ public class QuasimodoActivity extends Activity {
 			
 			conn.disconnect();
 			
-			if (!oldsave.equals(m_qtus_local)) { // update list only if something changed. ############ WORKING
+			if (!ListsEqual(oldsave, m_qtus_local)) { // update local list only if something changed.
+				m_qtus_local.clear();
+				m_qtus_local.addAll(oldsave);
 				runOnUiThread(renewList);
+			} else {
+				Log.d("QAct net","Old and new List are the same.");
+				clearUpdateErr();
 			}
 			
 			if (!quietmode) runOnUiThread(dismissPleaseWaitmsg);
@@ -561,13 +582,13 @@ public class QuasimodoActivity extends Activity {
 		
 		private void GetWorkday(boolean quietmode, WorkdayWrapperImpl wrp){
 			if (!wrp.getNewList()) {
-				m_qtus_local.clear();
 				Log.e("QAct net getNewList","wrapper could not get New List from Server.");
+				setUpdateErr();
 				if (!quietmode) runOnUiThread(dispFailToast);
 			} else {
-				synchronized (m_qtus_global) {
+				synchronized (m_qtus_global) {  // update global list for service immediately, local list will get updated later on.
 					m_qtus_global.clear();
-					m_qtus_global.addAll(m_qtus_local);
+					m_qtus_global.addAll(wrp.getList());
 				}
 				enableAutoUpdate();
 			}
@@ -575,13 +596,12 @@ public class QuasimodoActivity extends Activity {
 		
 		private void DeleteTU(WorkdayWrapperImpl wrp, long key){
 			if (!wrp.removeUnitByKey(key)) {
-				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not delete the TU.");
 				runOnUiThread(dispFailToast);
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
-					m_qtus_global.addAll(m_qtus_local);
+					m_qtus_global.addAll(wrp.getList());
 				}
 				enableAutoUpdate();
 			}
@@ -589,13 +609,12 @@ public class QuasimodoActivity extends Activity {
 		
 		private void AddTU(WorkdayWrapperImpl wrp, Date strt, long dur, String URL) {
 			if (!wrp.addUnit(strt, dur, URL)) {
-				m_qtus_local.clear();
 				Log.e("QAct net deleteTU","wrapper could not add a new TU.");
 				runOnUiThread(dispFailToast);
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
-					m_qtus_global.addAll(m_qtus_local);
+					m_qtus_global.addAll(wrp.getList());
 				}
 				enableAutoUpdate();
 			}
@@ -603,16 +622,31 @@ public class QuasimodoActivity extends Activity {
 		
 		private void Reset(WorkdayWrapperImpl wrp, int minutes) {
 			if (!wrp.reset(minutes)) {
-				m_qtus_local.clear();
 				Log.e("QAct net Reset","wrapper could not Reset the Workday.");
 				runOnUiThread(dispFailToast);
 			} else {
 				synchronized (m_qtus_global) {
 					m_qtus_global.clear();
-					m_qtus_global.addAll(m_qtus_local);
+					m_qtus_global.addAll(wrp.getList());
 				}
 				enableAutoUpdate();
 			}
+		}
+		
+		private boolean ListsEqual(List<TaskUnit> p, List<TaskUnit> q) {
+			if (p.size() == q.size()) {
+				ArrayList<Long> keys = new ArrayList<Long>();
+				for (TaskUnit tu : p)
+					keys.add(tu.getKey());
+				for (TaskUnit tu : q)  {
+					if (keys.contains(tu.getKey()))
+						keys.remove(tu.getKey());
+				}
+				return keys.isEmpty();
+			} else {
+				return false;
+			}
+			
 		}
 	}
 	
@@ -638,6 +672,7 @@ public class QuasimodoActivity extends Activity {
 	// UI THREAD!
 	private Runnable renewList = new Runnable(){
 		public void run() {
+			clearUpdateErr();
 			m_adapter = new TUAdapter(getApplicationContext(), R.layout.row, m_qtus_local);
 			lv_qtu.setAdapter(m_adapter);
 		}
@@ -648,6 +683,7 @@ public class QuasimodoActivity extends Activity {
 	private Runnable dispFailToast = new Runnable(){
 		public void run() {
 			dispFailToast();
+			setUpdateErr();
 		}
 	};
 	private void dispFailToast(){
