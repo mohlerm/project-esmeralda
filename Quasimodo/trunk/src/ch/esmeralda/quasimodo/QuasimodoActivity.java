@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -104,6 +105,7 @@ public class QuasimodoActivity extends Activity {
 		settingsbutton.setOnClickListener(deflistener);
 		
 		updateerrtxt = (TextView) findViewById(R.id.UpdateErrorText);
+		updateerrtxt.setTextAppearance(this, R.style.TransparentText);
 
 		//---- load previous Settings.
 		settings = getSharedPreferences(PREFS_NAME, 0);
@@ -184,6 +186,7 @@ public class QuasimodoActivity extends Activity {
 			startedit(0,0,true);
 		}
 	}
+	
 
 	/**
 	 * What happens when the "Connect" button gets clicked?
@@ -708,8 +711,8 @@ public class QuasimodoActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_exit:
-			finish();
+		case R.id.menu_add:
+			startedit(0,0,true);
 			break;
 		case R.id.menu_settings:
 			final Intent intent = new Intent(this,SettingsActivity.class);

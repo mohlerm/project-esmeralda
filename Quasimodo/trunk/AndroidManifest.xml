@@ -10,8 +10,9 @@
     
 
     <application android:icon="@drawable/icon" android:label="@string/app_name"
-                android:theme="@android:style/Theme.Light"
-                android:name="ch.esmeralda.quasimodo.QuasimodoApp" >>
+                android:theme="@android:style/Theme.Holo.Light"
+                android:name="ch.esmeralda.quasimodo.QuasimodoApp"
+                android:uiOptions="splitActionBarWhenNarrow" >
         <activity android:name=".QuasimodoActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="portrait">
