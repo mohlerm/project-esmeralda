@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -16,6 +19,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.quasimodo.radiostation.QFileIO;
 import ch.esmeralda.quasimodo.radiostation.RadioStation;
@@ -244,6 +248,29 @@ public class editActivity extends Activity implements OnClickListener{
 			semaphore = 0;
 		}
 	};
+	
+	// ------------------------- Menu Funktionalit�t
+
+		@Override
+		public boolean onCreateOptionsMenu(Menu menu) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate(R.menu.editmenu, menu);
+			return true;
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+			case R.id.editmenu_delete:
+				//delete()
+				break;
+			case R.id.editmenu_done:
+				//done()
+				break;
+			default:
+			}
+			return true;
+		}
 	
 	
 	/**
