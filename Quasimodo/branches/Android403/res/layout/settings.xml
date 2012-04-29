@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1" >
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/set_title"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/creditsbtn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:text="@string/set_credits"
+            android:onClick="CreditsButtonClick" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/second"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/top" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:layout_weight="5"
+            android:text="@string/set_ip" />
+        
+        <!--  dummy layout damit das editText keinen focus bekommt. -->
+
+        <EditText
+            android:id="@+id/setText_IP"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:selectAllOnFocus="true"
+            android:hint="@string/set_ip"
+            android:nextFocusUp="@id/setText_IP"
+            android:nextFocusLeft="@id/setText_IP"
+            android:layout_marginRight="5dip" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/third"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/second"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:layout_weight="5"
+            android:text="@string/set_port" />
+
+        <EditText
+            android:id="@+id/setText_PORT"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:selectAllOnFocus="true"
+            android:layout_marginRight="5dip" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/thirdandhalf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/third"
+        android:layout_marginTop="5dip"
+        android:orientation="vertical" >
+        
+        <View android:layout_width="310dip"
+			  android:layout_gravity="center"
+			  android:layout_height="1dip"
+			  android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" 
+            android:layout_marginTop="5dip">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="5dip"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/set_notif_desc" />
+
+            <ToggleButton
+                android:id="@+id/notifications_tbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textOff="@string/set_notif_tbtn_dis"
+                android:textOn="@string/set_notif_tbtn_en"
+                android:layout_marginRight="5dip" />
+
+        </LinearLayout>
+        
+         <View android:layout_width="310dip"
+			  android:layout_height="1dip"
+			  android:layout_marginTop="5dip"
+			  android:layout_gravity="center"
+			  android:background="?android:attr/listDivider" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/fourth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/thirdandhalf"
+        android:layout_marginTop="5dip"
+        android:gravity="center"
+        android:text="@string/set_radiostationscolon"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <LinearLayout
+        android:id="@+id/fifth"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/sixth"
+        android:layout_below="@+id/fourth"
+        android:orientation="horizontal" >
+
+        <ListView
+            android:id="@+id/RadioStationsLV"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+        </ListView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sixth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="5dip"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/set_defaultbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="DefaultButtonClick"
+                android:text="@string/set_default" />
+
+            <Button
+                android:id="@+id/set_savebtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="SaveButtonClick"
+                android:text="@string/set_save" />
+
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
