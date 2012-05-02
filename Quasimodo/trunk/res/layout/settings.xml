@@ -28,7 +28,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:text="@string/set_credits"
             android:onClick="CreditsButtonClick" />
 
@@ -148,7 +148,6 @@
         android:id="@+id/fifth"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/sixth"
         android:layout_below="@+id/fourth"
         android:orientation="horizontal" >
 
@@ -158,36 +157,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" >
         </ListView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/sixth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="5dip"
-        android:orientation="vertical" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <Button
-                android:id="@+id/set_defaultbtn"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="DefaultButtonClick"
-                android:text="@string/set_default" />
-
-            <Button
-                android:id="@+id/set_savebtn"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="SaveButtonClick"
-                android:text="@string/set_save" />
-
-        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

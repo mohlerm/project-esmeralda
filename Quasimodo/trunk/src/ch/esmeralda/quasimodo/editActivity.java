@@ -26,9 +26,6 @@ import ch.esmeralda.quasimodo.radiostation.RadioStation;
 
 public class editActivity extends Activity implements OnClickListener{
 	
-	Button donebtn;
-	Button deletebtn;
-	
 	Button workbtn;
 	Button breakbtn;
 	
@@ -59,8 +56,6 @@ public class editActivity extends Activity implements OnClickListener{
 	        QFileIO.loadRadioList(this, (List<RadioStation>)Radio_List, SettingsActivity.RadioListFilename);
 	        
         // find Views and make objects.
-	        donebtn = (Button) findViewById(R.id.edit_donebtn);
-	        deletebtn = (Button) findViewById(R.id.edit_deletebtn);
 	        workbtn = (Button) findViewById(R.id.edit_workTU);
 	        breakbtn = (Button) findViewById(R.id.edit_breakTU);
         
@@ -76,8 +71,6 @@ public class editActivity extends Activity implements OnClickListener{
 	        radiospinner.setAdapter(spinnerArrayAdapter);
         
         // set further View settings.
-	        donebtn.setOnClickListener(this);
-	        deletebtn.setOnClickListener(this);
 	        workbtn.setOnClickListener(this);
 	        breakbtn.setOnClickListener(this);
         
@@ -159,8 +152,6 @@ public class editActivity extends Activity implements OnClickListener{
 	        if (justnew){
 	        	TextView title = (TextView) findViewById(R.id.titlebar);
 	        	title.setText("Add TaskUnit");
-	        	deletebtn.setTextColor(Color.GRAY);
-	        	deletebtn.setClickable(false);
 	        	setToWork();
 	        }
 	}
@@ -171,34 +162,7 @@ public class editActivity extends Activity implements OnClickListener{
 	 * edit und delete button closen diese activity und geben Resultate an Quasimodo activity zur�ck.
 	 */
 	public void onClick(View v) {
-		if (v.getId() == R.id.edit_donebtn){
-			// neue Date objekte erstellen und duration berechnen
-				Date start = makeTodayDate(StartTP.getCurrentHour(),StartTP.getCurrentMinute());
-				Date end = makeTodayDate(EndTP.getCurrentHour(),EndTP.getCurrentMinute());
-				long duration = end.getTime()-start.getTime();
-			//  return TU ausf�llen
-				String streamURL = "lol";
-				if (isworkTU) {
-					streamURL = "";
-				} else {
-					streamURL = Radio_List.get(radiospinner.getSelectedItemPosition()).url;
-				}
-				TaskUnit retTU = new TaskUnit(start,duration,streamURL);
-			// Intent erstellen und zur�ckgeben und activity beenden.
-				Intent backintent = new Intent();
-				backintent.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
-				backintent.putExtra(QuasimodoActivity.TU_OBJECT_KEY, retTU);
-				backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, false);
-				setResult(Activity.RESULT_OK, backintent);
-				finish();
-		} else if (v.getId() == R.id.edit_deletebtn){
-			// Delete button, einfach delete key setzen und zur�ckgeben.
-				Intent backintent = new Intent();
-				backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, true);
-				backintent.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
-				setResult(Activity.RESULT_OK, backintent);
-				finish();
-		} else if (v.getId() == R.id.edit_workTU) {
+		if (v.getId() == R.id.edit_workTU) {
 			setToWork();
 		} else if (v.getId() == R.id.edit_breakTU) {
 			setToBreak();
@@ -255,17 +219,50 @@ public class editActivity extends Activity implements OnClickListener{
 		public boolean onCreateOptionsMenu(Menu menu) {
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate(R.menu.editmenu, menu);
+			// sorge dafür, dass wir ein mit add kreierten TU nicht löschen können.
+			MenuItem delitem = menu.findItem(R.id.editmenu_delete);
+			if (justnew) {
+				delitem.setEnabled(false);
+				delitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			} else {
+				delitem.setEnabled(true);
+				delitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			return true;
-		}
+		}			
 
 		@Override
 		public boolean onOptionsItemSelected(MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.editmenu_delete:
-				//delete()
+				// Delete button, einfach delete key setzen und zur�ckgeben.
+				Intent backintent = new Intent();
+				backintent.putExtra(QuasimodoActivity.TU_DELETE_KEY, true);
+				backintent.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
+				setResult(Activity.RESULT_OK, backintent);
+				finish();
 				break;
 			case R.id.editmenu_done:
-				//done()
+				// neue Date objekte erstellen und duration berechnen
+				Date start = makeTodayDate(StartTP.getCurrentHour(),StartTP.getCurrentMinute());
+				Date end = makeTodayDate(EndTP.getCurrentHour(),EndTP.getCurrentMinute());
+				long duration = end.getTime()-start.getTime();
+			//  return TU ausf�llen
+				String streamURL = "lol";
+				if (isworkTU) {
+					streamURL = "";
+				} else {
+					streamURL = Radio_List.get(radiospinner.getSelectedItemPosition()).url;
+				}
+				TaskUnit retTU = new TaskUnit(start,duration,streamURL);
+			// Intent erstellen und zur�ckgeben und activity beenden.
+				Intent backintent2 = new Intent();
+				backintent2.putExtra(QuasimodoActivity.TU_NEW_KEY, justnew);
+				backintent2.putExtra(QuasimodoActivity.TU_OBJECT_KEY, retTU);
+				backintent2.putExtra(QuasimodoActivity.TU_DELETE_KEY, false);
+				setResult(Activity.RESULT_OK, backintent2);
+				finish();
 				break;
 			default:
 			}

@@ -1,6 +1,7 @@
 package ch.esmeralda.quasimodo;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +12,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -25,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import ch.esmeralda.DataExchange.TaskUnit;
 import ch.esmeralda.quasimodo.radiostation.QFileIO;
 import ch.esmeralda.quasimodo.radiostation.RadioStation;
 import ch.esmeralda.quasimodo.svc.QNetSvc;
@@ -110,55 +115,6 @@ public class SettingsActivity extends Activity{
 	
 	// ---- Button click Functions / Handlers
 	
-	public void DefaultButtonClick(View v) {
-		showDialog(DIALOG_ASK_DEFAULT);
-	}
-	
-	public void SaveButtonClick(View v) {
-		// Service starten oder stoppen:
-		if (app.serviceRunning != notiftgl.isChecked()) {
-			if (notiftgl.isChecked()) {
-				// start service und zeige Info Dialog
-				startService(new Intent(this, QNetSvc.class));
-			} else {
-				// stop service
-				stopService(new Intent(this, QNetSvc.class));
-			}
-			if (firsttime) {
-				showDialog(DIALOG_INFO_NOTIF);
-				firsttime = false;
-				return;
-			}
-		}
-		
-		// Pr�fe ob IP richtig eingegeben.
-		if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
-			Toast.makeText(getApplicationContext(), "Please enter a correct IP address.", Toast.LENGTH_LONG).show();
-			return;
-		}
-		app.ip = editip.getText().toString();
-		
-	// Pr�fe ob Port richtig eingegeben.
-		int tempport = Integer.parseInt(editport.getText().toString());
-		if (tempport < 0 || tempport > 65536) {
-			Toast.makeText(getApplicationContext(), "Please set a valid port.", Toast.LENGTH_LONG).show();
-			return;
-		}
-		app.port = tempport;
-	
-	// Alles ok, schreibe die Einstellungen und die RadioListe
-		RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
-		QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
-		
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(SET_IP_KEY,app.ip);
-		editor.putInt(SET_PORT_KEY,app.port);
-		editor.putBoolean(SET_FIRSTTIME, false);
-		editor.commit();
-		setResult(Activity.RESULT_OK, null);
-		finish();
-	}
-	
 	public void CreditsButtonClick(View v) {
 		showDialog(DIALOG_CREDITS);
 	}
@@ -198,7 +154,10 @@ public class SettingsActivity extends Activity{
 			// show credits;
 			AlertDialog Credits = new AlertDialog.Builder(this).create();
 			Credits.setTitle("Quasimodo,\nthe Hunchback of NotreDame");
-			Credits.setMessage(getResources().getText(R.string.credits_string));
+			//Credits.setMessage(getResources().getText(R.string.credits_string));
+			LayoutInflater factory2 = LayoutInflater.from(this);
+	        final View creditsview = factory2.inflate(R.layout.creditsview, null);
+	        Credits.setView(creditsview);
 			Credits.setIcon(R.drawable.icon);
 			Credits.setButton("Done", new DialogInterface.OnClickListener() {
 			   public void onClick(DialogInterface dialog, int which) {
@@ -351,6 +310,71 @@ public class SettingsActivity extends Activity{
 		
 			
 	}
+	
+	// ---- Menu / ActionBar
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.settingsmenu, menu);
+		return true;
+	}			
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.setmenu_default:
+			showDialog(DIALOG_ASK_DEFAULT);
+			break;
+		case R.id.setmenu_save:
+			// Service starten oder stoppen:
+			if (app.serviceRunning != notiftgl.isChecked()) {
+				if (notiftgl.isChecked()) {
+					// start service und zeige Info Dialog
+					startService(new Intent(this, QNetSvc.class));
+				} else {
+					// stop service
+					stopService(new Intent(this, QNetSvc.class));
+				}
+				if (firsttime) {
+					showDialog(DIALOG_INFO_NOTIF);
+					firsttime = false;
+					break;
+				}
+			}
+			
+			// Pr�fe ob IP richtig eingegeben.
+			if (!editip.getText().toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
+				Toast.makeText(getApplicationContext(), "Please enter a correct IP address.", Toast.LENGTH_LONG).show();
+				break;
+			}
+			app.ip = editip.getText().toString();
+			
+		// Pr�fe ob Port richtig eingegeben.
+			int tempport = Integer.parseInt(editport.getText().toString());
+			if (tempport < 0 || tempport > 65536) {
+				Toast.makeText(getApplicationContext(), "Please set a valid port.", Toast.LENGTH_LONG).show();
+				break;
+			}
+			app.port = tempport;
+		
+		// Alles ok, schreibe die Einstellungen und die RadioListe
+			RADIO_LIST.remove(RADIO_LIST.size()-1); // remove "add" entry
+			QFileIO.writeRadioList(this, RADIO_LIST, RadioListFilename);
+			
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(SET_IP_KEY,app.ip);
+			editor.putInt(SET_PORT_KEY,app.port);
+			editor.putBoolean(SET_FIRSTTIME, false);
+			editor.commit();
+			setResult(Activity.RESULT_OK, null);
+			finish();
+			break;
+		default:
+		}
+		return true;
+	}
+	
 	
 	// ----  Helpers
 	

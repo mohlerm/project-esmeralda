@@ -51,9 +51,6 @@ public class QuasimodoActivity extends Activity {
 	
 	// Various GUI Objects
 	private ProgressDialog m_ProgressDialog;
-	private Button addbutton;
-	private Button connectbutton;
-	private Button settingsbutton;
 	private ListView lv_qtu;
 	private TextView updateerrtxt;
 
@@ -92,24 +89,17 @@ public class QuasimodoActivity extends Activity {
 		m_qtus_local = (List<TaskUnit>) new ArrayList<TaskUnit>(m_qtus_global);
 
 		//---- get ID's from various gui objects and initialize clickability
-		addbutton = (Button) findViewById(R.id.addbtn);
-		AddListenerClass addlistener = new AddListenerClass();
-		addbutton.setOnClickListener(addlistener);
-
-		connectbutton = (Button) findViewById(R.id.connectbtn);
-		ConnectListenerClass connectlistener = new ConnectListenerClass();
-		connectbutton.setOnClickListener(connectlistener);
-		
-		settingsbutton = (Button) findViewById(R.id.defaultbtn);
-		DefaultListenerClass deflistener = new DefaultListenerClass();
-		settingsbutton.setOnClickListener(deflistener);
-		
 		updateerrtxt = (TextView) findViewById(R.id.UpdateErrorText);
 		updateerrtxt.setTextAppearance(this, R.style.TransparentText);
 
 		//---- load previous Settings.
 		settings = getSharedPreferences(PREFS_NAME, 0);
 		readSettings();
+		
+		//---- Display Info Toast about IP:
+		if (!app.ip.toString().matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")){
+			Toast.makeText(getApplicationContext(), "Don't forget to set the server details in the settings.", Toast.LENGTH_LONG).show();
+		}
 
 		//---- load List and its adapter
 		lv_qtu = (ListView) findViewById(R.id.taskunitlist);
@@ -173,36 +163,6 @@ public class QuasimodoActivity extends Activity {
 				updateerrtxt.setTextAppearance(QuasimodoActivity.this, R.style.TransparentText);
 			}
 		});
-	}
-	
-	// ----------------------- Buttons
-
-	/**
-	 * What happens when the "Add" button gets clicked?
-	 * @author Marco
-	 */
-	private class AddListenerClass implements OnClickListener{
-		public void onClick(View v) {
-			startedit(0,0,true);
-		}
-	}
-	
-
-	/**
-	 * What happens when the "Connect" button gets clicked?
-	 * @author Marco
-	 */
-	private class ConnectListenerClass implements OnClickListener{
-		public void onClick(View v) {
-			final Intent intent = new Intent(QuasimodoActivity.this,SettingsActivity.class);
-			startActivityForResult(intent,1);
-		}
-	}
-	
-	private class DefaultListenerClass implements OnClickListener{
-		public void onClick(View v) {
-			showDialog(2);
-		}
 	}
 	
 	// ----------------------------------- Handle Dialogs
@@ -719,15 +679,7 @@ public class QuasimodoActivity extends Activity {
 			startActivityForResult(intent,1);
 			break;
 		case R.id.menu_reset:
-			// is the ip correct? if not, set it first in the settings
-			if (!app.ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$") || app.port < 1 || app.port > 65537) {
-				Toast.makeText(getApplicationContext(), "Please set the right IP and the right port in the Settings before connecting.", Toast.LENGTH_LONG).show();
-				break;
-			}
-
-			Thread connect = new net_DoStuff(false,1); // action 1 = get New Workday List.
-			connect.start();
-			break;
+			showDialog(2);
 		default:
 		}
 		return true;
