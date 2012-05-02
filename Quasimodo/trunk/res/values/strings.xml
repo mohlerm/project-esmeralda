@@ -2,8 +2,7 @@
 <resources>
     <string name="hello">Quasimodo, The Hunchback of Notre-Dame</string>
     <string name="app_name">Quasimodo</string>
-    <string name="credits_string">Authors:\n~~~~~~~~~~\nMarco Eppenberger:\n - Android GUI\n - Networking\n\nThomas Richner:\n - Streaming\n - Server Backend\n\nSandro Sgier:\n - Networking\n - Server Backend\n\nStefan Mach:\n - Communication\n\nPhilipp Bösch:\n - graphical engineering\n~~~~~~~~~~\n
-</string>
+    <string name="credits_string">Authors:\n~~~~~~~~~~\nMarco Eppenberger:\nAndroid GUI\nNetworking\n\nThomas Richner:\nStreaming\nServer Backend\n\nSandro Sgier:\nNetworking\nServer Backend\n\nStefan Mach:\nCommunication\n\nPhilipp Bösch:\nGraphical engineering\n~~~~~~~~~~\n</string>
     <string name="set_title">Settings</string>
     <string name="set_credits">Credits</string>
     <string name="set_ip">IP</string>
@@ -13,7 +12,7 @@
     <string name="set_save">Save</string>
     <string name="main_update">Settings</string>
     <string name="main_add">Add Element</string>
-    <string name="main_emptylist">List empty.\nServer is not connected or nobody set something yet.</string>
+    <string name="main_emptylist">List empty.\nServer is not connected or nobody scheduled something yet.</string>
     <string name="radio_name">Radio Name</string>
     <string name="radio_url">Radio URL</string>
     <string name="radiorow_remove">edit</string>
@@ -31,6 +30,7 @@
     <string name="set_notif_tbtn_en">enabled</string>
     <string name="set_notif_desc">Enable Notifications?</string>
     <string name="main_default">Default</string>
-    <string name="notifinfo">You enabled the notifications. When enabled you will get notified about break and worktimes from the last successful update from the server.\nAlso, your data gets updated every five minutes so you will never miss out on something.</string>
+    <string name="notifinfo">You enabled the notifications. When enabled you will get notified about breaks and worktimes from the last successful update from the server.\nAlso, your data gets updated every five minutes so you will never miss out on something.</string>
     <string name="UpdateErrorString">List out of date!</string>
+    <string name="main_listinfo">Your scheduled tasks:</string>
 </resources>
