@@ -1,6 +1,9 @@
 
 package ch.esmeralda.notredame.jobs;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 import ch.esmeralda.notredame.main.Constants;
@@ -13,6 +16,7 @@ import javazoom.jl.player.Player;
  *
  */
 public class AthmosStream implements StreamJob{
+	private static final String STARTSOUND_PATH = "bla.mp3";
 	//internal thread that handles the player, because player is blocking
     private class PlaySound extends Thread{
     	private String urlString;
@@ -21,8 +25,21 @@ public class AthmosStream implements StreamJob{
     	}
         public void run() {
             try {
-            	URL url = new URL(urlString);
-                player = new Player(url.openStream());
+            	
+            	if(urlString.equals("")){
+	    			try {
+	    				BufferedInputStream bis = new BufferedInputStream(new FileInputStream("STARTSOUND_PATH"));
+	    				player = new Player(bis);
+	    			} catch (FileNotFoundException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
+            	}else{
+            		URL url = new URL(urlString);
+            		player = new Player(url.openStream());
+            	}
+            	
+                
                 player.play(); }
             catch (Exception e) {}
         }
@@ -36,8 +53,10 @@ public class AthmosStream implements StreamJob{
 	}
 	
 	public void startStream(String urlString) {
-		if(Constants.V) System.out.println("starting Stream");
+		if(Constants.V) System.out.println("starting Stream " + urlString);
+		
 		playSound = new PlaySound(urlString);	//create a new Player thread
+
         playSound.start();						//start the thread
 	}
 
