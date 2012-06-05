@@ -305,10 +305,10 @@ public class editActivity extends Activity implements OnClickListener{
 	 * @param url
 	 * @return the last part of the url
 	 */
-	private String getStreamName(String url) {
+	static public String getStreamName(String url) {
 		int lastslash = url.lastIndexOf("/");
 		if (lastslash >= url.length()-2)
-			return "Stream";
+			return "Some Stream...";
 		return url.substring(lastslash+1);
 	}
 }

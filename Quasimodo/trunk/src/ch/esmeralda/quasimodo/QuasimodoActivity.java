@@ -285,7 +285,7 @@ public class QuasimodoActivity extends Activity {
 					icon.setImageResource(R.drawable.pause);
 					if (tt != null) { tt.setText(timestring); }
 					if(bt != null) { 
-						bt.setText(o.getStreamURL());
+						bt.setText(editActivity.getStreamName(o.getStreamURL()));
 						bt.setVisibility(View.VISIBLE);
 					}
 				} else {
