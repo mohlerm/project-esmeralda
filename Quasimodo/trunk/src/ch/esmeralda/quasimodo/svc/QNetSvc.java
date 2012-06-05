@@ -31,7 +31,7 @@ import android.widget.Toast;
 public class QNetSvc extends Service {
 	
 	// public statics
-	public static final int NOTIF_UPDATE_TIME = 60;
+	public static final int NOTIF_UPDATE_TIME = 10;
 	
 	// private statics
 	private static final String TAG = "Background Service";
@@ -117,6 +117,7 @@ public class QNetSvc extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == MSG_NOTIF_ID) {
+				Log.d(TAG, "Notify user: "+((Notification)msg.obj).toString());
 				mNotificationManager.notify(0, (Notification)msg.obj);
 			} else {
 				super.handleMessage(msg);
