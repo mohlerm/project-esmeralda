@@ -34,7 +34,7 @@ public class QFileIO {
 			try {
 				// Macht eine neue Datei wenn die App das erste Mal gestartet wurde.
 				fos_rl = act.openFileOutput(filename,Context.MODE_PRIVATE);
-				fos_rl.write("DI Trance\nhttp://u11aw.di.fm:80/di_trance\nDI Eurodance\nhttp://u11aw.di.fm:80/di_eurodance\n".getBytes());
+				fos_rl.write("DI Trance\nhttp://pub3.di.fm:80/di_trance\nDI Eurodance\nhttp://pub3.di.fm:80/di_eurodance\n".getBytes());
 				fos_rl.close();
 				fis_rl = act.openFileInput(filename);
 			} catch (IOException e1) {

@@ -393,14 +393,14 @@ public class SettingsActivity extends Activity{
         notiftgl.setChecked(false);
     // clear Radio List
         RADIO_LIST.clear();
-        RADIO_LIST.add(new RadioStation("DI Trance","http://u11aw.di.fm:80/di_trance"));
-        RADIO_LIST.add(new RadioStation("DI Eurodance","http://u11aw.di.fm:80/di_eurodance"));
-        RADIO_LIST.add(new RadioStation("DI Vocal Trance","http://u11aw.di.fm:80/di_vocaltrance"));
-        RADIO_LIST.add(new RadioStation("DI Chillout","http://u11aw.di.fm:80/di_chillout"));
-        RADIO_LIST.add(new RadioStation("DI Lounge","http://u11aw.di.fm:80/di_lounge"));
-        RADIO_LIST.add(new RadioStation("DI Classic Eurodance","http://u11aw.di.fm:80/di_classiceurodance"));
-        RADIO_LIST.add(new RadioStation("DI Disco House","http://u11aw.di.fm:80/di_discohouse"));
-        RADIO_LIST.add(new RadioStation("DI Drum n Bass","http://u11aw.di.fm:80/di_drumandbass"));
+        RADIO_LIST.add(new RadioStation("DI Trance","http://pub3.di.fm:80/di_trance"));
+        RADIO_LIST.add(new RadioStation("DI Eurodance","http://pub3.di.fm:80/di_eurodance"));
+        RADIO_LIST.add(new RadioStation("DI Vocal Trance","http://pub3.di.fm:80/di_vocaltrance"));
+        RADIO_LIST.add(new RadioStation("DI Chillout","http://pub3.di.fm:80/di_chillout"));
+        RADIO_LIST.add(new RadioStation("DI Lounge","http://pub3.di.fm:80/di_lounge"));
+        RADIO_LIST.add(new RadioStation("DI Classic Eurodance","http://pub3.di.fm:80/di_classiceurodance"));
+        RADIO_LIST.add(new RadioStation("DI Disco House","http://pub3.di.fm:80/di_discohouse"));
+        RADIO_LIST.add(new RadioStation("DI Drum n Bass","http://pub3.di.fm:80/di_drumandbass"));
     // add the last button
         RadioStation adder = new RadioStation("","New Radio...");
  		adder.newtag = true;
