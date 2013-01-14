@@ -3,9 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_weight="1" >
-
+    android:layout_height="match_parent" >
+    
     <LinearLayout
         android:id="@+id/top"
         android:layout_width="match_parent"
@@ -86,7 +85,8 @@
             android:selectAllOnFocus="true"
             android:layout_marginRight="5dip" />
     </LinearLayout>
-
+    
+    
     <LinearLayout
         android:id="@+id/thirdandhalf"
         android:layout_width="match_parent"
@@ -104,7 +104,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" 
             android:layout_marginTop="5dip">
-
+            
+            
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
