@@ -36,7 +36,7 @@ public class Minions {
 		//today at midnight
 		long a = System.currentTimeMillis();
 		a = a-a%(1000*3600*24);
-		long start = a + minutes*60*1000-(TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
+		long start = a + minutes*60*1000-TimeZone.getDefault().getDSTSavings(); // -(TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset())
 		
 		
 		
@@ -70,10 +70,10 @@ public class Minions {
 		workday.addUnit(task);
 		start += 45*60*1000;
 		
-		task = new TaskUnit(new Date(start), 60*60*1000, Constants.DI_TRANCE);		
+		task = new TaskUnit(new Date(start), 90*60*1000, Constants.DI_TRANCE);		
 		task.setDescription("supper");
 		workday.addUnit(task);
-		start += 60*60*1000;
+		start += 90*60*1000;
 		
 		task = new TaskUnit(new Date(start), 75*60*1000, "");
 		task.setDescription("Work1");

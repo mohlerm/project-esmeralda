@@ -16,7 +16,7 @@ import javazoom.jl.player.Player;
  *
  */
 public class AthmosStream implements StreamJob{
-	private static final String STARTSOUND_PATH = "bla.mp3";
+	private static final String STARTSOUND_PATH = "Soviet_Anthem_Instrumental_1955.mp3";
 	//internal thread that handles the player, because player is blocking
     private class PlaySound extends Thread{
     	private String urlString;
@@ -28,7 +28,7 @@ public class AthmosStream implements StreamJob{
             	
             	if(urlString.equals("")){
 	    			try {
-	    				BufferedInputStream bis = new BufferedInputStream(new FileInputStream("STARTSOUND_PATH"));
+	    				BufferedInputStream bis = new BufferedInputStream(new FileInputStream(STARTSOUND_PATH));
 	    				player = new Player(bis);
 	    			} catch (FileNotFoundException e) {
 	    				// TODO Auto-generated catch block
