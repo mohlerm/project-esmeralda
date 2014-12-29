@@ -1,0 +1,10 @@
+<project default="compile">
+    <target name="compile">
+        <mkdir dir="bin"/>
+        <javac srcdir="src" destdir="bin">
+		<classpath>
+			<pathelement path="./jl1.0.1.jar"/>
+		</classpath>
+	</javac>
+    </target>
+</project>
